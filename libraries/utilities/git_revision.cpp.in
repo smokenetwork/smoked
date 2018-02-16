@@ -1,0 +1,18 @@
+#include <stdint.h>
+#include <graphene/utilities/git_revision.hpp>
+
+//#define GRAPHENE_GIT_REVISION_SHA "@GRAPHENE_GIT_REVISION_SHA@"
+//#define GRAPHENE_GIT_REVISION_UNIX_TIMESTAMP @GRAPHENE_GIT_REVISION_UNIX_TIMESTAMP@
+//#define GRAPHENE_GIT_REVISION_DESCRIPTION "@GRAPHENE_GIT_REVISION_DESCRIPTION@"
+
+#define GRAPHENE_GIT_REVISION_SHA "bd1a255b8399a35acd2b083b7cd5cbb52394253f"
+#define GRAPHENE_GIT_REVISION_UNIX_TIMESTAMP 1518719544
+#define GRAPHENE_GIT_REVISION_DESCRIPTION "v0.19.1-97-gbd1a255b"
+
+namespace graphene { namespace utilities {
+
+const char* const git_revision_sha = GRAPHENE_GIT_REVISION_SHA;
+const uint32_t git_revision_unix_timestamp = GRAPHENE_GIT_REVISION_UNIX_TIMESTAMP;
+const char* const git_revision_description = GRAPHENE_GIT_REVISION_DESCRIPTION;
+
+} } // end namespace graphene::utilities
