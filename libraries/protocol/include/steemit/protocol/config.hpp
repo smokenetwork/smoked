@@ -44,11 +44,9 @@
 #define STEEMIT_OWNER_AUTH_HISTORY_TRACKING_START_BLOCK_NUM 1
 #else // IS LIVE STEEM NETWORK
 
-//#define STEEMIT_INIT_PUBLIC_KEY_STR             "STM8GC13uCZbP44HzMLV6zPZGwVQ8Nt4Kji8PapsPiNq1BK153XTX"
-//#define STEEMIT_INIT_PUBLIC_KEY_STR             "STM6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4"
 #define STEEMIT_INIT_PUBLIC_KEY_STR             "SMK6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4"
 //#define STEEMIT_CHAIN_ID                        (steemit::protocol::chain_id_type())
-#define STEEMIT_CHAIN_ID                        (fc::sha256::hash("smoke")) // 3b9a062c4c1f4338f6932ec8bfc083d99369df7479467bbab1811976181b0daf
+#define STEEMIT_CHAIN_ID                        (fc::sha256::hash("smoke")) // a66e00caa50e6817bbe24e927bf48c5d4ba1b33f36bdbb5fa262a04012c4e3ee
 #define VESTS_SYMBOL  (uint64_t(6) | (uint64_t('V') << 8) | (uint64_t('E') << 16) | (uint64_t('S') << 24) | (uint64_t('T') << 32) | (uint64_t('S') << 40)) ///< VESTS with 6 digits of precision
 #define STEEM_SYMBOL  (uint64_t(3) | (uint64_t('S') << 8) | (uint64_t('M') << 16) | (uint64_t('O') << 24) | (uint64_t('K') << 32) | (uint64_t('E') << 40)) ///< SMOKE with 3 digits of precision
 #define SBD_SYMBOL    (uint64_t(3) | (uint64_t('S') << 8) | (uint64_t('B') << 16) | (uint64_t('D') << 24) ) ///< SMOKE Backed Dollars with 3 digits of precision
@@ -56,7 +54,7 @@
 #define STEEMIT_SYMBOL                          "SMOKE"
 #define STEEMIT_ADDRESS_PREFIX                  "SMK"
 
-#define STEEMIT_GENESIS_TIME_EPOCH              1520000000  // 1458835200 1509704047 1520000000000 = Fri Mar 02 2018 21:13:20 GMT+0700 (+07)
+#define STEEMIT_GENESIS_TIME_EPOCH              1518000000  // Wed Feb 07 2018 17:40:00 GMT+0700 (+07)
 //#define STEEMIT_GENESIS_TIME                    (fc::time_point_sec(1458835200))
 #define STEEMIT_GENESIS_TIME                    (fc::time_point_sec(STEEMIT_GENESIS_TIME_EPOCH))
 //#define STEEMIT_MINING_TIME                     (fc::time_point_sec(1458838800))
