@@ -364,7 +364,7 @@ namespace steemit { namespace chain {
          /// Reset the object graph in-memory
          void initialize_indexes();
          void init_schema();
-         void init_genesis(uint64_t initial_supply = STEEMIT_INIT_SUPPLY, uint64_t initial_supply_srd = STEEMIT_INIT_SUPPLY_SBD );
+         void init_genesis(uint64_t initial_supply = STEEMIT_INIT_SUPPLY, uint64_t initial_supply_sbd = STEEMIT_INIT_SUPPLY_SBD );
 
          /**
           *  This method validates transactions without adding it to the pending state.

@@ -2336,7 +2336,7 @@ void database::init_schema()
    return;*/
 }
 
-void database::init_genesis( uint64_t init_supply, uint64_t init_supply_srd )
+void database::init_genesis( uint64_t init_supply, uint64_t init_supply_sbd )
 {
    try
    {
@@ -2399,7 +2399,7 @@ void database::init_genesis( uint64_t init_supply, uint64_t init_supply_srd )
             // https://github.com/steemit/steem/pull/1431/commits/ad861236e16fcffadc804b925f9b358e9a2fb176
             // Add STEEMIT_INIT_SBD_SUPPLY config option
 
-            a.sbd_balance = asset( i ? 0 : init_supply_srd, SBD_SYMBOL );
+            a.sbd_balance = asset( i ? 0 : init_supply_sbd, SBD_SYMBOL );
          } );
 
          create< account_authority_object >( [&]( account_authority_object& auth )
@@ -2427,12 +2427,12 @@ void database::init_genesis( uint64_t init_supply, uint64_t init_supply_srd )
          p.participation_count = 128;
          p.current_supply = asset( init_supply, STEEM_SYMBOL );
 
-         p.current_sbd_supply = asset( init_supply_srd, SBD_SYMBOL );
+         p.current_sbd_supply = asset( init_supply_sbd, SBD_SYMBOL );
 
-         // p.virtual_supply = p.current_supply;
-         // virtual_supply = steem_supply + sbd_supply * price_feed
+          p.virtual_supply = p.current_supply;
+//          virtual_supply = steem_supply + sbd_supply * price_feed
          // there is no price_feed at genesis, make it 1 ( 1 STEEM = 1 SBD )
-         p.virtual_supply = p.current_supply + asset( init_supply_srd, STEEM_SYMBOL );
+//         p.virtual_supply = p.current_supply + asset( init_supply_sbd, STEEM_SYMBOL );
 
          p.maximum_block_size = STEEMIT_MAX_BLOCK_SIZE;
       } );
