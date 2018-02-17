@@ -95,7 +95,7 @@ database::~database()
    clear_pending();
 }
 
-void database::open( const fc::path& data_dir, const fc::path& shared_mem_dir, uint64_t initial_supply, uint64_t initial_supply_srd, uint64_t shared_file_size, uint32_t chainbase_flags )
+void database::open( const fc::path& data_dir, const fc::path& shared_mem_dir, uint64_t initial_supply, uint64_t initial_supply_sbd, uint64_t shared_file_size, uint32_t chainbase_flags )
 {
    try
    {
@@ -110,7 +110,7 @@ void database::open( const fc::path& data_dir, const fc::path& shared_mem_dir, u
          if( !find< dynamic_global_property_object >() )
             with_write_lock( [&]()
             {
-               init_genesis( initial_supply );
+               init_genesis( initial_supply, initial_supply_sbd );
             });
 
          _block_log.open( data_dir / "block_log" );
