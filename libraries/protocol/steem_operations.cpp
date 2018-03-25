@@ -121,7 +121,10 @@ namespace steemit { namespace protocol {
    {
       validate_account_name( author );
       FC_ASSERT( percent_steem_dollars <= STEEMIT_100_PERCENT, "Percent cannot exceed 100%" );
-      FC_ASSERT( max_accepted_payout.symbol == SBD_SYMBOL, "Max accepted payout must be in SBD" );
+//      FC_ASSERT( max_accepted_payout.symbol == SBD_SYMBOL, "Max accepted payout must be in SBD" );
+// dont care symbol is SBD or STEEM
+      FC_ASSERT( ((max_accepted_payout.symbol == STEEM_SYMBOL) || (max_accepted_payout.symbol == SBD_SYMBOL)), "Max accepted payout must be in STEEM_SYMBOL or SBD_SYMBOL ( dont care symbol type because SBD_SYMBOL is disabled)!" );
+
       FC_ASSERT( max_accepted_payout.amount.value >= 0, "Cannot accept less than 0 payout" );
       validate_permlink( permlink );
       for( auto& e : extensions )

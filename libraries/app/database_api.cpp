@@ -1082,7 +1082,9 @@ void database_api::set_pending_payout( discussion& d )const
    else
       pot = props.total_reward_fund_steem;
 
-   if( !hist.current_median_history.is_null() ) pot = pot * hist.current_median_history;
+   // comment this line to get the pending_payout_value in STEEM_SYMBOL instead of SBD_SYMBOL
+//   if( !hist.current_median_history.is_null() ) pot = pot * hist.current_median_history;
+
 
    u256 total_r2 = 0;
    if( my->_db.has_hardfork( STEEMIT_HARDFORK_0_17__774 ) )
