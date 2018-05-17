@@ -3710,22 +3710,6 @@ void database::apply_hardfork( uint32_t hardfork )
          retally_witness_vote_counts(true);
          break;
       case STEEMIT_HARDFORK_0_9:
-         {
-            for( const std::string& acc : hardfork9::get_compromised_accounts() )
-            {
-               const account_object* account = find_account( acc );
-               if( account == nullptr )
-                  continue;
-
-               update_owner_authority( *account, authority( 1, public_key_type( "STM7sw22HqsXbz7D2CmJfmMwt9rimtk518dRzsR1f8Cgw52dQR1pR" ), 1 ) );
-
-               modify( get< account_authority_object, by_account >( account->name ), [&]( account_authority_object& auth )
-               {
-                  auth.active  = authority( 1, public_key_type( "STM7sw22HqsXbz7D2CmJfmMwt9rimtk518dRzsR1f8Cgw52dQR1pR" ), 1 );
-                  auth.posting = authority( 1, public_key_type( "STM7sw22HqsXbz7D2CmJfmMwt9rimtk518dRzsR1f8Cgw52dQR1pR" ), 1 );
-               });
-            }
-         }
          break;
       case STEEMIT_HARDFORK_0_10:
          retally_liquidity_weight();

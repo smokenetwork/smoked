@@ -23,14 +23,14 @@ inline static const std::set< std::string >& get_bad_memos()
 {
    static const std::set< std::string > bad_memos
    {
-      "5cd80b47e6764534b0f",
-      "c5149362bb7842cea10",
-      "b056089187754e71b32",
-      "e01abe56614548d48cc",
-      "294354b63c0c4d4dadb",
-      "96978449f7ca4ea48d1",
-      "28cbdfb353414d548fe",
-      "2f5b42d7408c43fc986"
+//      "5cd80b47e6764534b0f",
+//      "c5149362bb7842cea10",
+//      "b056089187754e71b32",
+//      "e01abe56614548d48cc",
+//      "294354b63c0c4d4dadb",
+//      "96978449f7ca4ea48d1",
+//      "28cbdfb353414d548fe",
+//      "2f5b42d7408c43fc986"
    };
 
    return bad_memos;
