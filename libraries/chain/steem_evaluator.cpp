@@ -442,32 +442,40 @@ struct comment_options_extension_visitor
 
 void comment_options_evaluator::do_apply( const comment_options_operation& o )
 {
-   if( _db.has_hardfork( STEEMIT_HARDFORK_0_10 ) )
-   {
-      const auto& auth = _db.get_account( o.author );
-      FC_ASSERT( !(auth.owner_challenged || auth.active_challenged ), "Operation cannot be processed because account is currently challenged." );
-   }
+  if( _db.has_hardfork( STEEMIT_HARDFORK_0_20) )
+  {
+     if (o.percent_steem_dollars > 0) {
+        FC_ASSERT( false, "comment_options_operation.percent_steem_dollars must be 0 since hardfork 20" );
+     }
+  }
 
-   const auto& comment = _db.get_comment( o.author, o.permlink );
-   if( !o.allow_curation_rewards || !o.allow_votes || o.max_accepted_payout < comment.max_accepted_payout )
-      FC_ASSERT( comment.abs_rshares == 0, "One of the included comment options requires the comment to have no rshares allocated to it." );
+  if( _db.has_hardfork( STEEMIT_HARDFORK_0_10 ) )
+  {
+     const auto& auth = _db.get_account( o.author );
+     FC_ASSERT( !(auth.owner_challenged || auth.active_challenged ), "Operation cannot be processed because account is currently challenged." );
+  }
 
-   FC_ASSERT( comment.allow_curation_rewards >= o.allow_curation_rewards, "Curation rewards cannot be re-enabled." );
-   FC_ASSERT( comment.allow_votes >= o.allow_votes, "Voting cannot be re-enabled." );
-   FC_ASSERT( comment.max_accepted_payout >= o.max_accepted_payout, "A comment cannot accept a greater payout." );
-   FC_ASSERT( comment.percent_steem_dollars >= o.percent_steem_dollars, "A comment cannot accept a greater percent SBD." );
+  const auto& comment = _db.get_comment( o.author, o.permlink );
+  // SBD is disable, compare the amount only.
+  if( !o.allow_curation_rewards || !o.allow_votes || o.max_accepted_payout.amount < comment.max_accepted_payout.amount )
+     FC_ASSERT( comment.abs_rshares == 0, "One of the included comment options requires the comment to have no rshares allocated to it." );
 
-   _db.modify( comment, [&]( comment_object& c ) {
-       c.max_accepted_payout   = o.max_accepted_payout;
-       c.percent_steem_dollars = o.percent_steem_dollars;
-       c.allow_votes           = o.allow_votes;
-       c.allow_curation_rewards = o.allow_curation_rewards;
-   });
+  FC_ASSERT( comment.allow_curation_rewards >= o.allow_curation_rewards, "Curation rewards cannot be re-enabled." );
+  FC_ASSERT( comment.allow_votes >= o.allow_votes, "Voting cannot be re-enabled." );
+  FC_ASSERT( comment.max_accepted_payout.amount.value >= o.max_accepted_payout.amount.value, "A comment cannot accept a greater payout." );
+  FC_ASSERT( comment.percent_steem_dollars >= o.percent_steem_dollars, "A comment cannot accept a greater percent SBD." );
 
-   for( auto& e : o.extensions )
-   {
-      e.visit( comment_options_extension_visitor( comment, _db ) );
-   }
+  _db.modify( comment, [&]( comment_object& c ) {
+      c.max_accepted_payout   = o.max_accepted_payout;
+      c.percent_steem_dollars = o.percent_steem_dollars;
+      c.allow_votes           = o.allow_votes;
+      c.allow_curation_rewards = o.allow_curation_rewards;
+  });
+
+  for( auto& e : o.extensions )
+  {
+     e.visit( comment_options_extension_visitor( comment, _db ) );
+  }
 }
 
 void comment_evaluator::do_apply( const comment_operation& o )
@@ -867,21 +875,28 @@ void escrow_release_evaluator::do_apply( const escrow_release_operation& o )
 
 void transfer_evaluator::do_apply( const transfer_operation& o )
 {
-   const auto& from_account = _db.get_account(o.from);
-   const auto& to_account = _db.get_account(o.to);
+  if( _db.has_hardfork( STEEMIT_HARDFORK_0_20) )
+  {
+     if (o.amount.symbol == SBD_SYMBOL) {
+        FC_ASSERT( false, "SBD disabled since hardfork 20" );
+     }
+  }
 
-   if( from_account.active_challenged )
-   {
-      _db.modify( from_account, [&]( account_object& a )
-      {
+  const auto& from_account = _db.get_account(o.from);
+  const auto& to_account = _db.get_account(o.to);
+
+  if( from_account.active_challenged )
+  {
+     _db.modify( from_account, [&]( account_object& a )
+     {
          a.active_challenged = false;
          a.last_active_proved = _db.head_block_time();
-      });
-   }
+     });
+  }
 
-   FC_ASSERT( _db.get_balance( from_account, o.amount.symbol ) >= o.amount, "Account does not have sufficient funds for transfer." );
-   _db.adjust_balance( from_account, -o.amount );
-   _db.adjust_balance( to_account, o.amount );
+  FC_ASSERT( _db.get_balance( from_account, o.amount.symbol ) >= o.amount, "Account does not have sufficient funds for transfer." );
+  _db.adjust_balance( from_account, -o.amount );
+  _db.adjust_balance( to_account, o.amount );
 }
 
 void transfer_to_vesting_evaluator::do_apply( const transfer_to_vesting_operation& o )
@@ -1759,6 +1774,11 @@ void feed_publish_evaluator::do_apply( const feed_publish_operation& o )
 
 void convert_evaluator::do_apply( const convert_operation& o )
 {
+  if( _db.has_hardfork( STEEMIT_HARDFORK_0_20) )
+  {
+     FC_ASSERT( false, "convert_operation disabled since hardfork 20" );
+  }
+
   const auto& owner = _db.get_account( o.owner );
   FC_ASSERT( _db.get_balance( owner, o.amount.symbol ) >= o.amount, "Account does not have sufficient balance for conversion." );
 
@@ -1783,15 +1803,20 @@ void convert_evaluator::do_apply( const convert_operation& o )
 
 void limit_order_create_evaluator::do_apply( const limit_order_create_operation& o )
 {
-   FC_ASSERT( o.expiration > _db.head_block_time(), "Limit order has to expire after head block time." );
+  if( _db.has_hardfork( STEEMIT_HARDFORK_0_20) )
+  {
+     FC_ASSERT( false, "limit_order_create_operation disabled since hardfork 20" );
+  }
 
-   const auto& owner = _db.get_account( o.owner );
+  FC_ASSERT( o.expiration > _db.head_block_time(), "Limit order has to expire after head block time." );
 
-   FC_ASSERT( _db.get_balance( owner, o.amount_to_sell.symbol ) >= o.amount_to_sell, "Account does not have sufficient funds for limit order." );
+  const auto& owner = _db.get_account( o.owner );
 
-   _db.adjust_balance( owner, -o.amount_to_sell );
+  FC_ASSERT( _db.get_balance( owner, o.amount_to_sell.symbol ) >= o.amount_to_sell, "Account does not have sufficient funds for limit order." );
 
-   const auto& order = _db.create<limit_order_object>( [&]( limit_order_object& obj )
+  _db.adjust_balance( owner, -o.amount_to_sell );
+
+  const auto& order = _db.create<limit_order_object>( [&]( limit_order_object& obj )
    {
        obj.created    = _db.head_block_time();
        obj.seller     = o.owner;
@@ -1801,22 +1826,27 @@ void limit_order_create_evaluator::do_apply( const limit_order_create_operation&
        obj.expiration = o.expiration;
    });
 
-   bool filled = _db.apply_order( order );
+  bool filled = _db.apply_order( order );
 
-   if( o.fill_or_kill ) FC_ASSERT( filled, "Cancelling order because it was not filled." );
+  if( o.fill_or_kill ) FC_ASSERT( filled, "Cancelling order because it was not filled." );
 }
 
 void limit_order_create2_evaluator::do_apply( const limit_order_create2_operation& o )
 {
-   FC_ASSERT( o.expiration > _db.head_block_time(), "Limit order has to expire after head block time." );
+  if( _db.has_hardfork( STEEMIT_HARDFORK_0_20) )
+  {
+     FC_ASSERT( false, "limit_order_create2_operation disabled since hardfork 20" );
+  }
 
-   const auto& owner = _db.get_account( o.owner );
+  FC_ASSERT( o.expiration > _db.head_block_time(), "Limit order has to expire after head block time." );
 
-   FC_ASSERT( _db.get_balance( owner, o.amount_to_sell.symbol ) >= o.amount_to_sell, "Account does not have sufficient funds for limit order." );
+  const auto& owner = _db.get_account( o.owner );
 
-   _db.adjust_balance( owner, -o.amount_to_sell );
+  FC_ASSERT( _db.get_balance( owner, o.amount_to_sell.symbol ) >= o.amount_to_sell, "Account does not have sufficient funds for limit order." );
 
-   const auto& order = _db.create<limit_order_object>( [&]( limit_order_object& obj )
+  _db.adjust_balance( owner, -o.amount_to_sell );
+
+  const auto& order = _db.create<limit_order_object>( [&]( limit_order_object& obj )
    {
        obj.created    = _db.head_block_time();
        obj.seller     = o.owner;
@@ -1826,9 +1856,9 @@ void limit_order_create2_evaluator::do_apply( const limit_order_create2_operatio
        obj.expiration = o.expiration;
    });
 
-   bool filled = _db.apply_order( order );
+  bool filled = _db.apply_order( order );
 
-   if( o.fill_or_kill ) FC_ASSERT( filled, "Cancelling order because it was not filled." );
+  if( o.fill_or_kill ) FC_ASSERT( filled, "Cancelling order because it was not filled." );
 }
 
 void limit_order_cancel_evaluator::do_apply( const limit_order_cancel_operation& o )
@@ -2020,12 +2050,16 @@ void change_recovery_account_evaluator::do_apply( const change_recovery_account_
 
 void transfer_to_savings_evaluator::do_apply( const transfer_to_savings_operation& op )
 {
-   const auto& from = _db.get_account( op.from );
-   const auto& to   = _db.get_account(op.to);
-   FC_ASSERT( _db.get_balance( from, op.amount.symbol ) >= op.amount, "Account does not have sufficient funds to transfer to savings." );
+  if( _db.has_hardfork( STEEMIT_HARDFORK_0_20) )
+  {
+     FC_ASSERT( false, "transfer_to_savings_operation since hardfork 20" );
+  }
+  const auto& from = _db.get_account( op.from );
+  const auto& to   = _db.get_account(op.to);
+  FC_ASSERT( _db.get_balance( from, op.amount.symbol ) >= op.amount, "Account does not have sufficient funds to transfer to savings." );
 
-   _db.adjust_balance( from, -op.amount );
-   _db.adjust_savings_balance( to, op.amount );
+  _db.adjust_balance( from, -op.amount );
+  _db.adjust_savings_balance( to, op.amount );
 }
 
 void transfer_from_savings_evaluator::do_apply( const transfer_from_savings_operation& op )

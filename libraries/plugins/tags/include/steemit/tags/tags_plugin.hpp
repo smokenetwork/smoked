@@ -261,7 +261,7 @@ class tag_stats_object : public object< tag_stats_object_type, tag_stats_object 
       id_type           id;
 
       tag_name_type     tag;
-      asset             total_payout = asset( 0, SBD_SYMBOL );
+      asset             total_payout = asset( 0, STEEM_SYMBOL );
       int32_t           net_votes = 0;
       uint32_t          top_posts = 0;
       uint32_t          comments  = 0;
