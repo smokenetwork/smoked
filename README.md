@@ -1,20 +1,19 @@
 # Introducing Smoke (beta)
 
-Steem is a Delegated Proof of Stake blockchain that uses a "Proof of Brain" social consensus algorithm for token allocation.
+Smoke is a Delegated Proof of Stake blockchain that uses a social consensus algorithm for token allocation.
 
   - Currency symbol SMOKE.
-  - Initial supply 349379987 SMOKE
+  - Initial supply 42,000,000 SMOKE
   - inflation rate of 9.5% per year, reducing by 0.5% per annum until the rewards
     drop to 5% per annum.
-  - 75% of inflation to "Proof of Brain" social consensus algorithm.
+  - 75% of inflation to social consensus algorithm.
   - 15% of inflation to stake holders.
   - 10% of inflation to block producers.
 
 # Public Announcement & Discussion
 
-Steem was announced on the
-[Bitcointalk forum](https://bitcointalk.org/index.php?topic=1410943.new) prior to
-the start of any mining.
+Smoke was announced prior to
+the start of the mainnet.
 
 # No Support & No Warranty
 
@@ -36,7 +35,7 @@ Just want to get up and running quickly? We have pre-built docker images for you
 
 # Building
 
-We strongly recommend using one of our pre-built Docker images or using Docker to build Steem. Both of these processes are described in the [quickstart guide](doc/exchangequickstart.md).
+We strongly recommend using one of our pre-built Docker images or using Docker to build Smoke. Both of these processes are described in the [quickstart guide](doc/exchangequickstart.md).
 
 If you would still like to build from source, we do have [build instructions](doc/building.md) for Linux (Ubuntu LTS) and macOS X.
 
