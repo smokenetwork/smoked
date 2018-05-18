@@ -439,4 +439,4 @@ void debug_node_plugin::plugin_shutdown()
 
 } } }
 
-STEEMIT_DEFINE_PLUGIN( debug_node, smoke::plugin::debug_node::debug_node_plugin )
+SMOKE_DEFINE_PLUGIN( debug_node, smoke::plugin::debug_node::debug_node_plugin )

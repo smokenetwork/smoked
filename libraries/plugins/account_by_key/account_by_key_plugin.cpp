@@ -271,4 +271,4 @@ void account_by_key_plugin::plugin_startup()
 
 } } // smoke::account_by_key
 
-STEEMIT_DEFINE_PLUGIN( account_by_key, smoke::account_by_key::account_by_key_plugin )
+SMOKE_DEFINE_PLUGIN( account_by_key, smoke::account_by_key::account_by_key_plugin )

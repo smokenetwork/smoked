@@ -110,8 +110,8 @@ std::string hello_api_api::get_message()
 } }
 
 /**
- * The STEEMIT_DEFINE_PLUGIN() macro will define a smoke::plugin::create_hello_api_plugin()
+ * The SMOKE_DEFINE_PLUGIN() macro will define a smoke::plugin::create_hello_api_plugin()
  * factory method which is expected by the manifest.
  */
 
-STEEMIT_DEFINE_PLUGIN( hello_api, smoke::example_plugin::hello_api_plugin )
+SMOKE_DEFINE_PLUGIN( hello_api, smoke::example_plugin::hello_api_plugin )

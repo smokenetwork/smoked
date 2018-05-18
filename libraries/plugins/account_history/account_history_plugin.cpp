@@ -298,4 +298,4 @@ flat_map< account_name_type, account_name_type > account_history_plugin::tracked
 
 } }
 
-STEEMIT_DEFINE_PLUGIN( account_history, smoke::account_history::account_history_plugin )
+SMOKE_DEFINE_PLUGIN( account_history, smoke::account_history::account_history_plugin )

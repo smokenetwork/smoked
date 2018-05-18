@@ -391,6 +391,6 @@ void follow_plugin::plugin_startup()
 
 } } // smoke::follow
 
-STEEMIT_DEFINE_PLUGIN( follow, smoke::follow::follow_plugin )
+SMOKE_DEFINE_PLUGIN( follow, smoke::follow::follow_plugin )
 
 //DEFINE_OPERATION_TYPE( smoke::follow::follow_plugin_operation )

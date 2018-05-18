@@ -1,4 +1,4 @@
-# Building Steem
+# Building Smoked
 
 ## Compile-Time Options (cmake)
 
@@ -18,9 +18,9 @@ recommended for witnesses and seed-nodes.
 
 Clears old votes from memory that are no longer required for consensus.
 
-### BUILD_STEEM_TESTNET=[OFF/ON]
+### BUILD_SMOKE_TESTNET=[OFF/ON]
 
-Builds steem for use in a private testnet. Also required for building unit tests.
+Builds smoke for use in a private testnet. Also required for building unit tests.
 
 ### SKIP_BY_TX_ID=[OFF/ON]
 
@@ -116,7 +116,7 @@ Here are the required packages:
 
 The Boost provided in the Ubuntu 14.04 package manager (Boost 1.55) is too old.
 Steem requires Boost 1.58 (as in Ubuntu 16.04) and works with versions up to 1.60 (including).
-So building Steem on Ubuntu 14.04 requires downloading and installing a more recent
+So building Smoked on Ubuntu 14.04 requires downloading and installing a more recent
 version of Boost.
 
 According to [this mailing list
@@ -167,7 +167,7 @@ Install Homebrew by following the instructions here: http://brew.sh/
    brew doctor
    brew update
 
-### Install steem dependencies:
+### Install smoked dependencies:
 
     brew install \
         autoconf \

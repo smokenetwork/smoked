@@ -36,7 +36,7 @@ repository root.)
     cd build
     cmake \
         -DCMAKE_BUILD_TYPE=Debug \
-        -DBUILD_STEEM_TESTNET=ON \
+        -DBUILD_SMOKE_TESTNET=ON \
         -DLOW_MEMORY_NODE=OFF \
         -DCLEAR_VOTES=ON \
         ..

@@ -2,8 +2,8 @@ FROM phusion/baseimage:0.9.19
 
 #ARG SMOKED_BLOCKCHAIN=https://example.com/smoked-blockchain.tbz2
 
-ARG STEEM_STATIC_BUILD=ON
-ENV STEEM_STATIC_BUILD ${STEEM_STATIC_BUILD}
+ARG SMOKE_STATIC_BUILD=ON
+ENV SMOKE_STATIC_BUILD ${SMOKE_STATIC_BUILD}
 
 ENV LANG=en_US.UTF-8
 
@@ -41,16 +41,16 @@ RUN \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     pip3 install gcovr
 
-ADD . /usr/local/src/steem
+ADD . /usr/local/src/smoked
 
 RUN \
-    cd /usr/local/src/steem && \
+    cd /usr/local/src/smoked && \
     git submodule update --init --recursive && \
     mkdir build && \
     cd build && \
     cmake \
         -DCMAKE_BUILD_TYPE=Release \
-        -DBUILD_STEEM_TESTNET=ON \
+        -DBUILD_SMOKE_TESTNET=ON \
         -DLOW_MEMORY_NODE=OFF \
         -DCLEAR_VOTES=ON \
         -DSKIP_BY_TX_ID=ON \
@@ -58,21 +58,21 @@ RUN \
     make -j$(nproc) chain_test test_fixed_string && \
     ./tests/chain_test && \
     ./programs/util/test_fixed_string && \
-    cd /usr/local/src/steem && \
+    cd /usr/local/src/smoked && \
     doxygen && \
     programs/build_helpers/check_reflect.py && \
     programs/build_helpers/get_config_check.sh && \
-    rm -rf /usr/local/src/steem/build
+    rm -rf /usr/local/src/smoked/build
 
 RUN \
-    cd /usr/local/src/steem && \
+    cd /usr/local/src/smoked && \
     git submodule update --init --recursive && \
     mkdir build && \
     cd build && \
     cmake \
         -DCMAKE_BUILD_TYPE=Debug \
         -DENABLE_COVERAGE_TESTING=ON \
-        -DBUILD_STEEM_TESTNET=ON \
+        -DBUILD_SMOKE_TESTNET=ON \
         -DLOW_MEMORY_NODE=OFF \
         -DCLEAR_VOTES=ON \
         -DSKIP_BY_TX_ID=ON \
@@ -82,11 +82,11 @@ RUN \
     ./tests/chain_test && \
     mkdir -p /var/cobertura && \
     gcovr --object-directory="../" --root=../ --xml-pretty --gcov-exclude=".*tests.*" --gcov-exclude=".*fc.*" --gcov-exclude=".*app*" --gcov-exclude=".*net*" --gcov-exclude=".*plugins*" --gcov-exclude=".*schema*" --gcov-exclude=".*time*" --gcov-exclude=".*utilities*" --gcov-exclude=".*wallet*" --gcov-exclude=".*programs*" --output="/var/cobertura/coverage.xml" && \
-    cd /usr/local/src/steem && \
-    rm -rf /usr/local/src/steem/build
+    cd /usr/local/src/smoked && \
+    rm -rf /usr/local/src/smoked/build
 
 RUN \
-    cd /usr/local/src/steem && \
+    cd /usr/local/src/smoked && \
     git submodule update --init --recursive && \
     mkdir build && \
     cd build && \
@@ -96,8 +96,8 @@ RUN \
         -DLOW_MEMORY_NODE=ON \
         -DCLEAR_VOTES=ON \
         -DSKIP_BY_TX_ID=OFF \
-        -DBUILD_STEEM_TESTNET=OFF \
-        -DSTEEM_STATIC_BUILD=${STEEM_STATIC_BUILD} \
+        -DBUILD_SMOKE_TESTNET=OFF \
+        -DSMOKE_STATIC_BUILD=${SMOKE_STATIC_BUILD} \
         .. \
     && \
     make -j$(nproc) && \
@@ -119,13 +119,13 @@ RUN \
         -DLOW_MEMORY_NODE=OFF \
         -DCLEAR_VOTES=OFF \
         -DSKIP_BY_TX_ID=ON \
-        -DBUILD_STEEM_TESTNET=OFF \
-        -DSTEEM_STATIC_BUILD=${STEEM_STATIC_BUILD} \
+        -DBUILD_SMOKE_TESTNET=OFF \
+        -DSMOKE_STATIC_BUILD=${SMOKE_STATIC_BUILD} \
         .. \
     && \
     make -j$(nproc) && \
     make install && \
-    rm -rf /usr/local/src/steem
+    rm -rf /usr/local/src/smoked
 
 RUN \
     apt-get remove -y \

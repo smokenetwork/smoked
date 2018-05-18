@@ -30,4 +30,4 @@ void raw_block_plugin::plugin_shutdown()
 
 } } } // smoke::plugin::raw_block
 
-STEEMIT_DEFINE_PLUGIN( raw_block, smoke::plugin::raw_block::raw_block_plugin )
+SMOKE_DEFINE_PLUGIN( raw_block, smoke::plugin::raw_block::raw_block_plugin )

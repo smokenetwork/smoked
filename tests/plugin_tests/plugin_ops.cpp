@@ -78,7 +78,7 @@ test_plugin::test_plugin( application* app ) : plugin( app )
 
 } } // smoke::plugin_tests
 
-STEEMIT_DEFINE_PLUGIN( test, smoke::plugin_tests::test_plugin )
+SMOKE_DEFINE_PLUGIN( test, smoke::plugin_tests::test_plugin )
 
 FC_REFLECT( smoke::plugin_tests::test_a_operation, (account) )
 FC_REFLECT( smoke::plugin_tests::test_b_operation, (account) )

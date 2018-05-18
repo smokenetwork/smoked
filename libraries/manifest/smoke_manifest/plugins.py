@@ -25,7 +25,6 @@ def process_plugin(ctx, plugin):
     return
 
 def main(argv):
-
     parser = argparse.ArgumentParser( description="Find plugins" )
 
     parser.add_argument("plugin_dir", metavar="DIR", type=str, nargs="+",

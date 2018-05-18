@@ -217,4 +217,4 @@ uint32_t market_history_plugin::get_max_history_per_bucket() const
 
 } } // smoke::market_history
 
-STEEMIT_DEFINE_PLUGIN( market_history, smoke::market_history::market_history_plugin )
+SMOKE_DEFINE_PLUGIN( market_history, smoke::market_history::market_history_plugin )

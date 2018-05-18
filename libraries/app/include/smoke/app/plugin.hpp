@@ -142,7 +142,7 @@ if( options.count(name) ) { \
 
 } } //smoke::app
 
-#define STEEMIT_DEFINE_PLUGIN( plugin_name, plugin_class ) \
+#define SMOKE_DEFINE_PLUGIN( plugin_name, plugin_class ) \
    namespace smoke { namespace plugin { \
    std::shared_ptr< smoke::app::abstract_plugin > create_ ## plugin_name ## _plugin( app::application* app )  \
    { return std::make_shared< plugin_class >( app ); } \

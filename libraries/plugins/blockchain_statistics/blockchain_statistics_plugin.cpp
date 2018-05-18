@@ -470,4 +470,4 @@ uint32_t blockchain_statistics_plugin::get_max_history_per_bucket() const
 
 } } // smoke::blockchain_statistics
 
-STEEMIT_DEFINE_PLUGIN( blockchain_statistics, smoke::blockchain_statistics::blockchain_statistics_plugin );
+SMOKE_DEFINE_PLUGIN( blockchain_statistics, smoke::blockchain_statistics::blockchain_statistics_plugin );

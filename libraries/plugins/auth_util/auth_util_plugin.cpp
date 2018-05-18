@@ -30,4 +30,4 @@ void auth_util_plugin::plugin_shutdown()
 
 } } } // smoke::plugin::auth_util
 
-STEEMIT_DEFINE_PLUGIN( auth_util, smoke::plugin::auth_util::auth_util_plugin )
+SMOKE_DEFINE_PLUGIN( auth_util, smoke::plugin::auth_util::auth_util_plugin )

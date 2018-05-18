@@ -535,4 +535,4 @@ void tags_plugin::plugin_startup()
 
 } } /// smoke::tags
 
-STEEMIT_DEFINE_PLUGIN( tags, smoke::tags::tags_plugin )
+SMOKE_DEFINE_PLUGIN( tags, smoke::tags::tags_plugin )

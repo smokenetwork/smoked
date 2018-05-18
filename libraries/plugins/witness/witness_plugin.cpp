@@ -695,4 +695,4 @@ block_production_condition::block_production_condition_enum witness_plugin::mayb
 
 } } // smoke::witness
 
-STEEMIT_DEFINE_PLUGIN( witness, smoke::witness::witness_plugin )
+SMOKE_DEFINE_PLUGIN( witness, smoke::witness::witness_plugin )

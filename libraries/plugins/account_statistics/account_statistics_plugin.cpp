@@ -107,4 +107,4 @@ const flat_set< std::string >& account_statistics_plugin::get_tracked_accounts()
 
 } } // smoke::account_statistics
 
-STEEMIT_DEFINE_PLUGIN( account_statistics, smoke::account_statistics::account_statistics_plugin );
+SMOKE_DEFINE_PLUGIN( account_statistics, smoke::account_statistics::account_statistics_plugin );

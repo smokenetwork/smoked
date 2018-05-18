@@ -165,4 +165,4 @@ void delayed_node_plugin::connection_failed()
 
 } }
 
-STEEMIT_DEFINE_PLUGIN( delayed_node, smoke::delayed_node::delayed_node_plugin )
+SMOKE_DEFINE_PLUGIN( delayed_node, smoke::delayed_node::delayed_node_plugin )
