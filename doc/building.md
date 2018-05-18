@@ -33,12 +33,12 @@ huge gain if you do not need this functionality.
 We ship a Dockerfile.  This builds both common node type binaries.
 
     git clone https://github.com/smokenetwork/smoked
-    cd steem
+    cd smoke
     docker build -t smoke/smoked .
 
 ## Building on Ubuntu 16.04
 
-For Ubuntu 16.04 users, after installing the right packages with `apt` Steem
+For Ubuntu 16.04 users, after installing the right packages with `apt` Smoke
 will build out of the box without further effort:
 
     # Required packages
