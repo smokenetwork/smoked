@@ -870,12 +870,12 @@ set<public_key_type> database_api::get_required_signatures( const signed_transac
 set<public_key_type> database_api_impl::get_required_signatures( const signed_transaction& trx, const flat_set<public_key_type>& available_keys )const
 {
 //   wdump((trx)(available_keys));
-   auto result = trx.get_required_signatures( STEEMIT_CHAIN_ID,
+   auto result = trx.get_required_signatures( SMOKE_CHAIN_ID,
                                               available_keys,
                                               [&]( string account_name ){ return authority( _db.get< account_authority_object, by_account >( account_name ).active  ); },
                                               [&]( string account_name ){ return authority( _db.get< account_authority_object, by_account >( account_name ).owner   ); },
                                               [&]( string account_name ){ return authority( _db.get< account_authority_object, by_account >( account_name ).posting ); },
-                                              STEEMIT_MAX_SIG_CHECK_DEPTH );
+                                              SMOKE_MAX_SIG_CHECK_DEPTH );
 //   wdump((result));
    return result;
 }
@@ -893,7 +893,7 @@ set<public_key_type> database_api_impl::get_potential_signatures( const signed_t
 //   wdump((trx));
    set<public_key_type> result;
    trx.get_required_signatures(
-      STEEMIT_CHAIN_ID,
+      SMOKE_CHAIN_ID,
       flat_set<public_key_type>(),
       [&]( account_name_type account_name )
       {
@@ -916,7 +916,7 @@ set<public_key_type> database_api_impl::get_potential_signatures( const signed_t
             result.insert(k);
          return authority( auth );
       },
-      STEEMIT_MAX_SIG_CHECK_DEPTH
+      SMOKE_MAX_SIG_CHECK_DEPTH
    );
 
 //   wdump((result));
@@ -933,11 +933,11 @@ bool database_api::verify_authority( const signed_transaction& trx ) const
 
 bool database_api_impl::verify_authority( const signed_transaction& trx )const
 {
-   trx.verify_authority( STEEMIT_CHAIN_ID,
+   trx.verify_authority( SMOKE_CHAIN_ID,
                          [&]( string account_name ){ return authority( _db.get< account_authority_object, by_account >( account_name ).active  ); },
                          [&]( string account_name ){ return authority( _db.get< account_authority_object, by_account >( account_name ).owner   ); },
                          [&]( string account_name ){ return authority( _db.get< account_authority_object, by_account >( account_name ).posting ); },
-                         STEEMIT_MAX_SIG_CHECK_DEPTH );
+                         SMOKE_MAX_SIG_CHECK_DEPTH );
    return true;
 }
 
@@ -1077,7 +1077,7 @@ void database_api::set_pending_payout( discussion& d )const
    const auto& hist  = my->_db.get_feed_history();
 
    asset pot;
-   if( my->_db.has_hardfork( STEEMIT_HARDFORK_0_17__774 ) )
+   if( my->_db.has_hardfork( SMOKE_HARDFORK_0_17__774 ) )
       pot = my->_db.get_reward_fund( my->_db.get_comment( d.author, d.permlink ) ).reward_balance;
    else
       pot = props.total_reward_fund_steem;
@@ -1087,7 +1087,7 @@ void database_api::set_pending_payout( discussion& d )const
 
 
    u256 total_r2 = 0;
-   if( my->_db.has_hardfork( STEEMIT_HARDFORK_0_17__774 ) )
+   if( my->_db.has_hardfork( SMOKE_HARDFORK_0_17__774 ) )
       total_r2 = to256( my->_db.get_reward_fund( my->_db.get_comment( d.author, d.permlink ) ).recent_claims );
    else
       total_r2 = to256( props.total_reward_shares2 );
@@ -1095,7 +1095,7 @@ void database_api::set_pending_payout( discussion& d )const
    if( total_r2 > 0 )
    {
       uint128_t vshares;
-      if( my->_db.has_hardfork( STEEMIT_HARDFORK_0_17__774 ) )
+      if( my->_db.has_hardfork( SMOKE_HARDFORK_0_17__774 ) )
       {
          const auto& rf = my->_db.get_reward_fund( my->_db.get_comment( d.author, d.permlink ) );
          vshares = d.net_rshares.value > 0 ? smoke::chain::util::evaluate_reward_curve( d.net_rshares.value, rf.author_reward_curve, rf.content_constant ) : 0;
@@ -1115,7 +1115,7 @@ void database_api::set_pending_payout( discussion& d )const
       }
    }
 
-   if( d.parent_author != STEEMIT_ROOT_POST_PARENT )
+   if( d.parent_author != SMOKE_ROOT_POST_PARENT )
       d.cashout_time = my->_db.calculate_discussion_payout_time( my->_db.get< comment_object >( d.id ) );
 
    if( d.body.size() > 1024*128 )
@@ -1424,7 +1424,7 @@ vector<discussion> database_api::get_discussions_by_promoted( const discussion_q
       auto parent = get_parent( query );
 
       const auto& tidx = my->_db.get_index<tags::tag_index>().indices().get<tags::by_parent_promoted>();
-      auto tidx_itr = tidx.lower_bound( boost::make_tuple( tag, parent, share_type(STEEMIT_MAX_SHARE_SUPPLY) )  );
+      auto tidx_itr = tidx.lower_bound( boost::make_tuple( tag, parent, share_type(SMOKE_MAX_SHARE_SUPPLY) )  );
 
       return get_discussions( query, tag, parent, tidx, tidx_itr, query.truncate_body, filter_default, exit_default, []( const tags::tag_object& t ){ return t.promoted_balance == 0; }  );
    });

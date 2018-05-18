@@ -49,4 +49,4 @@ FC_REFLECT( smoke::chain::hardfork_property_object,
    (next_hardfork)(next_hardfork_time) )
 CHAINBASE_SET_INDEX_TYPE( smoke::chain::hardfork_property_object, smoke::chain::hardfork_property_index )
 
-#define STEEMIT_NUM_HARDFORKS 20
+#define SMOKE_NUM_HARDFORKS 20

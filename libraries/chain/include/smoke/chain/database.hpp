@@ -77,7 +77,7 @@ namespace smoke { namespace chain {
           *
           * @param data_dir Path to open or create database in
           */
-         void open( const fc::path& data_dir, const fc::path& shared_mem_dir, uint64_t initial_supply = STEEMIT_INIT_SUPPLY, uint64_t initial_supply_sbd = STEEMIT_INIT_SUPPLY_SBD, uint64_t shared_file_size = 0, uint32_t chainbase_flags = 0 );
+         void open( const fc::path& data_dir, const fc::path& shared_mem_dir, uint64_t initial_supply = SMOKE_INIT_SUPPLY, uint64_t initial_supply_sbd = SMOKE_INIT_SUPPLY_SBD, uint64_t shared_file_size = 0, uint32_t chainbase_flags = 0 );
 
          /**
           * @brief Rebuild object graph from block history and open detabase
@@ -257,7 +257,7 @@ namespace smoke { namespace chain {
           * Use the get_slot_time() and get_slot_at_time() functions
           * to convert between slot_num and timestamp.
           *
-          * Passing slot_num == 0 returns STEEMIT_NULL_WITNESS
+          * Passing slot_num == 0 returns SMOKE_NULL_WITNESS
           */
          account_name_type get_scheduled_witness(uint32_t slot_num)const;
 
@@ -300,7 +300,7 @@ namespace smoke { namespace chain {
 
          /** this updates the votes for witnesses as a result of account voting proxy changing */
          void adjust_proxied_witness_votes( const account_object& a,
-                                            const std::array< share_type, STEEMIT_MAX_PROXY_RECURSION_DEPTH+1 >& delta,
+                                            const std::array< share_type, SMOKE_MAX_PROXY_RECURSION_DEPTH+1 >& delta,
                                             int depth = 0 );
 
          /** this updates the votes for all witnesses as a result of account VESTS changing */
@@ -364,7 +364,7 @@ namespace smoke { namespace chain {
          /// Reset the object graph in-memory
          void initialize_indexes();
          void init_schema();
-         void init_genesis(uint64_t initial_supply = STEEMIT_INIT_SUPPLY, uint64_t initial_supply_sbd = STEEMIT_INIT_SUPPLY_SBD );
+         void init_genesis(uint64_t initial_supply = SMOKE_INIT_SUPPLY, uint64_t initial_supply_sbd = SMOKE_INIT_SUPPLY_SBD );
 
          /**
           *  This method validates transactions without adding it to the pending state.
@@ -451,8 +451,8 @@ namespace smoke { namespace chain {
          std::unique_ptr< database_impl > _my;
 
          fork_database                 _fork_db;
-         fc::time_point_sec            _hardfork_times[ STEEMIT_NUM_HARDFORKS + 1 ];
-         protocol::hardfork_version    _hardfork_versions[ STEEMIT_NUM_HARDFORKS + 1 ];
+         fc::time_point_sec            _hardfork_times[ SMOKE_NUM_HARDFORKS + 1 ];
+         protocol::hardfork_version    _hardfork_versions[ SMOKE_NUM_HARDFORKS + 1 ];
 
          block_log                     _block_log;
 

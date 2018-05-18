@@ -32,7 +32,7 @@ struct sign_state
 
       flat_map<public_key_type,bool>   provided_signatures;
       flat_set<string>                 approved_by;
-      uint32_t                         max_recursion = STEEMIT_MAX_SIG_CHECK_DEPTH;
+      uint32_t                         max_recursion = SMOKE_MAX_SIG_CHECK_DEPTH;
 };
 
 } } // smoke::protocol

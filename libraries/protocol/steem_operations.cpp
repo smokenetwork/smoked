@@ -103,16 +103,16 @@ namespace smoke { namespace protocol {
       FC_ASSERT( beneficiaries.size() < 128, "Cannot specify more than 127 beneficiaries." ); // Require size serializtion fits in one byte.
 
       validate_account_name( beneficiaries[0].account );
-      FC_ASSERT( beneficiaries[0].weight <= STEEMIT_100_PERCENT, "Cannot allocate more than 100% of rewards to one account" );
+      FC_ASSERT( beneficiaries[0].weight <= SMOKE_100_PERCENT, "Cannot allocate more than 100% of rewards to one account" );
       sum += beneficiaries[0].weight;
-      FC_ASSERT( sum <= STEEMIT_100_PERCENT, "Cannot allocate more than 100% of rewards to a comment" ); // Have to check incrementally to avoid overflow
+      FC_ASSERT( sum <= SMOKE_100_PERCENT, "Cannot allocate more than 100% of rewards to a comment" ); // Have to check incrementally to avoid overflow
 
       for( size_t i = 1; i < beneficiaries.size(); i++ )
       {
          validate_account_name( beneficiaries[i].account );
-         FC_ASSERT( beneficiaries[i].weight <= STEEMIT_100_PERCENT, "Cannot allocate more than 100% of rewards to one account" );
+         FC_ASSERT( beneficiaries[i].weight <= SMOKE_100_PERCENT, "Cannot allocate more than 100% of rewards to one account" );
          sum += beneficiaries[i].weight;
-         FC_ASSERT( sum <= STEEMIT_100_PERCENT, "Cannot allocate more than 100% of rewards to a comment" ); // Have to check incrementally to avoid overflow
+         FC_ASSERT( sum <= SMOKE_100_PERCENT, "Cannot allocate more than 100% of rewards to a comment" ); // Have to check incrementally to avoid overflow
          FC_ASSERT( beneficiaries[i - 1] < beneficiaries[i], "Benficiaries must be specified in sorted order (account ascending)" );
       }
    }
@@ -120,7 +120,7 @@ namespace smoke { namespace protocol {
    void comment_options_operation::validate()const
    {
       validate_account_name( author );
-      FC_ASSERT( percent_steem_dollars <= STEEMIT_100_PERCENT, "Percent cannot exceed 100%" );
+      FC_ASSERT( percent_steem_dollars <= SMOKE_100_PERCENT, "Percent cannot exceed 100%" );
 //      FC_ASSERT( max_accepted_payout.symbol == SBD_SYMBOL, "Max accepted payout must be in SBD" );
 // dont care symbol is SBD or STEEM
       FC_ASSERT( ((max_accepted_payout.symbol == STEEM_SYMBOL) || (max_accepted_payout.symbol == SBD_SYMBOL)), "Max accepted payout must be in STEEM_SYMBOL or SBD_SYMBOL ( dont care symbol type because SBD_SYMBOL is disabled)!" );
@@ -153,7 +153,7 @@ namespace smoke { namespace protocol {
    {
       validate_account_name( voter );
       validate_account_name( author );\
-      FC_ASSERT( abs(weight) <= STEEMIT_100_PERCENT, "Weight is not a STEEMIT percentage" );
+      FC_ASSERT( abs(weight) <= SMOKE_100_PERCENT, "Weight is not a STEEMIT percentage" );
       validate_permlink( permlink );
    }
 
@@ -163,7 +163,7 @@ namespace smoke { namespace protocol {
       validate_account_name( to );
       FC_ASSERT( amount.symbol != VESTS_SYMBOL, "transferring of Steem Power (STMP) is not allowed." );
       FC_ASSERT( amount.amount > 0, "Cannot transfer a negative amount (aka: stealing)" );
-      FC_ASSERT( memo.size() < STEEMIT_MAX_MEMO_SIZE, "Memo is too large" );
+      FC_ASSERT( memo.size() < SMOKE_MAX_MEMO_SIZE, "Memo is too large" );
       FC_ASSERT( fc::is_utf8( memo ), "Memo is not UTF8" );
    } FC_CAPTURE_AND_RETHROW( (*this) ) }
 
@@ -185,7 +185,7 @@ namespace smoke { namespace protocol {
    {
       validate_account_name( from_account );
       validate_account_name( to_account );
-      FC_ASSERT( 0 <= percent && percent <= STEEMIT_100_PERCENT, "Percent must be valid smoke percent" );
+      FC_ASSERT( 0 <= percent && percent <= SMOKE_100_PERCENT, "Percent must be valid smoke percent" );
    }
 
    void witness_update_operation::validate() const
@@ -321,7 +321,7 @@ namespace smoke { namespace protocol {
       input.nonce = nonce;
 
       auto seed = fc::sha256::hash( input );
-      proof = fc::equihash::proof::hash( STEEMIT_EQUIHASH_N, STEEMIT_EQUIHASH_K, seed );
+      proof = fc::equihash::proof::hash( SMOKE_EQUIHASH_N, SMOKE_EQUIHASH_K, seed );
       pow_summary = fc::sha256::hash( proof.inputs ).approx_log_32();
    }
 
@@ -345,8 +345,8 @@ namespace smoke { namespace protocol {
    {
       validate_account_name( input.worker_account );
       auto seed = fc::sha256::hash( input );
-      FC_ASSERT( proof.n == STEEMIT_EQUIHASH_N, "proof of work 'n' value is incorrect" );
-      FC_ASSERT( proof.k == STEEMIT_EQUIHASH_K, "proof of work 'k' value is incorrect" );
+      FC_ASSERT( proof.n == SMOKE_EQUIHASH_N, "proof of work 'n' value is incorrect" );
+      FC_ASSERT( proof.k == SMOKE_EQUIHASH_K, "proof of work 'k' value is incorrect" );
       FC_ASSERT( proof.seed == seed, "proof of work seed does not match expected seed" );
       FC_ASSERT( proof.is_valid(), "proof of work is not a solution", ("block_id", input.prev_block)("worker_account", input.worker_account)("nonce", input.nonce) );
       FC_ASSERT( pow_summary == fc::sha256::hash( proof.inputs ).approx_log_32() );
@@ -490,7 +490,7 @@ namespace smoke { namespace protocol {
       validate_account_name( to );
       FC_ASSERT( amount.amount > 0 );
       FC_ASSERT( amount.symbol == STEEM_SYMBOL || amount.symbol == SBD_SYMBOL );
-      FC_ASSERT( memo.size() < STEEMIT_MAX_MEMO_SIZE, "Memo is too large" );
+      FC_ASSERT( memo.size() < SMOKE_MAX_MEMO_SIZE, "Memo is too large" );
       FC_ASSERT( fc::is_utf8( memo ), "Memo is not UTF8" );
    }
    void transfer_from_savings_operation::validate()const {
@@ -498,7 +498,7 @@ namespace smoke { namespace protocol {
       validate_account_name( to );
       FC_ASSERT( amount.amount > 0 );
       FC_ASSERT( amount.symbol == STEEM_SYMBOL || amount.symbol == SBD_SYMBOL );
-      FC_ASSERT( memo.size() < STEEMIT_MAX_MEMO_SIZE, "Memo is too large" );
+      FC_ASSERT( memo.size() < SMOKE_MAX_MEMO_SIZE, "Memo is too large" );
       FC_ASSERT( fc::is_utf8( memo ), "Memo is not UTF8" );
    }
    void cancel_transfer_from_savings_operation::validate()const {
