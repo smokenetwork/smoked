@@ -1,11 +1,11 @@
 #pragma once
 
-#include <steemit/app/application.hpp>
-#include <steemit/chain/database.hpp>
+#include <smoke/app/application.hpp>
+#include <smoke/chain/database.hpp>
 #include <fc/io/json.hpp>
 #include <fc/smart_ref_impl.hpp>
 
-#include <steemit/plugins/debug_node/debug_node_plugin.hpp>
+#include <smoke/plugins/debug_node/debug_node_plugin.hpp>
 
 #include <graphene/utilities/key_conversion.hpp>
 
@@ -17,10 +17,10 @@ using namespace graphene::db;
 extern uint32_t ( STEEMIT_TESTING_GENESIS_TIMESTAMP );
 
 #define PUSH_TX \
-   steemit::chain::test::_push_transaction
+   smoke::chain::test::_push_transaction
 
 #define PUSH_BLOCK \
-   steemit::chain::test::_push_block
+   smoke::chain::test::_push_block
 
 // See below
 #define REQUIRE_OP_VALIDATION_SUCCESS( op, field, value ) \
@@ -130,14 +130,14 @@ extern uint32_t ( STEEMIT_TESTING_GENESIS_TIMESTAMP );
 #define ASSET( s ) \
    asset::from_string( s )
 
-namespace steemit { namespace chain {
+namespace smoke { namespace chain {
 
-using namespace steemit::protocol;
+using namespace smoke::protocol;
 
 struct database_fixture {
    // the reason we use an app is to exercise the indexes of built-in
    //   plugins
-   steemit::app::application app;
+   smoke::app::application app;
    chain::database &db;
    signed_transaction trx;
    public_key_type committee_key;
@@ -148,7 +148,7 @@ struct database_fixture {
    public_key_type init_account_pub_key = init_account_priv_key.get_public_key();
    uint32_t default_skip = 0 | database::skip_undo_history_check | database::skip_authority_check;
 
-   std::shared_ptr< steemit::plugin::debug_node::debug_node_plugin > db_plugin;
+   std::shared_ptr< smoke::plugin::debug_node::debug_node_plugin > db_plugin;
 
    optional<fc::temp_directory> data_dir;
    bool skip_key_index_test = false;

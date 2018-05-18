@@ -21,14 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <steemit/app/api.hpp>
-#include <steemit/app/api_access.hpp>
-#include <steemit/app/application.hpp>
-#include <steemit/app/plugin.hpp>
+#include <smoke/app/api.hpp>
+#include <smoke/app/api_access.hpp>
+#include <smoke/app/application.hpp>
+#include <smoke/app/plugin.hpp>
 
-#include <steemit/chain/steem_objects.hpp>
-#include <steemit/chain/steem_object_types.hpp>
-#include <steemit/chain/database_exceptions.hpp>
+#include <smoke/chain/steem_objects.hpp>
+#include <smoke/chain/steem_object_types.hpp>
+#include <smoke/chain/database_exceptions.hpp>
 
 #include <fc/time.hpp>
 
@@ -62,7 +62,7 @@
 // Every 3-6 blocks, rebroadcast. Do this randomly to prevent simultaneous p2p spam.
 #define REBROADCAST_RAND_INTERVAL() 3 + ( rand() % 4 )
 
-namespace steemit { namespace app {
+namespace smoke { namespace app {
 using graphene::net::item_hash_t;
 using graphene::net::item_id;
 using graphene::net::message;
@@ -554,7 +554,7 @@ namespace detail {
                }
 
                return result;
-            } catch ( const steemit::chain::unlinkable_block_exception& e ) {
+            } catch ( const smoke::chain::unlinkable_block_exception& e ) {
                // translate to a graphene::net exception
                fc_elog(fc::logger::get("sync"),
                      "Error when pushing block, current head block is ${head}:\n${e}",
@@ -958,7 +958,7 @@ namespace detail {
       api_access _apiaccess;
 
       //std::shared_ptr<graphene::db::object_database>   _pending_trx_db;
-      std::shared_ptr<steemit::chain::database>        _chain_db;
+      std::shared_ptr<smoke::chain::database>        _chain_db;
       std::shared_ptr<graphene::net::node>             _p2p_network;
       std::shared_ptr<fc::http::websocket_server>      _websocket_server;
       std::shared_ptr<fc::http::websocket_tls_server>  _websocket_tls_server;

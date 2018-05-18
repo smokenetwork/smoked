@@ -1,11 +1,11 @@
 
-#include <steemit/chain/database.hpp>
-#include <steemit/chain/witness_objects.hpp>
-#include <steemit/chain/witness_schedule.hpp>
+#include <smoke/chain/database.hpp>
+#include <smoke/chain/witness_objects.hpp>
+#include <smoke/chain/witness_schedule.hpp>
 
-#include <steemit/protocol/config.hpp>
+#include <smoke/protocol/config.hpp>
 
-namespace steemit { namespace chain {
+namespace smoke { namespace chain {
 
 void reset_virtual_schedule_time( database& db )
 {

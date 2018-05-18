@@ -1,4 +1,4 @@
-file(GLOB HEADERS "include/steemit/market_history/*.hpp")
+file(GLOB HEADERS "include/smoke/market_history/*.hpp")
 
 add_library( smoke_market_history
              market_history_plugin.cpp

@@ -1,4 +1,4 @@
-file(GLOB HEADERS "include/steemit/account_by_key/*.hpp")
+file(GLOB HEADERS "include/smoke/account_by_key/*.hpp")
 
 add_library( smoke_account_by_key
              account_by_key_plugin.cpp

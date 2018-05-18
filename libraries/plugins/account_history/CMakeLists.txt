@@ -1,4 +1,4 @@
-file(GLOB HEADERS "include/steemit/account_history/*.hpp")
+file(GLOB HEADERS "include/smoke/account_history/*.hpp")
 
 add_library( smoke_account_history
              account_history_plugin.cpp

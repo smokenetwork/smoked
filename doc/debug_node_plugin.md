@@ -73,7 +73,7 @@ The API's configured with `public-api` are assigned numbers starting at zero.  S
 API number 2 (TODO:  Explain about resolving names to API's and get it working).
 
 The API provides the following methods
-(see `libraries/plugins/debug_node/include/steemit/plugins/debug_node/debug_node_api.hpp`
+(see `libraries/plugins/debug_node/include/smoke/plugins/debug_node/debug_node_api.hpp`
 for these definitions):
 
     void debug_push_blocks( std::string src_filename, uint32_t count );
@@ -113,7 +113,7 @@ which demonstrates the witness keys have been reset and the head block number ha
 
 If we want to take control of an account we can do so by editing its key with `debug_update_object` command like this:
 
-    curl --data '{"jsonrpc": "2.0", "method": "call", "params": [0,"lookup_account_names",[["steemit"]]], "id": 8}' http://127.0.0.1:8090/rpc    # find out ID of account we want is 2.2.28
+    curl --data '{"jsonrpc": "2.0", "method": "call", "params": [0,"lookup_account_names",[["smoke"]]], "id": 8}' http://127.0.0.1:8090/rpc    # find out ID of account we want is 2.2.28
     curl --data '{"jsonrpc": "2.0", "method": "call", "params": [2,"debug_update_object",[{"_action":"update","id":"2.2.28","active":{"weight_threshold":1,"key_auths":[["STM6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",1]]}}]], "id": 9}]' http://127.0.0.1:8090/rpc
 
 Now that we've reset its key, we can take control of it in the wallet:
@@ -122,9 +122,9 @@ Now that we've reset its key, we can take control of it in the wallet:
     unlock abc
     import_key 5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3
     list_my_accounts
-    transfer steemit dantheman "1.234 STEEM" "make -j100 money" true
+    transfer smoke dantheman "1.234 SMOKE" "make -j100 money" true
     list_my_accounts
-    get_account_history steemit -1 1000
+    get_account_history smoke -1 1000
 
 (For some unknown reason, the current version of the wallet hangs after the transfer command -- why?)
 

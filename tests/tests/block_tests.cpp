@@ -24,13 +24,13 @@
 #ifdef IS_TEST_NET
 #include <boost/test/unit_test.hpp>
 
-#include <steemit/protocol/exceptions.hpp>
+#include <smoke/protocol/exceptions.hpp>
 
-#include <steemit/chain/database.hpp>
-#include <steemit/chain/steem_objects.hpp>
-#include <steemit/chain/history_object.hpp>
+#include <smoke/chain/database.hpp>
+#include <smoke/chain/steem_objects.hpp>
+#include <smoke/chain/history_object.hpp>
 
-#include <steemit/account_history/account_history_plugin.hpp>
+#include <smoke/account_history/account_history_plugin.hpp>
 
 #include <graphene/utilities/tempdir.hpp>
 
@@ -38,9 +38,9 @@
 
 #include "../common/database_fixture.hpp"
 
-using namespace steemit;
-using namespace steemit::chain;
-using namespace steemit::protocol;
+using namespace smoke;
+using namespace smoke::chain;
+using namespace smoke::protocol;
 
 #define TEST_SHARED_MEM_SIZE (1024 * 1024 * 8)
 
@@ -715,8 +715,8 @@ BOOST_FIXTURE_TEST_CASE( hardfork_test, database_fixture )
          if( arg == "--show-test-names" )
             std::cout << "running test " << boost::unit_test::framework::current_test_case().p_name << std::endl;
       }
-      auto ahplugin = app.register_plugin< steemit::account_history::account_history_plugin >();
-      db_plugin = app.register_plugin< steemit::plugin::debug_node::debug_node_plugin >();
+      auto ahplugin = app.register_plugin< smoke::account_history::account_history_plugin >();
+      db_plugin = app.register_plugin< smoke::plugin::debug_node::debug_node_plugin >();
       init_account_pub_key = init_account_priv_key.get_public_key();
 
       boost::program_options::variables_map options;

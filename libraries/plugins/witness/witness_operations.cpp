@@ -1,14 +1,14 @@
-#include <steemit/witness/witness_operations.hpp>
+#include <smoke/witness/witness_operations.hpp>
 
-#include <steemit/protocol/operation_util_impl.hpp>
+#include <smoke/protocol/operation_util_impl.hpp>
 
-namespace steemit { namespace witness {
+namespace smoke { namespace witness {
 
 void enable_content_editing_operation::validate()const
 {
    chain::validate_account_name( account );
 }
 
-} } // steemit::witness
+} } // smoke::witness
 
-DEFINE_OPERATION_TYPE( steemit::witness::witness_plugin_operation )
+DEFINE_OPERATION_TYPE( smoke::witness::witness_plugin_operation )

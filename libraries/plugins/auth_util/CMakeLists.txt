@@ -1,4 +1,4 @@
-file(GLOB HEADERS "include/steemit/plugins/auth_util/*.hpp")
+file(GLOB HEADERS "include/smoke/plugins/auth_util/*.hpp")
 
 add_library( smoke_auth_util
              ${HEADERS}

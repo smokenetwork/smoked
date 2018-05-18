@@ -23,16 +23,16 @@
  */
 #include <cctype>
 
-#include <steemit/app/api.hpp>
-#include <steemit/app/api_access.hpp>
-#include <steemit/app/application.hpp>
-#include <steemit/app/impacted.hpp>
+#include <smoke/app/api.hpp>
+#include <smoke/app/api_access.hpp>
+#include <smoke/app/application.hpp>
+#include <smoke/app/impacted.hpp>
 
-#include <steemit/protocol/get_config.hpp>
+#include <smoke/protocol/get_config.hpp>
 
-#include <steemit/chain/database.hpp>
-#include <steemit/chain/steem_objects.hpp>
-#include <steemit/chain/transaction_object.hpp>
+#include <smoke/chain/database.hpp>
+#include <smoke/chain/steem_objects.hpp>
+#include <smoke/chain/transaction_object.hpp>
 #include <fc/time.hpp>
 
 #include <graphene/utilities/key_conversion.hpp>
@@ -43,7 +43,7 @@
 #include <graphene/utilities/git_revision.hpp>
 #include <fc/git_revision.hpp>
 
-namespace steemit { namespace app {
+namespace smoke { namespace app {
 
     login_api::login_api(const api_context& ctx)
     :_ctx(ctx)
@@ -333,4 +333,4 @@ namespace steemit { namespace app {
        return _app.p2p_node()->set_advanced_node_parameters(params);
     }
 
-} } // steemit::app
+} } // smoke::app

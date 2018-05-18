@@ -1,4 +1,4 @@
-file(GLOB HEADERS "include/steemit/witness/*.hpp")
+file(GLOB HEADERS "include/smoke/witness/*.hpp")
 
 add_library( smoke_witness
              witness_plugin.cpp

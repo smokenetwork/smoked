@@ -1,7 +1,7 @@
-#include <steemit/app/application.hpp>
+#include <smoke/app/application.hpp>
 
-#include <steemit/witness/witness_plugin.hpp>
-#include <steemit/manifest/plugins.hpp>
+#include <smoke/witness/witness_plugin.hpp>
+#include <smoke/manifest/plugins.hpp>
 
 #include <fc/exception/exception.hpp>
 #include <fc/thread/thread.hpp>
@@ -11,7 +11,7 @@
 #include <fc/log/logger.hpp>
 #include <fc/log/logger_config.hpp>
 
-#include <steemit/protocol/version.hpp>
+#include <smoke/protocol/version.hpp>
 #include <graphene/utilities/git_revision.hpp>
 #include <fc/git_revision.hpp>
 
@@ -33,15 +33,15 @@
 #endif
 #include <graphene/utilities/key_conversion.hpp>
 
-using namespace steemit;
-using steemit::protocol::version;
+using namespace smoke;
+using smoke::protocol::version;
 namespace bpo = boost::program_options;
 
 void write_default_logging_config_to_stream(std::ostream& out);
 fc::optional<fc::logging_config> load_logging_config_from_ini_file(const fc::path& config_ini_filename);
 
 int main(int argc, char** argv) {
-   steemit::plugin::initialize_plugin_factories();
+   smoke::plugin::initialize_plugin_factories();
    app::application* node = new app::application();
    fc::oexception unhandled_exception;
    try {
@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
       std::cerr << "------------------------------------------------------\n";
 #else
       std::cerr << "------------------------------------------------------\n\n";
-      std::cerr << "            STARTING STEEM NETWORK\n\n";
+      std::cerr << "            STARTING SMOKE NETWORK\n\n";
       std::cerr << "------------------------------------------------------\n";
       std::cerr << "initminer public key: " << STEEMIT_INIT_PUBLIC_KEY_STR << "\n";
       std::cerr << "chain id: " << std::string(STEEMIT_CHAIN_ID) << "\n";
@@ -76,8 +76,8 @@ int main(int argc, char** argv) {
 
       bpo::variables_map options;
 
-      for( const std::string& plugin_name : steemit::plugin::get_available_plugins() )
-         node->register_abstract_plugin( steemit::plugin::create_plugin( plugin_name, node ) );
+      for( const std::string& plugin_name : smoke::plugin::get_available_plugins() )
+         node->register_abstract_plugin( smoke::plugin::create_plugin( plugin_name, node ) );
 
       try
       {

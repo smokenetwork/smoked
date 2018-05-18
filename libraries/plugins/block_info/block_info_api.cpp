@@ -1,31 +1,31 @@
 
-#include <steemit/app/api_context.hpp>
-#include <steemit/app/application.hpp>
+#include <smoke/app/api_context.hpp>
+#include <smoke/app/application.hpp>
 
-#include <steemit/plugins/block_info/block_info_api.hpp>
-#include <steemit/plugins/block_info/block_info_plugin.hpp>
+#include <smoke/plugins/block_info/block_info_api.hpp>
+#include <smoke/plugins/block_info/block_info_plugin.hpp>
 
-namespace steemit { namespace plugin { namespace block_info {
+namespace smoke { namespace plugin { namespace block_info {
 
 namespace detail {
 
 class block_info_api_impl
 {
    public:
-      block_info_api_impl( steemit::app::application& _app );
+      block_info_api_impl( smoke::app::application& _app );
 
-      std::shared_ptr< steemit::plugin::block_info::block_info_plugin > get_plugin();
+      std::shared_ptr< smoke::plugin::block_info::block_info_plugin > get_plugin();
 
       void get_block_info( const get_block_info_args& args, std::vector< block_info >& result );
       void get_blocks_with_info( const get_block_info_args& args, std::vector< block_with_info >& result );
 
-      steemit::app::application& app;
+      smoke::app::application& app;
 };
 
-block_info_api_impl::block_info_api_impl( steemit::app::application& _app ) : app( _app )
+block_info_api_impl::block_info_api_impl( smoke::app::application& _app ) : app( _app )
 {}
 
-std::shared_ptr< steemit::plugin::block_info::block_info_plugin > block_info_api_impl::get_plugin()
+std::shared_ptr< smoke::plugin::block_info::block_info_plugin > block_info_api_impl::get_plugin()
 {
    return app.get_plugin< block_info_plugin >( "block_info" );
 }
@@ -66,7 +66,7 @@ void block_info_api_impl::get_blocks_with_info( const get_block_info_args& args,
 
 } // detail
 
-block_info_api::block_info_api( const steemit::app::api_context& ctx )
+block_info_api::block_info_api( const smoke::app::api_context& ctx )
 {
    my = std::make_shared< detail::block_info_api_impl >(ctx.app);
 }
@@ -87,4 +87,4 @@ std::vector< block_with_info > block_info_api::get_blocks_with_info( get_block_i
 
 void block_info_api::on_api_startup() { }
 
-} } } // steemit::plugin::block_info
+} } } // smoke::plugin::block_info

@@ -1,10 +1,10 @@
-#include <steemit/protocol/get_config.hpp>
-#include <steemit/protocol/config.hpp>
-#include <steemit/protocol/asset.hpp>
-#include <steemit/protocol/types.hpp>
-#include <steemit/protocol/version.hpp>
+#include <smoke/protocol/get_config.hpp>
+#include <smoke/protocol/config.hpp>
+#include <smoke/protocol/asset.hpp>
+#include <smoke/protocol/types.hpp>
+#include <smoke/protocol/version.hpp>
 
-namespace steemit { namespace protocol {
+namespace smoke { namespace protocol {
 
 fc::variant_object get_config()
 {
@@ -185,4 +185,4 @@ fc::variant_object get_config()
    return result;
 }
 
-} } // steemit::protocol
+} } // smoke::protocol

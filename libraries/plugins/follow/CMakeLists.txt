@@ -1,4 +1,4 @@
-file(GLOB HEADERS "include/steemit/follow/*.hpp")
+file(GLOB HEADERS "include/smoke/follow/*.hpp")
 
 add_library( smoke_follow
              follow_plugin.cpp

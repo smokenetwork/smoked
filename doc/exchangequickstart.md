@@ -22,8 +22,8 @@ sh get-docker.sh
 
 Pull in the steem repo from the official source on github and then change into the directory that's created for it.
 ```
-git clone https://github.com/steemit/steem
-cd steem
+git clone https://github.com/smokenetwork/smoked
+cd smoked
 ```
 
 ### Build the image from source with docker
@@ -31,7 +31,7 @@ cd steem
 Docker isn't just for downloading already built images, it can be used to build from source the same way you would otherwise build. By doing this you ensure that your build environment is identical to what we use to develop the software. Use the below command to start the build:
 
 ```
-docker build -t=steemit/steem .
+docker build -t=smoke/smoked .
 ```
 
 Don't forget the `.` at the end of the line which indicates the build target is in the current directory.
@@ -45,7 +45,7 @@ When the build completes you will see a message indicating that it is 'successfu
 If you'd like to use our already pre-built official binary images, it's as simple as downloading it from the Dockerhub registry with only one command:
 
 ```
-docker pull steemit/steem
+docker pull smoke/smoked
 ```
 
 ### Running a binary build without a Docker container
@@ -55,7 +55,7 @@ If you build with Docker but do not want to run smoked from within a docker cont
 To extract the binary you need to start a container and then copy the file from it.
 
 ```
-docker run -d --name smoked-exchange steemit/steem
+docker run -d --name smoked-exchange smoke/smoked
 docker cp smoked-exchange:/usr/local/smoked-default/bin/smoked /local/path/to/smoked
 docker cp smoked-exchange:/usr/local/smoked-default/bin/cli_wallet /local/path/to/cli_wallet
 docker stop smoked-exchange

@@ -32,9 +32,9 @@ huge gain if you do not need this functionality.
 
 We ship a Dockerfile.  This builds both common node type binaries.
 
-    git clone https://github.com/steemit/steem
+    git clone https://github.com/smokenetwork/smoked
     cd steem
-    docker build -t steemit/steem .
+    docker build -t smoke/smoked .
 
 ## Building on Ubuntu 16.04
 
@@ -78,7 +78,7 @@ will build out of the box without further effort:
         libreadline-dev \
         perl
 
-    git clone https://github.com/steemit/steem
+    git clone https://github.com/smokenetwork/smoked
     cd steem
     git submodule update --init --recursive
     mkdir build
@@ -141,7 +141,7 @@ Here is how to build and install Boost 1.60 into your user's home directory
 
 Then the instructions are the same as for steem:
 
-    git clone https://github.com/steemit/steem
+    git clone https://github.com/smokenetwork/smoked
     cd steem
     git submodule update --init --recursive
     mkdir build && cd build
@@ -194,7 +194,7 @@ steem. Until then, this will allow you to install boost 1.60.0.
 
 ### Clone the Repository
 
-    git clone https://github.com/steemit/steem.git
+    git clone https://github.com/smokenetwork/smoked.git
     cd steem
 
 ### Compile

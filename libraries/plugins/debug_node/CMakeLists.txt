@@ -1,4 +1,4 @@
-file(GLOB HEADERS "include/steemit/plugins/debug_node/*.hpp")
+file(GLOB HEADERS "include/smoke/plugins/debug_node/*.hpp")
 
 add_library( smoke_debug_node
              ${HEADERS}
@@ -15,4 +15,4 @@ install( TARGETS smoke_debug_node
          LIBRARY DESTINATION lib
          ARCHIVE DESTINATION lib
        )
-INSTALL( FILES ${HEADERS} DESTINATION "include/steemit/plugins/debug_node" )
+INSTALL( FILES ${HEADERS} DESTINATION "include/smoke/plugins/debug_node" )

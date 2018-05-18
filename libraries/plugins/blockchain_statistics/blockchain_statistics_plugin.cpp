@@ -1,20 +1,20 @@
-#include <steemit/blockchain_statistics/blockchain_statistics_api.hpp>
+#include <smoke/blockchain_statistics/blockchain_statistics_api.hpp>
 
-#include <steemit/app/impacted.hpp>
-#include <steemit/chain/account_object.hpp>
-#include <steemit/chain/comment_object.hpp>
-#include <steemit/chain/history_object.hpp>
+#include <smoke/app/impacted.hpp>
+#include <smoke/chain/account_object.hpp>
+#include <smoke/chain/comment_object.hpp>
+#include <smoke/chain/history_object.hpp>
 
-#include <steemit/chain/database.hpp>
-#include <steemit/chain/index.hpp>
-#include <steemit/chain/operation_notification.hpp>
+#include <smoke/chain/database.hpp>
+#include <smoke/chain/index.hpp>
+#include <smoke/chain/operation_notification.hpp>
 
-namespace steemit { namespace blockchain_statistics {
+namespace smoke { namespace blockchain_statistics {
 
 namespace detail
 {
 
-using namespace steemit::protocol;
+using namespace smoke::protocol;
 
 class blockchain_statistics_plugin_impl
 {
@@ -468,6 +468,6 @@ uint32_t blockchain_statistics_plugin::get_max_history_per_bucket() const
    return _my->_maximum_history_per_bucket_size;
 }
 
-} } // steemit::blockchain_statistics
+} } // smoke::blockchain_statistics
 
-STEEMIT_DEFINE_PLUGIN( blockchain_statistics, steemit::blockchain_statistics::blockchain_statistics_plugin );
+STEEMIT_DEFINE_PLUGIN( blockchain_statistics, smoke::blockchain_statistics::blockchain_statistics_plugin );

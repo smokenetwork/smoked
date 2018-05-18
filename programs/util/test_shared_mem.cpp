@@ -10,10 +10,10 @@
 
 #include <graphene/utilities/key_conversion.hpp>
 
-#include <steemit/protocol/types.hpp>
-#include <steemit/protocol/authority.hpp>
+#include <smoke/protocol/types.hpp>
+#include <smoke/protocol/authority.hpp>
 
-#include <steemit/chain/shared_authority.hpp>
+#include <smoke/chain/shared_authority.hpp>
 
 #include <boost/interprocess/managed_mapped_file.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
@@ -102,7 +102,7 @@ struct book
      template<typename Constructor, typename Allocator>
      book( Constructor&& c, const Allocator& al )
      :name(al),author(al),pages(0),prize(0),
-     auth( bip::allocator<steemit::chain::shared_authority, bip::managed_mapped_file::segment_manager>( al.get_segment_manager() )),
+     auth( bip::allocator<smoke::chain::shared_authority, bip::managed_mapped_file::segment_manager>( al.get_segment_manager() )),
      deq( basic_string_allocator( al.get_segment_manager() ) )
      {
         c( *this );
@@ -112,12 +112,12 @@ struct book
      shared_string author;
      int32_t                          pages;
      int32_t                          prize;
-     steemit::chain::shared_authority auth;
+     smoke::chain::shared_authority auth;
      bip::deque<shared_string,basic_string_allocator> deq;
 
      book(const shared_string::allocator_type& al):
      name(al),author(al),pages(0),prize(0),
-     auth( bip::allocator<steemit::chain::shared_authority, bip::managed_mapped_file::segment_manager>( al.get_segment_manager() )),
+     auth( bip::allocator<smoke::chain::shared_authority, bip::managed_mapped_file::segment_manager>( al.get_segment_manager() )),
      deq( basic_string_allocator( al.get_segment_manager() ) )
      {}
 
@@ -171,7 +171,7 @@ int main(int argc, char** argv, char** envp)
    }
 
    //b.pages = pbc->size();
-   //b.auth = steemit::chain::authority( 1, "dan", pbc->size() );
+   //b.auth = smoke::chain::authority( 1, "dan", pbc->size() );
    pbc->emplace( [&]( book& b ) {
                  b.name = "emplace name";
                  b.pages = pbc->size();

@@ -13,10 +13,10 @@ my $outFile = new IO::File($outputFileName, "w")
 my $fileHeader = <<'END';
 /** GENERATED FILE **/
 #include <set>
-#include <steemit/wallet/api_documentation.hpp>
-#include <steemit/wallet/wallet.hpp>
+#include <smoke/wallet/api_documentation.hpp>
+#include <smoke/wallet/wallet.hpp>
 
-namespace steemit { namespace wallet {
+namespace smoke { namespace wallet {
    namespace detail
    {
       struct api_method_name_collector_visitor
@@ -38,7 +38,7 @@ $outFile->print($fileHeader);
 
 for my $class (@{$doxydocs->{classes}})
 {
-  if ($class->{name} eq 'steemit::wallet::wallet_api')
+  if ($class->{name} eq 'smoke::wallet::wallet_api')
   {
     for my $member (@{$class->{public_methods}->{members}})
     {
@@ -84,7 +84,7 @@ my $fileFooter = <<'END';
           ++iter;
    }
 
-} } // end namespace steemit::wallet
+} } // end namespace smoke::wallet
 END
 $outFile->print($fileFooter);
 $outFile->close();

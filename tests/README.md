@@ -27,9 +27,9 @@ Then, inside the container:
 (These steps are taken from `/Dockerfile.test` in the
 repository root.)
 
-    git clone https://github.com/steemit/steem.git \
-        /usr/local/src/steem
-    cd /usr/local/src/steem
+    git clone https://github.com/smokenetwork/smoked.git \
+        /usr/local/src/smoked
+    cd /usr/local/src/smoked
     git checkout <branch> # e.g. 123-feature
     git submodule update --init --recursive
     mkdir build
@@ -42,6 +42,6 @@ repository root.)
         ..
     make -j$(nproc) chain_test
     ./tests/chain_test
-    cd /usr/local/src/steem
+    cd /usr/local/src/smoked
     doxygen
     programs/build_helpers/check_reflect.py

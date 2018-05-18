@@ -16,14 +16,14 @@ target_link_libraries( smoke_plugins
 # we will have this circular dependency:
 #
 # ```
-# xxx_plugin ===> steemit::app ===> plugins ===> xxx_plugin
+# xxx_plugin ===> smoke::app ===> plugins ===> xxx_plugin
 # ```
 #
 # To break the dependency, we create `mf_plugins` which only
 # has a "weak" reference to the plugin:
 #
 # ```
-# xxx_plugin ===> steemit::app ===> mf_plugins ---> xxx_plugin
+# xxx_plugin ===> smoke::app ===> mf_plugins ---> xxx_plugin
 # ```
 #
 # This weak reference is implemented by a declaring a
@@ -35,7 +35,7 @@ target_link_libraries( smoke_plugins
 
 add_library( smoke_mf_plugins
    mf_plugins.cpp
-   ${CMAKE_CURRENT_SOURCE_DIR}/include/steemit/manifest/plugins.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/smoke/manifest/plugins.hpp
 )
 
 target_include_directories( smoke_mf_plugins

@@ -1,26 +1,26 @@
-#include <steemit/protocol/steem_operations.hpp>
+#include <smoke/protocol/steem_operations.hpp>
 
-#include <steemit/chain/block_summary_object.hpp>
-#include <steemit/chain/compound.hpp>
-#include <steemit/chain/custom_operation_interpreter.hpp>
-#include <steemit/chain/database.hpp>
-#include <steemit/chain/database_exceptions.hpp>
-#include <steemit/chain/db_with.hpp>
-#include <steemit/chain/evaluator_registry.hpp>
-#include <steemit/chain/global_property_object.hpp>
-#include <steemit/chain/history_object.hpp>
-#include <steemit/chain/index.hpp>
-#include <steemit/chain/steem_evaluator.hpp>
-#include <steemit/chain/steem_objects.hpp>
-#include <steemit/chain/transaction_object.hpp>
-#include <steemit/chain/shared_db_merkle.hpp>
-#include <steemit/chain/operation_notification.hpp>
-#include <steemit/chain/witness_schedule.hpp>
+#include <smoke/chain/block_summary_object.hpp>
+#include <smoke/chain/compound.hpp>
+#include <smoke/chain/custom_operation_interpreter.hpp>
+#include <smoke/chain/database.hpp>
+#include <smoke/chain/database_exceptions.hpp>
+#include <smoke/chain/db_with.hpp>
+#include <smoke/chain/evaluator_registry.hpp>
+#include <smoke/chain/global_property_object.hpp>
+#include <smoke/chain/history_object.hpp>
+#include <smoke/chain/index.hpp>
+#include <smoke/chain/steem_evaluator.hpp>
+#include <smoke/chain/steem_objects.hpp>
+#include <smoke/chain/transaction_object.hpp>
+#include <smoke/chain/shared_db_merkle.hpp>
+#include <smoke/chain/operation_notification.hpp>
+#include <smoke/chain/witness_schedule.hpp>
 
-#include <steemit/chain/util/asset.hpp>
-#include <steemit/chain/util/reward.hpp>
-#include <steemit/chain/util/uint256.hpp>
-#include <steemit/chain/util/reward.hpp>
+#include <smoke/chain/util/asset.hpp>
+#include <smoke/chain/util/reward.hpp>
+#include <smoke/chain/util/uint256.hpp>
+#include <smoke/chain/util/reward.hpp>
 
 #include <fc/smart_ref_impl.hpp>
 #include <fc/uint128.hpp>
@@ -34,7 +34,7 @@
 #include <fstream>
 #include <functional>
 
-namespace steemit { namespace chain {
+namespace smoke { namespace chain {
 
 //namespace db2 = graphene::db2;
 
@@ -60,11 +60,11 @@ struct db_schema
 
 } }
 
-FC_REFLECT( steemit::chain::object_schema_repr, (space_type)(type) )
-FC_REFLECT( steemit::chain::operation_schema_repr, (id)(type) )
-FC_REFLECT( steemit::chain::db_schema, (types)(object_types)(operation_type)(custom_operation_types) )
+FC_REFLECT( smoke::chain::object_schema_repr, (space_type)(type) )
+FC_REFLECT( smoke::chain::operation_schema_repr, (id)(type) )
+FC_REFLECT( smoke::chain::db_schema, (types)(object_types)(operation_type)(custom_operation_types) )
 
-namespace steemit { namespace chain {
+namespace smoke { namespace chain {
 
 using boost::container::flat_set;
 
@@ -2468,14 +2468,6 @@ void database::init_genesis( uint64_t init_supply, uint64_t init_supply_sbd )
       {
          wso.current_shuffled_witnesses[0] = STEEMIT_INIT_MINER_NAME;
       } );
-
-
-
-       // tuanpa
-      // https://github.com/steemit/steem/issues/1407
-//       set_hardfork( STEEMIT_NUM_HARDFORKS, true);
-
-
    }
    FC_CAPTURE_AND_RETHROW()
 }
@@ -4223,4 +4215,4 @@ void database::retally_witness_vote_counts( bool force )
    }
 }
 
-} } //steemit::chain
+} } //smoke::chain

@@ -83,7 +83,7 @@ cd $HOME
 
 if [[ "$USE_PUBLIC_SHARED_MEMORY" ]]; then
   echo smoked: Downloading and uncompressing blockchain-$VERSION-latest.tar.bz2 - this may take awhile.
-  wget -qO- https://s3.amazonaws.com/steemit-dev-blockchainstate/blockchain-$VERSION-latest.tar.bz2 | pbzip2 -m2000dc | tar x
+  wget -qO- https://s3.amazonaws.com/smoke-dev-blockchainstate/blockchain-$VERSION-latest.tar.bz2 | pbzip2 -m2000dc | tar x
 fi
 
 # slow down restart loop if flapping

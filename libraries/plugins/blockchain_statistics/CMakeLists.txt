@@ -1,4 +1,4 @@
-file(GLOB HEADERS "include/steemit/blockchain_statistics/*.hpp")
+file(GLOB HEADERS "include/smoke/blockchain_statistics/*.hpp")
 
 add_library( smoke_blockchain_statistics
              blockchain_statistics_plugin.cpp

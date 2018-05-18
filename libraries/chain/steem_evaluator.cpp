@@ -1,11 +1,11 @@
-#include <steemit/chain/steem_evaluator.hpp>
-#include <steemit/chain/database.hpp>
-#include <steemit/chain/custom_operation_interpreter.hpp>
-#include <steemit/chain/steem_objects.hpp>
-#include <steemit/chain/witness_objects.hpp>
-#include <steemit/chain/block_summary_object.hpp>
+#include <smoke/chain/steem_evaluator.hpp>
+#include <smoke/chain/database.hpp>
+#include <smoke/chain/custom_operation_interpreter.hpp>
+#include <smoke/chain/steem_objects.hpp>
+#include <smoke/chain/witness_objects.hpp>
+#include <smoke/chain/block_summary_object.hpp>
 
-#include <steemit/chain/util/reward.hpp>
+#include <smoke/chain/util/reward.hpp>
 
 #ifndef IS_LOW_MEM
 #include <diff_match_patch.h>
@@ -30,7 +30,7 @@ std::string wstring_to_utf8(const std::wstring& str)
 
 #include <limits>
 
-namespace steemit { namespace chain {
+namespace smoke { namespace chain {
    using fc::uint128_t;
 
 inline void validate_permlink_0_1( const string& permlink )
@@ -2300,4 +2300,4 @@ void delegate_vesting_shares_evaluator::do_apply( const delegate_vesting_shares_
    }
 }
 
-} } // steemit::chain
+} } // smoke::chain
