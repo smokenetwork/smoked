@@ -82,7 +82,7 @@ for these definitions):
     void debug_stream_json_objects( std::string filename );
     void debug_stream_json_objects_flush();
 
-Okay, let's run `steemd`.  It should start immediately with no blocks.  We can ask it to read blocks from the directory we saved earlier:
+Okay, let's run `smoked`.  It should start immediately with no blocks.  We can ask it to read blocks from the directory we saved earlier:
 
     curl --data '{"jsonrpc": "2.0", "method": "call", "params": [2,"debug_push_blocks",["/mydir/myblocks", 1000]], "id": 1}' http://127.0.0.1:8090/rpc
 
