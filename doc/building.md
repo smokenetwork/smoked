@@ -1,4 +1,4 @@
-# Building Steem
+# Building Smoked
 
 ## Compile-Time Options (cmake)
 
@@ -10,7 +10,7 @@ running tests, it is recommended to build as release.
 
 ### LOW_MEMORY_NODE=[OFF/ON]
 
-Builds steemd to be a consensus-only low memory node. Data and fields not
+Builds smoked to be a consensus-only low memory node. Data and fields not
 needed for consensus are not stored in the object database.  This option is
 recommended for witnesses and seed-nodes.
 
@@ -18,9 +18,9 @@ recommended for witnesses and seed-nodes.
 
 Clears old votes from memory that are no longer required for consensus.
 
-### BUILD_STEEM_TESTNET=[OFF/ON]
+### BUILD_SMOKE_TESTNET=[OFF/ON]
 
-Builds steem for use in a private testnet. Also required for building unit tests.
+Builds smoke for use in a private testnet. Also required for building unit tests.
 
 ### SKIP_BY_TX_ID=[OFF/ON]
 
@@ -32,9 +32,9 @@ huge gain if you do not need this functionality.
 
 We ship a Dockerfile.  This builds both common node type binaries.
 
-    git clone https://github.com/steemit/steem
+    git clone https://github.com/smokenetwork/smoked
     cd steem
-    docker build -t steemit/steem .
+    docker build -t smoke/smoked .
 
 ## Building on Ubuntu 16.04
 
@@ -78,13 +78,13 @@ will build out of the box without further effort:
         libreadline-dev \
         perl
 
-    git clone https://github.com/steemit/steem
+    git clone https://github.com/smokenetwork/smoked
     cd steem
     git submodule update --init --recursive
     mkdir build
     cd build
     cmake -DCMAKE_BUILD_TYPE=Release ..
-    make -j$(nproc) steemd
+    make -j$(nproc) smoked
     make -j$(nproc) cli_wallet
     # optional
     make install  # defaults to /usr/local
@@ -116,7 +116,7 @@ Here are the required packages:
 
 The Boost provided in the Ubuntu 14.04 package manager (Boost 1.55) is too old.
 Steem requires Boost 1.58 (as in Ubuntu 16.04) and works with versions up to 1.60 (including).
-So building Steem on Ubuntu 14.04 requires downloading and installing a more recent
+So building Smoked on Ubuntu 14.04 requires downloading and installing a more recent
 version of Boost.
 
 According to [this mailing list
@@ -141,12 +141,12 @@ Here is how to build and install Boost 1.60 into your user's home directory
 
 Then the instructions are the same as for steem:
 
-    git clone https://github.com/steemit/steem
+    git clone https://github.com/smokenetwork/smoked
     cd steem
     git submodule update --init --recursive
     mkdir build && cd build
     cmake -DCMAKE_BUILD_TYPE=Release ..
-    make -j$(nproc) steemd
+    make -j$(nproc) smoked
     make -j$(nproc) cli_wallet
 
 ## Building on macOS X
@@ -167,7 +167,7 @@ Install Homebrew by following the instructions here: http://brew.sh/
    brew doctor
    brew update
 
-### Install steem dependencies:
+### Install smoked dependencies:
 
     brew install \
         autoconf \
@@ -194,7 +194,7 @@ steem. Until then, this will allow you to install boost 1.60.0.
 
 ### Clone the Repository
 
-    git clone https://github.com/steemit/steem.git
+    git clone https://github.com/smokenetwork/smoked.git
     cd steem
 
 ### Compile
@@ -208,15 +208,15 @@ steem. Until then, this will allow you to install boost 1.60.0.
 
 Also, some useful build targets for `make` are:
 
-    steemd
+    smoked
     chain_test
     cli_wallet
 
 e.g.:
 
-    make -j$(sysctl -n hw.logicalcpu) steemd
+    make -j$(sysctl -n hw.logicalcpu) smoked
 
-This will only build `steemd`.
+This will only build `smoked`.
 
 ## Building on Other Platforms
 

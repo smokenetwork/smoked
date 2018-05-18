@@ -1,20 +1,20 @@
-#include <steemit/blockchain_statistics/blockchain_statistics_api.hpp>
+#include <smoke/blockchain_statistics/blockchain_statistics_api.hpp>
 
-#include <steemit/app/impacted.hpp>
-#include <steemit/chain/account_object.hpp>
-#include <steemit/chain/comment_object.hpp>
-#include <steemit/chain/history_object.hpp>
+#include <smoke/app/impacted.hpp>
+#include <smoke/chain/account_object.hpp>
+#include <smoke/chain/comment_object.hpp>
+#include <smoke/chain/history_object.hpp>
 
-#include <steemit/chain/database.hpp>
-#include <steemit/chain/index.hpp>
-#include <steemit/chain/operation_notification.hpp>
+#include <smoke/chain/database.hpp>
+#include <smoke/chain/index.hpp>
+#include <smoke/chain/operation_notification.hpp>
 
-namespace steemit { namespace blockchain_statistics {
+namespace smoke { namespace blockchain_statistics {
 
 namespace detail
 {
 
-using namespace steemit::protocol;
+using namespace smoke::protocol;
 
 class blockchain_statistics_plugin_impl
 {
@@ -357,11 +357,11 @@ void blockchain_statistics_plugin_impl::pre_operation( const operation_notificat
          auto& account = db.get_account( op.account );
          const auto& bucket = db.get(bucket_id);
 
-         auto new_vesting_withdrawal_rate = op.vesting_shares.amount / STEEMIT_VESTING_WITHDRAW_INTERVALS;
+         auto new_vesting_withdrawal_rate = op.vesting_shares.amount / SMOKE_VESTING_WITHDRAW_INTERVALS;
          if( op.vesting_shares.amount > 0 && new_vesting_withdrawal_rate == 0 )
             new_vesting_withdrawal_rate = 1;
 
-         if( !db.has_hardfork( STEEMIT_HARDFORK_0_1 ) )
+         if( !db.has_hardfork( SMOKE_HARDFORK_0_1 ) )
             new_vesting_withdrawal_rate *= 1000000;
 
          db.modify( bucket, [&]( bucket_object& b )
@@ -468,6 +468,6 @@ uint32_t blockchain_statistics_plugin::get_max_history_per_bucket() const
    return _my->_maximum_history_per_bucket_size;
 }
 
-} } // steemit::blockchain_statistics
+} } // smoke::blockchain_statistics
 
-STEEMIT_DEFINE_PLUGIN( blockchain_statistics, steemit::blockchain_statistics::blockchain_statistics_plugin );
+SMOKE_DEFINE_PLUGIN( blockchain_statistics, smoke::blockchain_statistics::blockchain_statistics_plugin );

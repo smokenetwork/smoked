@@ -1,15 +1,15 @@
-#include <steemit/tags/tags_plugin.hpp>
+#include <smoke/tags/tags_plugin.hpp>
 
-#include <steemit/app/impacted.hpp>
+#include <smoke/app/impacted.hpp>
 
-#include <steemit/protocol/config.hpp>
+#include <smoke/protocol/config.hpp>
 
-#include <steemit/chain/database.hpp>
-#include <steemit/chain/hardfork.hpp>
-#include <steemit/chain/index.hpp>
-#include <steemit/chain/operation_notification.hpp>
-#include <steemit/chain/account_object.hpp>
-#include <steemit/chain/comment_object.hpp>
+#include <smoke/chain/database.hpp>
+#include <smoke/chain/hardfork.hpp>
+#include <smoke/chain/index.hpp>
+#include <smoke/chain/operation_notification.hpp>
+#include <smoke/chain/account_object.hpp>
+#include <smoke/chain/comment_object.hpp>
 
 #include <fc/smart_ref_impl.hpp>
 #include <fc/thread/thread.hpp>
@@ -19,11 +19,11 @@
 #include <boost/range/iterator_range.hpp>
 #include <boost/algorithm/string.hpp>
 
-namespace steemit { namespace tags {
+namespace smoke { namespace tags {
 
 namespace detail {
 
-using namespace steemit::protocol;
+using namespace smoke::protocol;
 
 class tags_plugin_impl
 {
@@ -33,7 +33,7 @@ class tags_plugin_impl
       { }
       virtual ~tags_plugin_impl();
 
-      steemit::chain::database& database()
+      smoke::chain::database& database()
       {
          return _self.database();
       }
@@ -391,7 +391,7 @@ struct operation_visitor
 
    void operator()( const transfer_operation& op )const
    {
-      if( op.to == STEEMIT_NULL_ACCOUNT && op.amount.symbol == SBD_SYMBOL )
+      if( op.to == SMOKE_NULL_ACCOUNT && op.amount.symbol == SBD_SYMBOL )
       {
          vector<string> part; part.reserve(4);
          auto path = op.memo;
@@ -533,6 +533,6 @@ void tags_plugin::plugin_startup()
 {
 }
 
-} } /// steemit::tags
+} } /// smoke::tags
 
-STEEMIT_DEFINE_PLUGIN( tags, steemit::tags::tags_plugin )
+SMOKE_DEFINE_PLUGIN( tags, smoke::tags::tags_plugin )

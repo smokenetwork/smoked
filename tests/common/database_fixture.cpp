@@ -3,10 +3,10 @@
 
 #include <graphene/utilities/tempdir.hpp>
 
-#include <steemit/chain/steem_objects.hpp>
-#include <steemit/chain/history_object.hpp>
-#include <steemit/account_history/account_history_plugin.hpp>
-#include <steemit/witness/witness_plugin.hpp>
+#include <smoke/chain/steem_objects.hpp>
+#include <smoke/chain/history_object.hpp>
+#include <smoke/account_history/account_history_plugin.hpp>
+#include <smoke/witness/witness_plugin.hpp>
 
 #include <fc/crypto/digest.hpp>
 #include <fc/smart_ref_impl.hpp>
@@ -17,11 +17,11 @@
 
 #include "database_fixture.hpp"
 
-//using namespace steemit::chain::test;
+//using namespace smoke::chain::test;
 
-uint32_t STEEMIT_TESTING_GENESIS_TIMESTAMP = 1431700000;
+uint32_t SMOKE_TESTING_GENESIS_TIMESTAMP = 1431700000;
 
-namespace steemit { namespace chain {
+namespace smoke { namespace chain {
 
 using std::cout;
 using std::cerr;
@@ -39,9 +39,9 @@ clean_database_fixture::clean_database_fixture()
       if( arg == "--show-test-names" )
          std::cout << "running test " << boost::unit_test::framework::current_test_case().p_name << std::endl;
    }
-   auto ahplugin = app.register_plugin< steemit::account_history::account_history_plugin >();
-   db_plugin = app.register_plugin< steemit::plugin::debug_node::debug_node_plugin >();
-   auto wit_plugin = app.register_plugin< steemit::witness::witness_plugin >();
+   auto ahplugin = app.register_plugin< smoke::account_history::account_history_plugin >();
+   db_plugin = app.register_plugin< smoke::plugin::debug_node::debug_node_plugin >();
+   auto wit_plugin = app.register_plugin< smoke::witness::witness_plugin >();
    init_account_pub_key = init_account_priv_key.get_public_key();
 
    boost::program_options::variables_map options;
@@ -54,7 +54,7 @@ clean_database_fixture::clean_database_fixture()
    open_database();
 
    generate_block();
-   db.set_hardfork( STEEMIT_NUM_HARDFORKS );
+   db.set_hardfork( SMOKE_NUM_HARDFORKS );
    generate_block();
 
    //ahplugin->plugin_startup();
@@ -62,11 +62,11 @@ clean_database_fixture::clean_database_fixture()
    vest( "initminer", 10000 );
 
    // Fill up the rest of the required miners
-   for( int i = STEEMIT_NUM_INIT_MINERS; i < STEEMIT_MAX_WITNESSES; i++ )
+   for( int i = SMOKE_NUM_INIT_MINERS; i < SMOKE_MAX_WITNESSES; i++ )
    {
-      account_create( STEEMIT_INIT_MINER_NAME + fc::to_string( i ), init_account_pub_key );
-      fund( STEEMIT_INIT_MINER_NAME + fc::to_string( i ), STEEMIT_MIN_PRODUCER_REWARD.amount.value );
-      witness_create( STEEMIT_INIT_MINER_NAME + fc::to_string( i ), init_account_priv_key, "foo.bar", init_account_pub_key, STEEMIT_MIN_PRODUCER_REWARD.amount );
+      account_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_pub_key );
+      fund( SMOKE_INIT_MINER_NAME + fc::to_string( i ), SMOKE_MIN_PRODUCER_REWARD.amount.value );
+      witness_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_priv_key, "foo.bar", init_account_pub_key, SMOKE_MIN_PRODUCER_REWARD.amount );
    }
 
    validate_database();
@@ -114,17 +114,17 @@ void clean_database_fixture::resize_shared_mem( uint64_t size )
 
 
    generate_block();
-   db.set_hardfork( STEEMIT_NUM_HARDFORKS );
+   db.set_hardfork( SMOKE_NUM_HARDFORKS );
    generate_block();
 
    vest( "initminer", 10000 );
 
    // Fill up the rest of the required miners
-   for( int i = STEEMIT_NUM_INIT_MINERS; i < STEEMIT_MAX_WITNESSES; i++ )
+   for( int i = SMOKE_NUM_INIT_MINERS; i < SMOKE_MAX_WITNESSES; i++ )
    {
-      account_create( STEEMIT_INIT_MINER_NAME + fc::to_string( i ), init_account_pub_key );
-      fund( STEEMIT_INIT_MINER_NAME + fc::to_string( i ), STEEMIT_MIN_PRODUCER_REWARD.amount.value );
-      witness_create( STEEMIT_INIT_MINER_NAME + fc::to_string( i ), init_account_priv_key, "foo.bar", init_account_pub_key, STEEMIT_MIN_PRODUCER_REWARD.amount );
+      account_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_pub_key );
+      fund( SMOKE_INIT_MINER_NAME + fc::to_string( i ), SMOKE_MIN_PRODUCER_REWARD.amount.value );
+      witness_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_priv_key, "foo.bar", init_account_pub_key, SMOKE_MIN_PRODUCER_REWARD.amount );
    }
 
    validate_database();
@@ -138,7 +138,7 @@ live_database_fixture::live_database_fixture()
       _chain_dir = fc::current_path() / "test_blockchain";
       FC_ASSERT( fc::exists( _chain_dir ), "Requires blockchain to test on in ./test_blockchain" );
 
-      auto ahplugin = app.register_plugin< steemit::account_history::account_history_plugin >();
+      auto ahplugin = app.register_plugin< smoke::account_history::account_history_plugin >();
       ahplugin->plugin_initialize( boost::program_options::variables_map() );
 
       db.open( _chain_dir, _chain_dir );
@@ -208,7 +208,7 @@ void database_fixture::generate_blocks( uint32_t block_count )
 void database_fixture::generate_blocks(fc::time_point_sec timestamp, bool miss_intermediate_blocks)
 {
    db_plugin->debug_generate_blocks_until( debug_key, timestamp, miss_intermediate_blocks, default_skip );
-   BOOST_REQUIRE( ( db.head_block_time() - timestamp ).to_seconds() < STEEMIT_BLOCK_INTERVAL );
+   BOOST_REQUIRE( ( db.head_block_time() - timestamp ).to_seconds() < SMOKE_BLOCK_INTERVAL );
 }
 
 const account_object& database_fixture::account_create(
@@ -223,7 +223,7 @@ const account_object& database_fixture::account_create(
 {
    try
    {
-      if( db.has_hardfork( STEEMIT_HARDFORK_0_17 ) )
+      if( db.has_hardfork( SMOKE_HARDFORK_0_17 ) )
       {
          account_create_with_delegation_operation op;
          op.new_account_name = name;
@@ -253,7 +253,7 @@ const account_object& database_fixture::account_create(
          trx.operations.push_back( op );
       }
 
-      trx.set_expiration( db.head_block_time() + STEEMIT_MAX_TIME_UNTIL_EXPIRATION );
+      trx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
       trx.sign( creator_key, db.get_chain_id() );
       trx.validate();
       db.push_transaction( trx, 0 );
@@ -277,9 +277,9 @@ const account_object& database_fixture::account_create(
    {
       return account_create(
          name,
-         STEEMIT_INIT_MINER_NAME,
+         SMOKE_INIT_MINER_NAME,
          init_account_priv_key,
-         std::max( db.get_witness_schedule_object().median_props.account_creation_fee.amount * STEEMIT_CREATE_ACCOUNT_WITH_STEEM_MODIFIER, share_type( 100 ) ),
+         std::max( db.get_witness_schedule_object().median_props.account_creation_fee.amount * SMOKE_CREATE_ACCOUNT_WITH_STEEM_MODIFIER, share_type( 100 ) ),
          key,
          post_key,
          "" );
@@ -311,7 +311,7 @@ const witness_object& database_fixture::witness_create(
       op.fee = asset( fee, STEEM_SYMBOL );
 
       trx.operations.push_back( op );
-      trx.set_expiration( db.head_block_time() + STEEMIT_MAX_TIME_UNTIL_EXPIRATION );
+      trx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
       trx.sign( owner_key, db.get_chain_id() );
       trx.validate();
       db.push_transaction( trx, 0 );
@@ -330,7 +330,7 @@ void database_fixture::fund(
 {
    try
    {
-      transfer( STEEMIT_INIT_MINER_NAME, account_name, amount );
+      transfer( SMOKE_INIT_MINER_NAME, account_name, amount );
 
    } FC_CAPTURE_AND_RETHROW( (account_name)(amount) )
 }
@@ -418,7 +418,7 @@ void database_fixture::transfer(
       op.amount = amount;
 
       trx.operations.push_back( op );
-      trx.set_expiration( db.head_block_time() + STEEMIT_MAX_TIME_UNTIL_EXPIRATION );
+      trx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
       trx.validate();
       db.push_transaction( trx, ~0 );
       trx.operations.clear();
@@ -435,7 +435,7 @@ void database_fixture::vest( const string& from, const share_type& amount )
       op.amount = asset( amount, STEEM_SYMBOL );
 
       trx.operations.push_back( op );
-      trx.set_expiration( db.head_block_time() + STEEMIT_MAX_TIME_UNTIL_EXPIRATION );
+      trx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
       trx.validate();
       db.push_transaction( trx, ~0 );
       trx.operations.clear();
@@ -480,16 +480,16 @@ void database_fixture::set_price_feed( const price& new_price )
       for ( int i = 1; i < 8; i++ )
       {
          feed_publish_operation op;
-         op.publisher = STEEMIT_INIT_MINER_NAME + fc::to_string( i );
+         op.publisher = SMOKE_INIT_MINER_NAME + fc::to_string( i );
          op.exchange_rate = new_price;
          trx.operations.push_back( op );
-         trx.set_expiration( db.head_block_time() + STEEMIT_MAX_TIME_UNTIL_EXPIRATION );
+         trx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
          db.push_transaction( trx, ~0 );
          trx.operations.clear();
       }
    } FC_CAPTURE_AND_RETHROW( (new_price) )
 
-   generate_blocks( STEEMIT_BLOCKS_PER_HOUR );
+   generate_blocks( SMOKE_BLOCKS_PER_HOUR );
    BOOST_REQUIRE(
 #ifdef IS_TEST_NET
       !db.skip_price_feed_limit_check ||
@@ -517,7 +517,7 @@ vector< operation > database_fixture::get_last_operations( uint32_t num_ops )
    while( itr != acc_hist_idx.begin() && ops.size() < num_ops )
    {
       itr--;
-      ops.push_back( fc::raw::unpack< steemit::chain::operation >( db.get(itr->op).serialized_op ) );
+      ops.push_back( fc::raw::unpack< smoke::chain::operation >( db.get(itr->op).serialized_op ) );
    }
 
    return ops;
@@ -544,6 +544,6 @@ void _push_transaction( database& db, const signed_transaction& tx, uint32_t ski
    db.push_transaction( tx, skip_flags );
 } FC_CAPTURE_AND_RETHROW((tx)) }
 
-} // steemit::chain::test
+} // smoke::chain::test
 
-} } // steemit::chain
+} } // smoke::chain

@@ -22,11 +22,11 @@
  * THE SOFTWARE.
  */
 
-#include <steemit/app/plugin.hpp>
+#include <smoke/app/plugin.hpp>
 
 #include <fc/vector.hpp>
 
-namespace steemit { namespace app {
+namespace smoke { namespace app {
 
 plugin::plugin( application* app ) : _app( app )
 {
@@ -66,4 +66,4 @@ void plugin::plugin_set_program_options(
    return;
 }
 
-} } // steemit::app
+} } // smoke::app

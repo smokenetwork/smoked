@@ -1,22 +1,22 @@
 #ifdef IS_TEST_NET
 #include <boost/test/unit_test.hpp>
 
-#include <steemit/chain/account_object.hpp>
-#include <steemit/chain/comment_object.hpp>
-#include <steemit/protocol/steem_operations.hpp>
+#include <smoke/chain/account_object.hpp>
+#include <smoke/chain/comment_object.hpp>
+#include <smoke/protocol/steem_operations.hpp>
 
-#include <steemit/market_history/market_history_plugin.hpp>
+#include <smoke/market_history/market_history_plugin.hpp>
 
 #include "../common/database_fixture.hpp"
 
-using namespace steemit::chain;
-using namespace steemit::protocol;
+using namespace smoke::chain;
+using namespace smoke::protocol;
 
 BOOST_FIXTURE_TEST_SUITE( market_history, clean_database_fixture )
 
 BOOST_AUTO_TEST_CASE( mh_test )
 {
-   using namespace steemit::market_history;
+   using namespace smoke::market_history;
 
    try
    {
@@ -42,12 +42,12 @@ BOOST_AUTO_TEST_CASE( mh_test )
 
       vote_operation vote;
       vote.voter = "alice";
-      vote.weight = STEEMIT_100_PERCENT;
+      vote.weight = SMOKE_100_PERCENT;
       vote.author = "alice";
       vote.permlink = "test";
       tx.operations.push_back( vote );
 
-      tx.set_expiration( db.head_block_time() + STEEMIT_MAX_TIME_UNTIL_EXPIRATION );
+      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
       tx.sign( alice_private_key, db.get_chain_id() );
       db.push_transaction( tx, 0 );
 
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE( mh_test )
       op.amount_to_sell = ASSET( "1.000 TBD" );
       op.min_to_receive = ASSET( "2.000 TESTS" );
       tx.operations.push_back( op );
-      tx.set_expiration( db.head_block_time() + STEEMIT_MAX_TIME_UNTIL_EXPIRATION );
+      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
       tx.sign( alice_private_key, db.get_chain_id() );
       db.push_transaction( tx,  0 );
 
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE( mh_test )
       op.amount_to_sell = ASSET( "1.000 TESTS" );
       op.min_to_receive = ASSET( "0.500 TBD" );
       tx.operations.push_back( op );
-      tx.set_expiration( db.head_block_time() + STEEMIT_MAX_TIME_UNTIL_EXPIRATION );
+      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
       tx.sign( sam_private_key, db.get_chain_id() );
       db.push_transaction( tx, 0 );
 
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE( mh_test )
       op.amount_to_sell = ASSET( "0.500 TBD" );
       op.min_to_receive = ASSET( "0.900 TESTS" );
       tx.operations.push_back( op );
-      tx.set_expiration( db.head_block_time() + STEEMIT_MAX_TIME_UNTIL_EXPIRATION );
+      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
       tx.sign( alice_private_key, db.get_chain_id() );
       db.push_transaction( tx, 0 );
 
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE( mh_test )
       op.amount_to_sell = ASSET( "0.450 TESTS" );
       op.min_to_receive = ASSET( "0.250 TBD" );
       tx.operations.push_back( op );
-      tx.set_expiration( db.head_block_time() + STEEMIT_MAX_TIME_UNTIL_EXPIRATION );
+      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
       tx.sign( bob_private_key, db.get_chain_id() );
       db.push_transaction( tx, 0 );
       validate_database();
@@ -270,7 +270,7 @@ BOOST_AUTO_TEST_CASE( mh_test )
       bucket++;
 
       BOOST_REQUIRE( bucket->seconds == 86400 );
-      BOOST_REQUIRE( bucket->open == STEEMIT_GENESIS_TIME );
+      BOOST_REQUIRE( bucket->open == SMOKE_GENESIS_TIME );
       BOOST_REQUIRE( bucket->high_steem == ASSET( "0.450 TESTS " ).amount );
       BOOST_REQUIRE( bucket->high_sbd == ASSET( "0.250 TBD" ).amount );
       BOOST_REQUIRE( bucket->low_steem == ASSET( "1.500 TESTS" ).amount );

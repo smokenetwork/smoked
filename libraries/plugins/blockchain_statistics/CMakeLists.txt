@@ -1,16 +1,16 @@
-file(GLOB HEADERS "include/steemit/blockchain_statistics/*.hpp")
+file(GLOB HEADERS "include/smoke/blockchain_statistics/*.hpp")
 
-add_library( steemit_blockchain_statistics
+add_library( smoke_blockchain_statistics
              blockchain_statistics_plugin.cpp
              blockchain_statistics_api.cpp
            )
 
-target_link_libraries( steemit_blockchain_statistics steemit_chain steemit_protocol steemit_app )
-target_include_directories( steemit_blockchain_statistics
+target_link_libraries( smoke_blockchain_statistics smoke_chain smoke_protocol smoke_app )
+target_include_directories( smoke_blockchain_statistics
                             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" )
 
 install( TARGETS
-   steemit_blockchain_statistics
+        smoke_blockchain_statistics
 
    RUNTIME DESTINATION bin
    LIBRARY DESTINATION lib

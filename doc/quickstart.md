@@ -1,12 +1,12 @@
 Quickstart
 ----------
 
-### Get current steemd
+### Get current smoked
 Use docker:
 ```
 docker run \
-    -d -p 2001:2001 -p 8090:8090 --name steemd-default \
-    --restart unless-stopped steemit/steem
+    -d -p 2001:2001 -p 8090:8090 --name smoked-default \
+    --restart unless-stopped smoke/smoked
 ```
 #### Low memory node?
 Above runs low memory node, which is suitable for:
@@ -18,9 +18,9 @@ For full api node use:
 ```
 docker run \
     --env USE_WAY_TOO_MUCH_RAM=1 --env USE_FULL_WEB_NODE=1 \
-    -d -p 2001:2001 -p 8090:8090 --name steemd-full \
+    -d -p 2001:2001 -p 8090:8090 --name smoked-full \
     --restart unless-stopped \
-    steemit/steem
+    smoke/smoked
 ```
 ### Configure for your use case
 #### Full API node
@@ -42,9 +42,9 @@ This configuration exists in Docker with the following command
 
 ```
 docker run -d --env TRACK_ACCOUNT="yourexchangeid" \
-    --name steemd \
+    --name smoked \
     --restart unless-stopped \
-    steemit/steem
+    smoke/smoked
 ```
 
 ### Resources usage

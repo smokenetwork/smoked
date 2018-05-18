@@ -1,6 +1,6 @@
 # Please Read
 
-Please read these instructions before submitting issues to the Steem GitHub repository. The issue tracker is for bugs and specific implementation discussion **only**. It should not be used for other purposes, as described below.
+Please read these instructions before submitting issues to the Smoke repository. The issue tracker is for bugs and specific implementation discussion **only**. It should not be used for other purposes, as described below.
 
 ## Bug Reports
 
@@ -8,7 +8,7 @@ If there is an existing feature that is not working correctly, or a glitch in th
 
 ## Enhancement Suggestions
 
-Do **not** use the issue tracker to suggest enhancements or improvements to the platform. The best place for these discussions is on Steemit.com. If there is a well vetted idea that has the support of the community that you feel should be considered by the development team, please email it to [sneak@steemit.com](mailto:sneak@steemit.com) for review.
+Do **not** use the issue tracker to suggest enhancements or improvements to the platform. The best place for these discussions is on smoke.io. If there is a well vetted idea that has the support of the community that you feel should be considered by the development team, please email it to [hello@smoke.io](mailto:hello@smoke.io) for review.
 
 ## Implementation Discussion
 
@@ -22,9 +22,9 @@ This is not the place to make suggestions for product improvement (please see th
 
 Please do a keyword search to see if there is already an existing issue before opening a new one.
 
-## Steemit.com vs. Steem Blockchain
+## smoke.io vs. Smoke Blockchain
 
-This issue tracker is only intended to track issues for the Steem blockchain. If the issue is with the Steemit.com website, please open an issue in the [Steemit.com Repository](https://github.com/steemit/steemit.com/).
+This issue tracker is only intended to track issues for the Smoke blockchain. If the issue is with the smoke.io website, please open an issue in the Smoke Repository.
 
 ## Pull Requests
 

@@ -1,8 +1,8 @@
 
-#include <steemit/chain/util/reward.hpp>
-#include <steemit/chain/util/uint256.hpp>
+#include <smoke/chain/util/reward.hpp>
+#include <smoke/chain/util/uint256.hpp>
 
-namespace steemit { namespace chain { namespace util {
+namespace smoke { namespace chain { namespace util {
 
 uint8_t find_msb( const uint128_t& u )
 {
@@ -48,16 +48,16 @@ uint64_t get_rshare_reward( const comment_reward_context& ctx, bool has_hardfork
       //idump( (ctx) );
 
       u256 claim = to256( evaluate_reward_curve( ctx.rshares.value, ctx.reward_curve, ctx.content_constant ) );
-      claim = ( claim * ctx.reward_weight ) / STEEMIT_100_PERCENT;
+      claim = ( claim * ctx.reward_weight ) / SMOKE_100_PERCENT;
 
       u256 payout_u256 = ( rf * claim ) / total_claims;
       FC_ASSERT( payout_u256 <= u256( uint64_t( std::numeric_limits<int64_t>::max() ) ) );
       uint64_t payout = static_cast< uint64_t >( payout_u256 );
 
-      //if( _db.has_hardfork( STEEMIT_HARDFORK_0_20) )
+      //if( _db.has_hardfork( SMOKE_HARDFORK_0_20) )
       if (has_hardfork_0_20)
       {
-         if( payout < STEEMIT_MIN_PAYOUT_STEEM) {
+         if( payout < SMOKE_MIN_PAYOUT_STEEM) {
             payout = 0;
          }
       } else {
@@ -104,4 +104,4 @@ uint128_t evaluate_reward_curve( const uint128_t& rshares, const curve_id& curve
    return result;
 }
 
-} } } // steemit::chain::util
+} } } // smoke::chain::util
