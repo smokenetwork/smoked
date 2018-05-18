@@ -1,9 +1,11 @@
-# Introducing Steem (beta)
+# Introducing Smoke (beta)
 
 Steem is a Delegated Proof of Stake blockchain that uses a "Proof of Brain" social consensus algorithm for token allocation.
 
-  - Currency symbol STEEM.
-  - 10% APR inflation narrowing to 1% APR over 20 years.
+  - Currency symbol SMOKE.
+  - Initial supply 349379987 SMOKE
+  - inflation rate of 9.5% per year, reducing by 0.5% per annum until the rewards
+    drop to 5% per annum.
   - 75% of inflation to "Proof of Brain" social consensus algorithm.
   - 15% of inflation to stake holders.
   - 10% of inflation to block producers.
@@ -26,7 +28,7 @@ IN THE SOFTWARE.
 
 # Whitepaper
 
-You can read the Steem Whitepaper at [Steem.io/SteemWhitePaper.pdf](https://steem.io/SteemWhitePaper.pdf).
+You can read the [Smoke Whitepaper](https://smoke.network/Smoke-Whitepaper-2.0.pdf).
 
 # Quickstart
 
