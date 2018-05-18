@@ -12,26 +12,26 @@ endif()
 if( STEEM_STATIC_BUILD )
    target_link_libraries( smoked PRIVATE
       "-static-libstdc++ -static-libgcc"
-      steemit_plugins
-      steemit_mf_plugins
-      steemit_app
-      steemit_witness
-      steemit_account_history
-      steemit_chain
-      steemit_protocol
+      smoke_plugins
+      smoke_mf_plugins
+      smoke_app
+      smoke_witness
+      smoke_account_history
+      smoke_chain
+      smoke_protocol
       fc
       ${CMAKE_DL_LIBS}
       ${PLATFORM_SPECIFIC_LIBS}
    )
 else( STEEM_STATIC_BUILD )
    target_link_libraries( smoked PRIVATE
-      steemit_plugins
-      steemit_mf_plugins
-      steemit_app
-      steemit_witness
-      steemit_account_history
-      steemit_chain
-      steemit_protocol
+      smoke_plugins
+      smoke_mf_plugins
+      smoke_app
+      smoke_witness
+      smoke_account_history
+      smoke_chain
+      smoke_protocol
       fc
       ${CMAKE_DL_LIBS}
       ${PLATFORM_SPECIFIC_LIBS}
