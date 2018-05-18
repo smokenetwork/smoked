@@ -167,10 +167,7 @@ void account_create_evaluator::do_apply( const account_create_operation& o )
       acc.mined = false;
 
       if( !_db.has_hardfork( SMOKE_HARDFORK_0_11__169 ) )
-         acc.recovery_account = "steem";
-      else
          acc.recovery_account = o.creator;
-
 
       #ifndef IS_LOW_MEM
          from_string( acc.json_metadata, o.json_metadata );
