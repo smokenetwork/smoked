@@ -54,7 +54,6 @@ uint64_t get_rshare_reward( const comment_reward_context& ctx, bool has_hardfork
       FC_ASSERT( payout_u256 <= u256( uint64_t( std::numeric_limits<int64_t>::max() ) ) );
       uint64_t payout = static_cast< uint64_t >( payout_u256 );
 
-      //if( _db.has_hardfork( SMOKE_HARDFORK_0_20) )
       if (has_hardfork_0_20)
       {
          if( payout < SMOKE_MIN_PAYOUT_STEEM) {

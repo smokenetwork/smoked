@@ -1801,15 +1801,7 @@ void database::process_funds()
      // below subtraction cannot underflow int64_t because inflation_rate_adjustment is <2^32
      int64_t current_inflation_rate = std::max( start_inflation_rate - inflation_rate_adjustment, inflation_rate_floor );
 
-     /**
-      * inflation rate reduce 90% (=10%) after HF20
-      */
-     if( has_hardfork( SMOKE_HARDFORK_0_20) )
-     {
-        current_inflation_rate = int64_t(current_inflation_rate/10);
-     }
-
-     auto new_steem = ( props.virtual_supply.amount * current_inflation_rate ) / ( int64_t( SMOKE_100_PERCENT ) * int64_t( SMOKE_BLOCKS_PER_YEAR ) );
+     auto new_steem = ( props.current_supply.amount * current_inflation_rate ) / ( int64_t( SMOKE_100_PERCENT ) * int64_t( SMOKE_BLOCKS_PER_YEAR ) );
      auto content_reward = ( new_steem * SMOKE_CONTENT_REWARD_PERCENT ) / SMOKE_100_PERCENT;
      if( has_hardfork( SMOKE_HARDFORK_0_17__774 ) )
         content_reward = pay_reward_funds( content_reward ); /// 75% to content creator
