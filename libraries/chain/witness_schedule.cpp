@@ -325,7 +325,7 @@ void update_witness_schedule(database& db)
 
       fc::uint128 new_virtual_time;
 
-      /// only use vote based scheduling after the first 1M STEEM is created or if there is no POW queued
+      /// only use vote based scheduling after the first 1M SMOKE is created or if there is no POW queued
       if( props.num_pow_witnesses == 0 || db.head_block_num() > SMOKE_START_MINER_VOTING_BLOCK )
       {
          const auto& widx = db.get_index<witness_index>().indices().get<by_vote_name>();

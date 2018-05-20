@@ -12,7 +12,7 @@
 #define SMOKE_CHAIN_ID                        (fc::sha256::hash("testnet"))
 
 #define VESTS_SYMBOL  (uint64_t(6) | (uint64_t('V') << 8) | (uint64_t('E') << 16) | (uint64_t('S') << 24) | (uint64_t('T') << 32) | (uint64_t('S') << 40)) ///< VESTS with 6 digits of precision
-#define STEEM_SYMBOL  (uint64_t(3) | (uint64_t('T') << 8) | (uint64_t('E') << 16) | (uint64_t('S') << 24) | (uint64_t('T') << 32) | (uint64_t('S') << 40)) ///< STEEM with 3 digits of precision
+#define SMOKE_SYMBOL  (uint64_t(3) | (uint64_t('T') << 8) | (uint64_t('E') << 16) | (uint64_t('S') << 24) | (uint64_t('T') << 32) | (uint64_t('S') << 40)) ///< SMOKE with 3 digits of precision
 #define SBD_SYMBOL    (uint64_t(3) | (uint64_t('T') << 8) | (uint64_t('B') << 16) | (uint64_t('D') << 24) ) ///< Test Backed Dollars with 3 digits of precision
 #define STMD_SYMBOL   (uint64_t(3) | (uint64_t('T') << 8) | (uint64_t('S') << 16) | (uint64_t('T') << 24) | (uint64_t('D') << 32) ) ///< Test Dollars with 3 digits of precision
 
@@ -47,7 +47,7 @@
 #define SMOKE_INIT_PUBLIC_KEY_STR             "SMK6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4"
 #define SMOKE_CHAIN_ID                        (fc::sha256::hash("smoke")) // a66e00caa50e6817bbe24e927bf48c5d4ba1b33f36bdbb5fa262a04012c4e3ee
 #define VESTS_SYMBOL  (uint64_t(6) | (uint64_t('V') << 8) | (uint64_t('E') << 16) | (uint64_t('S') << 24) | (uint64_t('T') << 32) | (uint64_t('S') << 40)) ///< VESTS with 6 digits of precision
-#define STEEM_SYMBOL  (uint64_t(3) | (uint64_t('S') << 8) | (uint64_t('M') << 16) | (uint64_t('O') << 24) | (uint64_t('K') << 32) | (uint64_t('E') << 40)) ///< SMOKE with 3 digits of precision
+#define SMOKE_SYMBOL  (uint64_t(3) | (uint64_t('S') << 8) | (uint64_t('M') << 16) | (uint64_t('O') << 24) | (uint64_t('K') << 32) | (uint64_t('E') << 40)) ///< SMOKE with 3 digits of precision
 #define SBD_SYMBOL    (uint64_t(3) | (uint64_t('S') << 8) | (uint64_t('B') << 16) | (uint64_t('D') << 24) ) ///< SMOKE Backed Dollars with 3 digits of precision
 #define STMD_SYMBOL   (uint64_t(3) | (uint64_t('S') << 8) | (uint64_t('M') << 16) | (uint64_t('K') << 24) | (uint64_t('D') << 32) ) ///< SMOKE Dollars with 3 digits of precision
 #define SMOKE_SYMBOL_STR                      "SMOKE"
@@ -148,7 +148,7 @@
 #define SMOKE_CREATE_ACCOUNT_DELEGATION_RATIO    5
 #define SMOKE_CREATE_ACCOUNT_DELEGATION_TIME     fc::days(30)
 
-#define SMOKE_MINING_REWARD                   asset( 1000, STEEM_SYMBOL )
+#define SMOKE_MINING_REWARD                   asset( 1000, SMOKE_SYMBOL )
 #define SMOKE_EQUIHASH_N                      140
 #define SMOKE_EQUIHASH_K                      6
 
@@ -156,14 +156,14 @@
 #define SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC (fc::seconds(60)) // 1 minute required on books to receive volume
 #define SMOKE_LIQUIDITY_REWARD_PERIOD_SEC     (60*60)
 #define SMOKE_LIQUIDITY_REWARD_BLOCKS         (SMOKE_LIQUIDITY_REWARD_PERIOD_SEC/SMOKE_BLOCK_INTERVAL)
-#define SMOKE_MIN_LIQUIDITY_REWARD            (asset( 1000*SMOKE_LIQUIDITY_REWARD_BLOCKS, STEEM_SYMBOL )) // Minumum reward to be paid out to liquidity providers
+#define SMOKE_MIN_LIQUIDITY_REWARD            (asset( 1000*SMOKE_LIQUIDITY_REWARD_BLOCKS, SMOKE_SYMBOL )) // Minumum reward to be paid out to liquidity providers
 #define SMOKE_MIN_CONTENT_REWARD              SMOKE_MINING_REWARD
 #define SMOKE_MIN_CURATE_REWARD               SMOKE_MINING_REWARD
 #define SMOKE_MIN_PRODUCER_REWARD             SMOKE_MINING_REWARD
 #define SMOKE_MIN_POW_REWARD                  SMOKE_MINING_REWARD
 
-#define SMOKE_ACTIVE_CHALLENGE_FEE            asset( 2000, STEEM_SYMBOL )
-#define SMOKE_OWNER_CHALLENGE_FEE             asset( 30000, STEEM_SYMBOL )
+#define SMOKE_ACTIVE_CHALLENGE_FEE            asset( 2000, SMOKE_SYMBOL )
+#define SMOKE_OWNER_CHALLENGE_FEE             asset( 30000, SMOKE_SYMBOL )
 #define SMOKE_ACTIVE_CHALLENGE_COOLDOWN       fc::days(1)
 #define SMOKE_OWNER_CHALLENGE_COOLDOWN        fc::days(1)
 

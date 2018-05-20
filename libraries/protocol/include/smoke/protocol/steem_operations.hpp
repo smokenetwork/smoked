@@ -127,7 +127,7 @@ namespace smoke { namespace protocol {
       account_name_type author;
       string            permlink;
 
-      asset             max_accepted_payout    = asset( 1000000000, STEEM_SYMBOL );       /// SBD value of the maximum payout this post will receive
+      asset             max_accepted_payout    = asset( 1000000000, SMOKE_SYMBOL );       /// SBD value of the maximum payout this post will receive
       uint16_t          percent_steem_dollars  = 0; /// SMOKE_100_PERCENT the percent of Steem Dollars to key, unkept amounts will be received as Steem Power
       bool              allow_votes            = true;      /// allows a post to receive votes;
       bool              allow_curation_rewards = true; /// allows voters to recieve curation rewards. Rewards return to reward fund.
@@ -186,7 +186,7 @@ namespace smoke { namespace protocol {
    /**
     * @ingroup operations
     *
-    * @brief Transfers STEEM from one account to another.
+    * @brief Transfers SMOKE from one account to another.
     */
    struct transfer_operation : public base_operation
    {
@@ -232,7 +232,7 @@ namespace smoke { namespace protocol {
       uint32_t          escrow_id = 30;
 
       asset             sbd_amount = asset( 0, SBD_SYMBOL );
-      asset             steem_amount = asset( 0, STEEM_SYMBOL );
+      asset             steem_amount = asset( 0, SMOKE_SYMBOL );
       asset             fee;
 
       time_point_sec    ratification_deadline;
@@ -304,7 +304,7 @@ namespace smoke { namespace protocol {
 
       uint32_t          escrow_id = 30;
       asset             sbd_amount = asset( 0, SBD_SYMBOL ); ///< the amount of sbd to release
-      asset             steem_amount = asset( 0, STEEM_SYMBOL ); ///< the amount of steem to release
+      asset             steem_amount = asset( 0, SMOKE_SYMBOL ); ///< the amount of steem to release
 
       void validate()const;
       void get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert(who); }
@@ -312,7 +312,7 @@ namespace smoke { namespace protocol {
 
 
    /**
-    *  This operation converts STEEM into VFS (Vesting Fund Shares) at
+    *  This operation converts SMOKE into VFS (Vesting Fund Shares) at
     *  the current exchange rate. With this operation it is possible to
     *  give another account vesting shares so that faucets can
     *  pre-fund new accounts with vesting shares.
@@ -321,7 +321,7 @@ namespace smoke { namespace protocol {
    {
       account_name_type from;
       account_name_type to; ///< if null, then same as from
-      asset             amount; ///< must be STEEM
+      asset             amount; ///< must be SMOKE
 
       void validate()const;
       void get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert(from); }
@@ -376,13 +376,13 @@ namespace smoke { namespace protocol {
    struct chain_properties
    {
       /**
-       *  This fee, paid in STEEM, is converted into VESTING SHARES for the new account. Accounts
+       *  This fee, paid in SMOKE, is converted into VESTING SHARES for the new account. Accounts
        *  without vesting shares cannot earn usage rations and therefore are powerless. This minimum
        *  fee requires all accounts to have some kind of commitment to the network that includes the
        *  ability to vote and make transactions.
        */
       asset             account_creation_fee =
-         asset( SMOKE_MIN_ACCOUNT_CREATION_FEE, STEEM_SYMBOL );
+         asset( SMOKE_MIN_ACCOUNT_CREATION_FEE, SMOKE_SYMBOL );
 
       /**
        *  This witnesses vote for the maximum_block_size which is used by the network
@@ -520,7 +520,7 @@ namespace smoke { namespace protocol {
 
 
    /**
-    *  This operation instructs the blockchain to start a conversion between STEEM and SBD,
+    *  This operation instructs the blockchain to start a conversion between SMOKE and SBD,
     *  The funds are deposited after SMOKE_CONVERSION_DELAY
     */
    struct convert_operation : public base_operation
@@ -690,7 +690,7 @@ namespace smoke { namespace protocol {
     * key getting compromised and being used to produced multiple blocks so
     * the attacker can report it and steel their vesting steem.
     *
-    * The result of the operation is to transfer the full VESTING STEEM balance
+    * The result of the operation is to transfer the full VESTING SMOKE balance
     * of the block producer to the reporter.
     */
    struct report_over_production_operation : public base_operation

@@ -71,7 +71,7 @@ using boost::container::flat_set;
 struct reward_fund_context
 {
    uint128_t   recent_claims = 0;
-   asset       reward_balance = asset( 0, STEEM_SYMBOL );
+   asset       reward_balance = asset( 0, SMOKE_SYMBOL );
    share_type  steem_awarded = 0;
 };
 
@@ -960,12 +960,12 @@ uint32_t database::get_slot_at_time(fc::time_point_sec when)const
 }
 
 /**
- *  Converts STEEM into sbd and adds it to to_account while reducing the STEEM supply
- *  by STEEM and increasing the sbd supply by the specified amount.
+ *  Converts SMOKE into sbd and adds it to to_account while reducing the SMOKE supply
+ *  by SMOKE and increasing the sbd supply by the specified amount.
  */
 std::pair< asset, asset > database::create_sbd( const account_object& to_account, asset steem, bool to_reward_balance )
 {
-   std::pair< asset, asset > assets( asset( 0, SBD_SYMBOL ), asset( 0, STEEM_SYMBOL ) );
+   std::pair< asset, asset > assets( asset( 0, SBD_SYMBOL ), asset( 0, SMOKE_SYMBOL ) );
 
    try
    {
@@ -980,20 +980,20 @@ std::pair< asset, asset > database::create_sbd( const account_object& to_account
          auto to_sbd = ( gpo.sbd_print_rate * steem.amount ) / SMOKE_100_PERCENT;
          auto to_steem = steem.amount - to_sbd;
 
-         auto sbd = asset( to_sbd, STEEM_SYMBOL ) * median_price;
+         auto sbd = asset( to_sbd, SMOKE_SYMBOL ) * median_price;
 
          if( to_reward_balance )
          {
             adjust_reward_balance( to_account, sbd );
-            adjust_reward_balance( to_account, asset( to_steem, STEEM_SYMBOL ) );
+            adjust_reward_balance( to_account, asset( to_steem, SMOKE_SYMBOL ) );
          }
          else
          {
             adjust_balance( to_account, sbd );
-            adjust_balance( to_account, asset( to_steem, STEEM_SYMBOL ) );
+            adjust_balance( to_account, asset( to_steem, SMOKE_SYMBOL ) );
          }
 
-         adjust_supply( asset( -to_sbd, STEEM_SYMBOL ) );
+         adjust_supply( asset( -to_sbd, SMOKE_SYMBOL ) );
          adjust_supply( sbd );
          assets.first = sbd;
          assets.second = to_steem;
@@ -1011,7 +1011,7 @@ std::pair< asset, asset > database::create_sbd( const account_object& to_account
 
 /**
  * @param to_account - the account to receive the new vesting shares
- * @param STEEM - STEEM to be converted to vesting shares
+ * @param SMOKE - SMOKE to be converted to vesting shares
  */
 asset database::create_vesting( const account_object& to_account, asset steem, bool to_reward_balance )
 {
@@ -1205,7 +1205,7 @@ void database::clear_null_account_balance()
    if( !has_hardfork( SMOKE_HARDFORK_0_14__327 ) ) return;
 
    const auto& null_account = get_account( SMOKE_NULL_ACCOUNT );
-   asset total_steem( 0, STEEM_SYMBOL );
+   asset total_steem( 0, SMOKE_SYMBOL );
    asset total_sbd( 0, SBD_SYMBOL );
 
    if( null_account.balance.amount > 0 )
@@ -1351,7 +1351,7 @@ void database::process_vesting_withdrawals()
 
       share_type vests_deposited_as_steem = 0;
       share_type vests_deposited_as_vests = 0;
-      asset total_steem_converted = asset( 0, STEEM_SYMBOL );
+      asset total_steem_converted = asset( 0, SMOKE_SYMBOL );
 
       // Do two passes, the first for vests, the second for steem. Try to maintain as much accuracy for vests as possible.
       for( auto itr = didx.upper_bound( boost::make_tuple( from_account.id, account_id_type() ) );
@@ -1490,7 +1490,7 @@ share_type database::pay_curators( const comment_object& c, share_type& max_rewa
             {
                unclaimed_rewards -= claim;
                const auto& voter = get(itr->voter);
-               auto reward = create_vesting( voter, asset( claim, STEEM_SYMBOL ), has_hardfork( SMOKE_HARDFORK_0_17__659 ) );
+               auto reward = create_vesting( voter, asset( claim, SMOKE_SYMBOL ), has_hardfork( SMOKE_HARDFORK_0_17__659 ) );
 
                push_virtual_operation( curation_reward_operation( voter.name, reward, c.author, to_string( c.permlink ) ) );
 
@@ -1569,10 +1569,10 @@ share_type database::cashout_comment_helper( util::comment_reward_context& ctx, 
            auto vest_created = create_vesting( author, vesting_steem, has_hardfork( SMOKE_HARDFORK_0_17__659 ) );
            auto sbd_payout = create_sbd( author, sbd_steem, has_hardfork( SMOKE_HARDFORK_0_17__659 ) );
 
-           adjust_total_payout( comment, sbd_payout.second + asset( vesting_steem, STEEM_SYMBOL ), asset( curation_tokens, STEEM_SYMBOL ), asset( total_beneficiary, STEEM_SYMBOL ) );
+           adjust_total_payout( comment, sbd_payout.second + asset( vesting_steem, SMOKE_SYMBOL ), asset( curation_tokens, SMOKE_SYMBOL ), asset( total_beneficiary, SMOKE_SYMBOL ) );
 
            push_virtual_operation( author_reward_operation( comment.author, to_string( comment.permlink ), sbd_payout.first, sbd_payout.second, vest_created ) );
-           push_virtual_operation( comment_reward_operation( comment.author, to_string( comment.permlink ), asset( claimed_reward, STEEM_SYMBOL ) ) );
+           push_virtual_operation( comment_reward_operation( comment.author, to_string( comment.permlink ), asset( claimed_reward, SMOKE_SYMBOL ) ) );
 
 #ifndef IS_LOW_MEM
            modify( comment, [&]( comment_object& c )
@@ -1826,14 +1826,14 @@ void database::process_funds()
 
      modify( props, [&]( dynamic_global_property_object& p )
      {
-         p.total_vesting_fund_steem += asset( vesting_reward, STEEM_SYMBOL );
+         p.total_vesting_fund_steem += asset( vesting_reward, SMOKE_SYMBOL );
          if( !has_hardfork( SMOKE_HARDFORK_0_17__774 ) )
-            p.total_reward_fund_steem  += asset( content_reward, STEEM_SYMBOL );
-         p.current_supply           += asset( new_steem, STEEM_SYMBOL );
-         p.virtual_supply           += asset( new_steem, STEEM_SYMBOL );
+            p.total_reward_fund_steem  += asset( content_reward, SMOKE_SYMBOL );
+         p.current_supply           += asset( new_steem, SMOKE_SYMBOL );
+         p.virtual_supply           += asset( new_steem, SMOKE_SYMBOL );
      });
 
-     const auto& producer_reward = create_vesting( get_account( cwit.owner ), asset( witness_reward, STEEM_SYMBOL ) );
+     const auto& producer_reward = create_vesting( get_account( cwit.owner ), asset( witness_reward, SMOKE_SYMBOL ) );
      push_virtual_operation( producer_reward_operation( cwit.owner, producer_reward ) );
 
   }
@@ -1885,11 +1885,11 @@ void database::process_savings_withdraws()
 asset database::get_liquidity_reward()const
 {
    if( has_hardfork( SMOKE_HARDFORK_0_12__178 ) )
-      return asset( 0, STEEM_SYMBOL );
+      return asset( 0, SMOKE_SYMBOL );
 
    const auto& props = get_dynamic_global_properties();
    static_assert( SMOKE_LIQUIDITY_REWARD_PERIOD_SEC == 60*60, "this code assumes a 1 hour time interval" );
-   asset percent( protocol::calc_percent_reward_per_hour< SMOKE_LIQUIDITY_APR_PERCENT >( props.virtual_supply.amount ), STEEM_SYMBOL );
+   asset percent( protocol::calc_percent_reward_per_hour< SMOKE_LIQUIDITY_APR_PERCENT >( props.virtual_supply.amount ), SMOKE_SYMBOL );
    return std::max( percent, SMOKE_MIN_LIQUIDITY_REWARD );
 }
 
@@ -1897,7 +1897,7 @@ asset database::get_content_reward()const
 {
    const auto& props = get_dynamic_global_properties();
    static_assert( SMOKE_BLOCK_INTERVAL == 3, "this code assumes a 3-second time interval" );
-   asset percent( protocol::calc_percent_reward_per_block< SMOKE_CONTENT_APR_PERCENT >( props.virtual_supply.amount ), STEEM_SYMBOL );
+   asset percent( protocol::calc_percent_reward_per_block< SMOKE_CONTENT_APR_PERCENT >( props.virtual_supply.amount ), SMOKE_SYMBOL );
    return std::max( percent, SMOKE_MIN_CONTENT_REWARD );
 }
 
@@ -1905,7 +1905,7 @@ asset database::get_curation_reward()const
 {
    const auto& props = get_dynamic_global_properties();
    static_assert( SMOKE_BLOCK_INTERVAL == 3, "this code assumes a 3-second time interval" );
-   asset percent( protocol::calc_percent_reward_per_block< SMOKE_CURATE_APR_PERCENT >( props.virtual_supply.amount ), STEEM_SYMBOL);
+   asset percent( protocol::calc_percent_reward_per_block< SMOKE_CURATE_APR_PERCENT >( props.virtual_supply.amount ), SMOKE_SYMBOL);
    return std::max( percent, SMOKE_MIN_CURATE_REWARD );
 }
 
@@ -1913,7 +1913,7 @@ asset database::get_producer_reward()
 {
    const auto& props = get_dynamic_global_properties();
    static_assert( SMOKE_BLOCK_INTERVAL == 3, "this code assumes a 3-second time interval" );
-   asset percent( protocol::calc_percent_reward_per_block< SMOKE_PRODUCER_APR_PERCENT >( props.virtual_supply.amount ), STEEM_SYMBOL);
+   asset percent( protocol::calc_percent_reward_per_block< SMOKE_PRODUCER_APR_PERCENT >( props.virtual_supply.amount ), SMOKE_SYMBOL);
    auto pay = std::max( percent, SMOKE_MIN_PRODUCER_REWARD );
    const auto& witness_account = get_account( props.current_witness );
 
@@ -1941,13 +1941,13 @@ asset database::get_pow_reward()const
 #ifndef IS_TEST_NET
    /// 0 block rewards until at least SMOKE_MAX_WITNESSES have produced a POW
    if( props.num_pow_witnesses < SMOKE_MAX_WITNESSES && props.head_block_number < SMOKE_START_VESTING_BLOCK )
-      return asset( 0, STEEM_SYMBOL );
+      return asset( 0, SMOKE_SYMBOL );
 #endif
 
    static_assert( SMOKE_BLOCK_INTERVAL == 3, "this code assumes a 3-second time interval" );
 // tuanpa - temporary for private testnet only
 //   static_assert( SMOKE_MAX_WITNESSES == 21, "this code assumes 21 per round" );
-   asset percent( calc_percent_reward_per_round< SMOKE_POW_APR_PERCENT >( props.virtual_supply.amount ), STEEM_SYMBOL);
+   asset percent( calc_percent_reward_per_round< SMOKE_POW_APR_PERCENT >( props.virtual_supply.amount ), SMOKE_SYMBOL);
    return std::max( percent, SMOKE_MIN_POW_REWARD );
 }
 
@@ -2007,12 +2007,12 @@ share_type database::pay_reward_funds( share_type reward )
 
       modify( *itr, [&]( reward_fund_object& rfo )
       {
-         rfo.reward_balance += asset( r, STEEM_SYMBOL );
+         rfo.reward_balance += asset( r, SMOKE_SYMBOL );
       });
 
       used_rewards += r;
 
-      // Sanity check to ensure we aren't printing more STEEM than has been allocated through inflation
+      // Sanity check to ensure we aren't printing more SMOKE than has been allocated through inflation
       FC_ASSERT( used_rewards <= reward );
    }
 
@@ -2035,7 +2035,7 @@ void database::process_conversions()
       return;
 
    asset net_sbd( 0, SBD_SYMBOL );
-   asset net_steem( 0, STEEM_SYMBOL );
+   asset net_steem( 0, SMOKE_SYMBOL );
 
    while( itr != request_by_date.end() && itr->conversion_date <= now )
    {
@@ -2401,7 +2401,7 @@ void database::init_genesis( uint64_t init_supply )
          {
             a.name = SMOKE_INIT_MINER_NAME + ( i ? fc::to_string( i ) : std::string() );
             a.memo_key = init_public_key;
-            a.balance  = asset( i ? 0 : init_supply, STEEM_SYMBOL );
+            a.balance  = asset( i ? 0 : init_supply, SMOKE_SYMBOL );
             a.sbd_balance = asset( 0, SBD_SYMBOL );
          } );
 
@@ -2428,7 +2428,7 @@ void database::init_genesis( uint64_t init_supply )
          p.time = SMOKE_GENESIS_TIME;
          p.recent_slots_filled = fc::uint128::max_value();
          p.participation_count = 128;
-         p.current_supply = asset( init_supply, STEEM_SYMBOL );
+         p.current_supply = asset( init_supply, SMOKE_SYMBOL );
          p.current_sbd_supply = asset( 0, SBD_SYMBOL );
          p.virtual_supply = p.current_supply;
          p.maximum_block_size = SMOKE_MAX_BLOCK_SIZE;
@@ -3014,7 +3014,7 @@ void database::update_virtual_supply()
             dgp.sbd_print_rate = 0;
          } else {
             dgp.virtual_supply = dgp.current_supply
-                                 + (get_feed_history().current_median_history.is_null() ? asset(0, STEEM_SYMBOL) :
+                                 + (get_feed_history().current_median_history.is_null() ? asset(0, SMOKE_SYMBOL) :
                                     dgp.current_sbd_supply * get_feed_history().current_median_history);
 
             auto median_price = get_feed_history().current_median_history;
@@ -3187,7 +3187,7 @@ int database::match( const limit_order_object& new_order, const limit_order_obje
        ( (age >= SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC && !has_hardfork( SMOKE_HARDFORK_0_10__149)) ||
        (age >= SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC_HF10 && has_hardfork( SMOKE_HARDFORK_0_10__149) ) ) )
    {
-      if( old_order_receives.symbol == STEEM_SYMBOL )
+      if( old_order_receives.symbol == SMOKE_SYMBOL )
       {
          adjust_liquidity_reward( get_account( old_order.seller ), old_order_receives, false );
          adjust_liquidity_reward( get_account( new_order.seller ), -old_order_receives, false );
@@ -3343,7 +3343,7 @@ void database::adjust_balance( const account_object& a, const asset& delta )
    {
       switch( delta.symbol )
       {
-         case STEEM_SYMBOL:
+         case SMOKE_SYMBOL:
             acnt.balance += delta;
             break;
          case SBD_SYMBOL:
@@ -3388,7 +3388,7 @@ void database::adjust_savings_balance( const account_object& a, const asset& del
    {
       switch( delta.symbol )
       {
-         case STEEM_SYMBOL:
+         case SMOKE_SYMBOL:
             acnt.savings_balance += delta;
             break;
          case SBD_SYMBOL:
@@ -3433,7 +3433,7 @@ void database::adjust_reward_balance( const account_object& a, const asset& delt
    {
       switch( delta.symbol )
       {
-         case STEEM_SYMBOL:
+         case SMOKE_SYMBOL:
             acnt.reward_steem_balance += delta;
             break;
          case SBD_SYMBOL:
@@ -3457,9 +3457,9 @@ void database::adjust_supply( const asset& delta, bool adjust_vesting )
    {
       switch( delta.symbol )
       {
-         case STEEM_SYMBOL:
+         case SMOKE_SYMBOL:
          {
-            asset new_vesting( (adjust_vesting && delta.amount > 0) ? delta.amount * 9 : 0, STEEM_SYMBOL );
+            asset new_vesting( (adjust_vesting && delta.amount > 0) ? delta.amount * 9 : 0, SMOKE_SYMBOL );
             props.current_supply += delta + new_vesting;
             props.virtual_supply += delta + new_vesting;
             props.total_vesting_fund_steem += new_vesting;
@@ -3482,7 +3482,7 @@ asset database::get_balance( const account_object& a, asset_symbol_type symbol )
 {
    switch( symbol )
    {
-      case STEEM_SYMBOL:
+      case SMOKE_SYMBOL:
          return a.balance;
       case SBD_SYMBOL:
          return a.sbd_balance;
@@ -3495,7 +3495,7 @@ asset database::get_savings_balance( const account_object& a, asset_symbol_type 
 {
    switch( symbol )
    {
-      case STEEM_SYMBOL:
+      case SMOKE_SYMBOL:
          return a.savings_balance;
       case SBD_SYMBOL:
          return a.savings_sbd_balance;
@@ -3787,7 +3787,7 @@ void database::apply_hardfork( uint32_t hardfork )
 
             modify( gpo, [&]( dynamic_global_property_object& g )
             {
-               g.total_reward_fund_steem = asset( 0, STEEM_SYMBOL );
+               g.total_reward_fund_steem = asset( 0, SMOKE_SYMBOL );
                g.total_reward_shares2 = 0;
             });
 
@@ -3913,10 +3913,10 @@ void database::validate_invariants()const
   try
   {
      const auto& account_idx = get_index<account_index>().indices().get<by_name>();
-     asset total_supply = asset( 0, STEEM_SYMBOL );
+     asset total_supply = asset( 0, SMOKE_SYMBOL );
      asset total_sbd = asset( 0, SBD_SYMBOL );
      asset total_vesting = asset( 0, VESTS_SYMBOL );
-     asset pending_vesting_steem = asset( 0, STEEM_SYMBOL );
+     asset pending_vesting_steem = asset( 0, SMOKE_SYMBOL );
      share_type total_vsf_votes = share_type( 0 );
 
      auto gpo = get_dynamic_global_properties();
@@ -3948,7 +3948,7 @@ void database::validate_invariants()const
 
      for( auto itr = convert_request_idx.begin(); itr != convert_request_idx.end(); ++itr )
      {
-        if( itr->amount.symbol == STEEM_SYMBOL )
+        if( itr->amount.symbol == SMOKE_SYMBOL )
            total_supply += itr->amount;
         else if( itr->amount.symbol == SBD_SYMBOL )
            total_sbd += itr->amount;
@@ -3960,9 +3960,9 @@ void database::validate_invariants()const
 
      for( auto itr = limit_order_idx.begin(); itr != limit_order_idx.end(); ++itr )
      {
-        if( itr->sell_price.base.symbol == STEEM_SYMBOL )
+        if( itr->sell_price.base.symbol == SMOKE_SYMBOL )
         {
-           total_supply += asset( itr->for_sale, STEEM_SYMBOL );
+           total_supply += asset( itr->for_sale, SMOKE_SYMBOL );
         }
         else if ( itr->sell_price.base.symbol == SBD_SYMBOL )
         {
@@ -3977,24 +3977,24 @@ void database::validate_invariants()const
         total_supply += itr->steem_balance;
         total_sbd += itr->sbd_balance;
 
-        if( itr->pending_fee.symbol == STEEM_SYMBOL )
+        if( itr->pending_fee.symbol == SMOKE_SYMBOL )
            total_supply += itr->pending_fee;
         else if( itr->pending_fee.symbol == SBD_SYMBOL )
            total_sbd += itr->pending_fee;
         else
-           FC_ASSERT( false, "found escrow pending fee that is not SBD or STEEM" );
+           FC_ASSERT( false, "found escrow pending fee that is not SBD or SMOKE" );
      }
 
      const auto& savings_withdraw_idx = get_index< savings_withdraw_index >().indices().get< by_id >();
 
      for( auto itr = savings_withdraw_idx.begin(); itr != savings_withdraw_idx.end(); ++itr )
      {
-        if( itr->amount.symbol == STEEM_SYMBOL )
+        if( itr->amount.symbol == SMOKE_SYMBOL )
            total_supply += itr->amount;
         else if( itr->amount.symbol == SBD_SYMBOL )
            total_sbd += itr->amount;
         else
-           FC_ASSERT( false, "found savings withdraw that is not SBD or STEEM" );
+           FC_ASSERT( false, "found savings withdraw that is not SBD or SMOKE" );
      }
      fc::uint128_t total_rshares2;
 

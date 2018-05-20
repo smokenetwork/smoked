@@ -61,7 +61,7 @@ void market_history_plugin_impl::update_market_histories( const operation_notifi
                b.open = open;
                b.seconds = bucket;
 
-               if( op.open_pays.symbol == STEEM_SYMBOL )
+               if( op.open_pays.symbol == SMOKE_SYMBOL )
                {
                   b.high_steem = op.open_pays.amount;
                   b.high_sbd = op.current_pays.amount;
@@ -93,7 +93,7 @@ void market_history_plugin_impl::update_market_histories( const operation_notifi
          {
             db.modify( *itr, [&]( bucket_object& b )
             {
-               if( op.open_pays.symbol == STEEM_SYMBOL )
+               if( op.open_pays.symbol == SMOKE_SYMBOL )
                {
                   b.steem_volume += op.open_pays.amount;
                   b.sbd_volume += op.current_pays.amount;

@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE( account_create_apply )
 
       account_create_operation op;
 
-      op.fee = asset( 100, STEEM_SYMBOL );
+      op.fee = asset( 100, SMOKE_SYMBOL );
       op.new_account_name = "alice";
       op.creator = SMOKE_INIT_MINER_NAME;
       op.owner = authority( 1, priv_key.get_public_key(), 1 );
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE( account_create_apply )
       BOOST_REQUIRE( acct.sbd_balance.amount.value == ASSET( "0.000 TBD" ).amount.value );
       BOOST_REQUIRE( acct.id._id == acct_auth.id._id );
 
-      /// because init_witness has created vesting shares and blocks have been produced, 100 STEEM is worth less than 100 vesting shares due to rounding
+      /// because init_witness has created vesting shares and blocks have been produced, 100 SMOKE is worth less than 100 vesting shares due to rounding
       BOOST_REQUIRE( acct.vesting_shares.amount.value == ( op.fee * ( vest_shares / vests ) ).amount.value );
       BOOST_REQUIRE( acct.vesting_withdraw_rate.amount.value == ASSET( "0.000000 VESTS" ).amount.value );
       BOOST_REQUIRE( acct.proxied_vsf_votes_total().value == 0 );
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE( account_create_apply )
       BOOST_REQUIRE( acct.memo_key == priv_key.get_public_key() );
       BOOST_REQUIRE( acct.proxy == "" );
       BOOST_REQUIRE( acct.created == db.head_block_time() );
-      BOOST_REQUIRE( acct.balance.amount.value == ASSET( "0.000 STEEM " ).amount.value );
+      BOOST_REQUIRE( acct.balance.amount.value == ASSET( "0.000 SMOKE " ).amount.value );
       BOOST_REQUIRE( acct.sbd_balance.amount.value == ASSET( "0.000 TBD" ).amount.value );
       BOOST_REQUIRE( acct.vesting_shares.amount.value == ( op.fee * ( vest_shares / vests ) ).amount.value );
       BOOST_REQUIRE( acct.vesting_withdraw_rate.amount.value == ASSET( "0.000000 VESTS" ).amount.value );
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE( account_create_apply )
       BOOST_TEST_MESSAGE( "--- Test failure when creator cannot cover fee" );
       tx.signatures.clear();
       tx.operations.clear();
-      op.fee = asset( db.get_account( SMOKE_INIT_MINER_NAME ).balance.amount + 1, STEEM_SYMBOL );
+      op.fee = asset( db.get_account( SMOKE_INIT_MINER_NAME ).balance.amount + 1, SMOKE_SYMBOL );
       op.new_account_name = "bob";
       tx.operations.push_back( op );
       tx.sign( init_account_priv_key, db.get_chain_id() );
@@ -1317,7 +1317,7 @@ BOOST_AUTO_TEST_CASE( transfer_to_vesting_apply )
       BOOST_REQUIRE( alice.balance == ASSET( "10.000 TESTS" ) );
 
       auto shares = asset( gpo.total_vesting_shares.amount, VESTS_SYMBOL );
-      auto vests = asset( gpo.total_vesting_fund_steem.amount, STEEM_SYMBOL );
+      auto vests = asset( gpo.total_vesting_fund_steem.amount, SMOKE_SYMBOL );
       auto alice_shares = alice.vesting_shares;
       auto bob_shares = bob.vesting_shares;
 
@@ -1344,7 +1344,7 @@ BOOST_AUTO_TEST_CASE( transfer_to_vesting_apply )
       validate_database();
 
       op.to = "bob";
-      op.amount = asset( 2000, STEEM_SYMBOL );
+      op.amount = asset( 2000, SMOKE_SYMBOL );
       tx.operations.clear();
       tx.signatures.clear();
       tx.operations.push_back( op );
@@ -1639,7 +1639,7 @@ BOOST_AUTO_TEST_CASE( witness_update_apply )
       op.url = "foo.bar";
       op.fee = ASSET( "1.000 TESTS" );
       op.block_signing_key = signing_key.get_public_key();
-      op.props.account_creation_fee = asset( SMOKE_MIN_ACCOUNT_CREATION_FEE + 10, STEEM_SYMBOL);
+      op.props.account_creation_fee = asset( SMOKE_MIN_ACCOUNT_CREATION_FEE + 10, SMOKE_SYMBOL);
       op.props.maximum_block_size = SMOKE_MIN_BLOCK_SIZE_LIMIT + 100;
 
       signed_transaction tx;
@@ -2267,7 +2267,7 @@ BOOST_AUTO_TEST_CASE( feed_publish_apply )
       BOOST_TEST_MESSAGE( "--- Test publishing price feed" );
       feed_publish_operation op;
       op.publisher = "alice";
-      op.exchange_rate = price( ASSET( "1000.000 TESTS" ), ASSET( "1.000 TBD" ) ); // 1000 STEEM : 1 SBD
+      op.exchange_rate = price( ASSET( "1000.000 TESTS" ), ASSET( "1.000 TBD" ) ); // 1000 SMOKE : 1 SBD
 
       signed_transaction tx;
       tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
@@ -2605,7 +2605,7 @@ BOOST_AUTO_TEST_CASE( limit_order_create_apply )
       BOOST_REQUIRE( limit_order->orderid == op.orderid );
       BOOST_REQUIRE( limit_order->for_sale == op.amount_to_sell.amount );
       BOOST_REQUIRE( limit_order->sell_price == price( op.amount_to_sell / op.min_to_receive ) );
-      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, STEEM_SYMBOL ) );
+      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, SMOKE_SYMBOL ) );
       BOOST_REQUIRE( alice.balance.amount.value == ASSET( "990.000 TESTS" ).amount.value );
       BOOST_REQUIRE( alice.sbd_balance.amount.value == ASSET( "0.000 TBD" ).amount.value );
       validate_database();
@@ -2625,7 +2625,7 @@ BOOST_AUTO_TEST_CASE( limit_order_create_apply )
       BOOST_REQUIRE( limit_order->orderid == op.orderid );
       BOOST_REQUIRE( limit_order->for_sale == 10000 );
       BOOST_REQUIRE( limit_order->sell_price == price( ASSET( "10.000 TESTS" ), op.min_to_receive ) );
-      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, STEEM_SYMBOL ) );
+      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, SMOKE_SYMBOL ) );
       BOOST_REQUIRE( alice.balance.amount.value == ASSET( "990.000 TESTS" ).amount.value );
       BOOST_REQUIRE( alice.sbd_balance.amount.value == ASSET( "0.000 TBD" ).amount.value );
       validate_database();
@@ -2647,7 +2647,7 @@ BOOST_AUTO_TEST_CASE( limit_order_create_apply )
 
       BOOST_TEST_MESSAGE( "--- Test having a partial match to limit order" );
       // Alice has order for 15 SBD at a price of 2:3
-      // Fill 5 STEEM for 7.5 SBD
+      // Fill 5 SMOKE for 7.5 SBD
 
       op.owner = "bob";
       op.orderid = 1;
@@ -2669,7 +2669,7 @@ BOOST_AUTO_TEST_CASE( limit_order_create_apply )
       BOOST_REQUIRE( limit_order->orderid == op.orderid );
       BOOST_REQUIRE( limit_order->for_sale == 5000 );
       BOOST_REQUIRE( limit_order->sell_price == price( ASSET( "10.000 TESTS" ), ASSET( "15.000 TBD" ) ) );
-      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, STEEM_SYMBOL ) );
+      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, SMOKE_SYMBOL ) );
       BOOST_REQUIRE( limit_order_idx.find( std::make_tuple( "bob", op.orderid ) ) == limit_order_idx.end() );
       BOOST_REQUIRE( alice.balance.amount.value == ASSET( "990.000 TESTS" ).amount.value );
       BOOST_REQUIRE( alice.sbd_balance.amount.value == ASSET( "7.500 TBD" ).amount.value );
@@ -2699,7 +2699,7 @@ BOOST_AUTO_TEST_CASE( limit_order_create_apply )
       BOOST_REQUIRE( limit_order->orderid == 1 );
       BOOST_REQUIRE( limit_order->for_sale.value == 7500 );
       BOOST_REQUIRE( limit_order->sell_price == price( ASSET( "15.000 TBD" ), ASSET( "10.000 TESTS" ) ) );
-      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, STEEM_SYMBOL ) );
+      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, SMOKE_SYMBOL ) );
       BOOST_REQUIRE( limit_order_idx.find( std::make_tuple( "alice", 1 ) ) == limit_order_idx.end() );
       BOOST_REQUIRE( alice.balance.amount.value == ASSET( "990.000 TESTS" ).amount.value );
       BOOST_REQUIRE( alice.sbd_balance.amount.value == ASSET( "15.000 TBD" ).amount.value );
@@ -2756,7 +2756,7 @@ BOOST_AUTO_TEST_CASE( limit_order_create_apply )
       BOOST_REQUIRE( limit_order->orderid == 4 );
       BOOST_REQUIRE( limit_order->for_sale.value == 1000 );
       BOOST_REQUIRE( limit_order->sell_price == price( ASSET( "12.000 TBD" ), ASSET( "10.000 TESTS" ) ) );
-      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, STEEM_SYMBOL ) );
+      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, SMOKE_SYMBOL ) );
       BOOST_REQUIRE( alice.balance.amount.value == ASSET( "975.000 TESTS" ).amount.value );
       BOOST_REQUIRE( alice.sbd_balance.amount.value == ASSET( "33.500 TBD" ).amount.value );
       BOOST_REQUIRE( bob.balance.amount.value == ASSET( "25.000 TESTS" ).amount.value );
@@ -2804,7 +2804,7 @@ BOOST_AUTO_TEST_CASE( limit_order_create_apply )
       BOOST_REQUIRE( limit_order->orderid == 5 );
       BOOST_REQUIRE( limit_order->for_sale.value == 9091 );
       BOOST_REQUIRE( limit_order->sell_price == price( ASSET( "20.000 TESTS" ), ASSET( "22.000 TBD" ) ) );
-      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, STEEM_SYMBOL ) );
+      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, SMOKE_SYMBOL ) );
       BOOST_REQUIRE( alice.balance.amount.value == ASSET( "955.000 TESTS" ).amount.value );
       BOOST_REQUIRE( alice.sbd_balance.amount.value == ASSET( "45.500 TBD" ).amount.value );
       BOOST_REQUIRE( bob.balance.amount.value == ASSET( "35.909 TESTS" ).amount.value );
@@ -2939,7 +2939,7 @@ BOOST_AUTO_TEST_CASE( limit_order_create2_apply )
       BOOST_REQUIRE( limit_order->orderid == op.orderid );
       BOOST_REQUIRE( limit_order->for_sale == op.amount_to_sell.amount );
       BOOST_REQUIRE( limit_order->sell_price == op.exchange_rate );
-      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, STEEM_SYMBOL ) );
+      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, SMOKE_SYMBOL ) );
       BOOST_REQUIRE( alice.balance.amount.value == ASSET( "990.000 TESTS" ).amount.value );
       BOOST_REQUIRE( alice.sbd_balance.amount.value == ASSET( "0.000 TBD" ).amount.value );
       validate_database();
@@ -2959,7 +2959,7 @@ BOOST_AUTO_TEST_CASE( limit_order_create2_apply )
       BOOST_REQUIRE( limit_order->orderid == op.orderid );
       BOOST_REQUIRE( limit_order->for_sale == 10000 );
       BOOST_REQUIRE( limit_order->sell_price == op.exchange_rate );
-      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, STEEM_SYMBOL ) );
+      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, SMOKE_SYMBOL ) );
       BOOST_REQUIRE( alice.balance.amount.value == ASSET( "990.000 TESTS" ).amount.value );
       BOOST_REQUIRE( alice.sbd_balance.amount.value == ASSET( "0.000 TBD" ).amount.value );
       validate_database();
@@ -2981,7 +2981,7 @@ BOOST_AUTO_TEST_CASE( limit_order_create2_apply )
 
       BOOST_TEST_MESSAGE( "--- Test having a partial match to limit order" );
       // Alice has order for 15 SBD at a price of 2:3
-      // Fill 5 STEEM for 7.5 SBD
+      // Fill 5 SMOKE for 7.5 SBD
 
       op.owner = "bob";
       op.orderid = 1;
@@ -3003,7 +3003,7 @@ BOOST_AUTO_TEST_CASE( limit_order_create2_apply )
       BOOST_REQUIRE( limit_order->orderid == op.orderid );
       BOOST_REQUIRE( limit_order->for_sale == 5000 );
       BOOST_REQUIRE( limit_order->sell_price == price( ASSET( "2.000 TESTS" ), ASSET( "3.000 TBD" ) ) );
-      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, STEEM_SYMBOL ) );
+      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, SMOKE_SYMBOL ) );
       BOOST_REQUIRE( limit_order_idx.find( std::make_tuple( "bob", op.orderid ) ) == limit_order_idx.end() );
       BOOST_REQUIRE( alice.balance.amount.value == ASSET( "990.000 TESTS" ).amount.value );
       BOOST_REQUIRE( alice.sbd_balance.amount.value == ASSET( "7.500 TBD" ).amount.value );
@@ -3033,7 +3033,7 @@ BOOST_AUTO_TEST_CASE( limit_order_create2_apply )
       BOOST_REQUIRE( limit_order->orderid == 1 );
       BOOST_REQUIRE( limit_order->for_sale.value == 7500 );
       BOOST_REQUIRE( limit_order->sell_price == price( ASSET( "3.000 TBD" ), ASSET( "2.000 TESTS" ) ) );
-      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, STEEM_SYMBOL ) );
+      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, SMOKE_SYMBOL ) );
       BOOST_REQUIRE( limit_order_idx.find( std::make_tuple( "alice", 1 ) ) == limit_order_idx.end() );
       BOOST_REQUIRE( alice.balance.amount.value == ASSET( "990.000 TESTS" ).amount.value );
       BOOST_REQUIRE( alice.sbd_balance.amount.value == ASSET( "15.000 TBD" ).amount.value );
@@ -3090,7 +3090,7 @@ BOOST_AUTO_TEST_CASE( limit_order_create2_apply )
       BOOST_REQUIRE( limit_order->orderid == 4 );
       BOOST_REQUIRE( limit_order->for_sale.value == 1000 );
       BOOST_REQUIRE( limit_order->sell_price == op.exchange_rate );
-      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, STEEM_SYMBOL ) );
+      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, SMOKE_SYMBOL ) );
       BOOST_REQUIRE( alice.balance.amount.value == ASSET( "975.000 TESTS" ).amount.value );
       BOOST_REQUIRE( alice.sbd_balance.amount.value == ASSET( "33.500 TBD" ).amount.value );
       BOOST_REQUIRE( bob.balance.amount.value == ASSET( "25.000 TESTS" ).amount.value );
@@ -3138,7 +3138,7 @@ BOOST_AUTO_TEST_CASE( limit_order_create2_apply )
       BOOST_REQUIRE( limit_order->orderid == 5 );
       BOOST_REQUIRE( limit_order->for_sale.value == 9091 );
       BOOST_REQUIRE( limit_order->sell_price == price( ASSET( "1.000 TESTS" ), ASSET( "1.100 TBD" ) ) );
-      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, STEEM_SYMBOL ) );
+      BOOST_REQUIRE( limit_order->get_market() == std::make_pair( SBD_SYMBOL, SMOKE_SYMBOL ) );
       BOOST_REQUIRE( alice.balance.amount.value == ASSET( "955.000 TESTS" ).amount.value );
       BOOST_REQUIRE( alice.sbd_balance.amount.value == ASSET( "45.500 TBD" ).amount.value );
       BOOST_REQUIRE( bob.balance.amount.value == ASSET( "35.909 TESTS" ).amount.value );
@@ -3656,21 +3656,21 @@ BOOST_AUTO_TEST_CASE( escrow_transfer_validate )
       op.escrow_expiration = db.head_block_time() + 200;
 
       BOOST_TEST_MESSAGE( "--- failure when sbd symbol != SBD" );
-      op.sbd_amount.symbol = STEEM_SYMBOL;
+      op.sbd_amount.symbol = SMOKE_SYMBOL;
       SMOKE_REQUIRE_THROW( op.validate(), fc::exception );
 
-      BOOST_TEST_MESSAGE( "--- failure when steem symbol != STEEM" );
+      BOOST_TEST_MESSAGE( "--- failure when steem symbol != SMOKE" );
       op.sbd_amount.symbol = SBD_SYMBOL;
       op.steem_amount.symbol = SBD_SYMBOL;
       SMOKE_REQUIRE_THROW( op.validate(), fc::exception );
 
-      BOOST_TEST_MESSAGE( "--- failure when fee symbol != SBD and fee symbol != STEEM" );
-      op.steem_amount.symbol = STEEM_SYMBOL;
+      BOOST_TEST_MESSAGE( "--- failure when fee symbol != SBD and fee symbol != SMOKE" );
+      op.steem_amount.symbol = SMOKE_SYMBOL;
       op.fee.symbol = VESTS_SYMBOL;
       SMOKE_REQUIRE_THROW( op.validate(), fc::exception );
 
       BOOST_TEST_MESSAGE( "--- failure when sbd == 0 and steem == 0" );
-      op.fee.symbol = STEEM_SYMBOL;
+      op.fee.symbol = SMOKE_SYMBOL;
       op.sbd_amount.amount = 0;
       op.steem_amount.amount = 0;
       SMOKE_REQUIRE_THROW( op.validate(), fc::exception );
@@ -4472,7 +4472,7 @@ BOOST_AUTO_TEST_CASE( escrow_release_validate )
 
 
       BOOST_TEST_MESSAGE( "--- success" );
-      op.steem_amount.symbol = STEEM_SYMBOL;
+      op.steem_amount.symbol = SMOKE_SYMBOL;
       op.validate();
    }
    FC_LOG_AND_RETHROW()
@@ -5018,7 +5018,7 @@ BOOST_AUTO_TEST_CASE( transfer_to_savings_validate )
       op.validate();
 
 
-      BOOST_TEST_MESSAGE( "success when amount is STEEM" );
+      BOOST_TEST_MESSAGE( "success when amount is SMOKE" );
       op.amount = ASSET( "1.000 TESTS" );
       op.validate();
    }
@@ -5100,7 +5100,7 @@ BOOST_AUTO_TEST_CASE( transfer_to_savings_apply )
       validate_database();
 
 
-      BOOST_TEST_MESSAGE( "--- success transferring STEEM to self" );
+      BOOST_TEST_MESSAGE( "--- success transferring SMOKE to self" );
       op.to = "alice";
 
       tx.clear();
@@ -5126,7 +5126,7 @@ BOOST_AUTO_TEST_CASE( transfer_to_savings_apply )
       validate_database();
 
 
-      BOOST_TEST_MESSAGE( "--- success transferring STEEM to other" );
+      BOOST_TEST_MESSAGE( "--- success transferring SMOKE to other" );
       op.to = "bob";
       op.amount = ASSET( "1.000 TESTS" );
 
@@ -5195,7 +5195,7 @@ BOOST_AUTO_TEST_CASE( transfer_from_savings_validate )
       op.validate();
 
 
-      BOOST_TEST_MESSAGE( "success when amount is STEEM" );
+      BOOST_TEST_MESSAGE( "success when amount is SMOKE" );
       op.amount = ASSET( "1.000 TESTS" );
       op.validate();
    }
@@ -5289,7 +5289,7 @@ BOOST_AUTO_TEST_CASE( transfer_from_savings_apply )
       SMOKE_REQUIRE_THROW( db.push_transaction( tx, 0 ), fc::exception );
 
 
-      BOOST_TEST_MESSAGE( "--- success withdrawing STEEM to self" );
+      BOOST_TEST_MESSAGE( "--- success withdrawing SMOKE to self" );
       op.to = "alice";
 
       tx.clear();
@@ -5339,7 +5339,7 @@ BOOST_AUTO_TEST_CASE( transfer_from_savings_apply )
       SMOKE_REQUIRE_THROW( db.push_transaction( tx, 0 ), fc::exception );
 
 
-      BOOST_TEST_MESSAGE( "--- success withdrawing STEEM to other" );
+      BOOST_TEST_MESSAGE( "--- success withdrawing SMOKE to other" );
       op.to = "bob";
       op.amount = ASSET( "1.000 TESTS" );
       op.request_id = 3;
@@ -5808,7 +5808,7 @@ BOOST_AUTO_TEST_CASE( claim_reward_balance_validate )
       op.reward_vests.amount = 0;
 
 
-      BOOST_TEST_MESSAGE( "Testing wrong STEEM symbol" );
+      BOOST_TEST_MESSAGE( "Testing wrong SMOKE symbol" );
       op.reward_steem = ASSET( "1.000 WRONG" );
       SMOKE_REQUIRE_THROW( op.validate(), fc::assert_exception );
 
@@ -5925,7 +5925,7 @@ BOOST_AUTO_TEST_CASE( account_create_with_delegation_apply )
       BOOST_TEST_MESSAGE( "Testing: account_create_with_delegation_apply" );
       signed_transaction tx;
       ACTORS( (alice) );
-      // 150 * fee = ( 5 * STEEM ) + SP
+      // 150 * fee = ( 5 * SMOKE ) + SP
       auto gpo = db.get_dynamic_global_properties();
       generate_blocks(1);
       fund( "alice", ASSET("1510.000 TESTS") );
@@ -5990,10 +5990,10 @@ BOOST_AUTO_TEST_CASE( account_create_with_delegation_apply )
 
       generate_block();
 
-      BOOST_TEST_MESSAGE( "--- Test success using only STEEM to reach target delegation." );
+      BOOST_TEST_MESSAGE( "--- Test success using only SMOKE to reach target delegation." );
 
       tx.clear();
-      op.fee=asset( db.get_witness_schedule_object().median_props.account_creation_fee.amount * SMOKE_CREATE_ACCOUNT_WITH_STEEM_MODIFIER * SMOKE_CREATE_ACCOUNT_DELEGATION_RATIO, STEEM_SYMBOL );
+      op.fee=asset( db.get_witness_schedule_object().median_props.account_creation_fee.amount * SMOKE_CREATE_ACCOUNT_WITH_STEEM_MODIFIER * SMOKE_CREATE_ACCOUNT_DELEGATION_RATIO, SMOKE_SYMBOL );
       op.delegation = asset(0, VESTS_SYMBOL);
       op.new_account_name = "sam";
       tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
@@ -6013,7 +6013,7 @@ BOOST_AUTO_TEST_CASE( account_create_with_delegation_apply )
       SMOKE_REQUIRE_THROW( db.push_transaction( tx, 0 ), fc::exception );
 
       BOOST_TEST_MESSAGE( "--- Test failure when insufficient fee fo reach target delegation." );
-      fund( "alice" , asset( db.get_witness_schedule_object().median_props.account_creation_fee.amount * SMOKE_CREATE_ACCOUNT_WITH_STEEM_MODIFIER * SMOKE_CREATE_ACCOUNT_DELEGATION_RATIO , STEEM_SYMBOL ));
+      fund( "alice" , asset( db.get_witness_schedule_object().median_props.account_creation_fee.amount * SMOKE_CREATE_ACCOUNT_WITH_STEEM_MODIFIER * SMOKE_CREATE_ACCOUNT_DELEGATION_RATIO , SMOKE_SYMBOL ));
       SMOKE_REQUIRE_THROW( db.push_transaction( tx, 0 ), fc::exception );
 
       validate_database();
@@ -6081,7 +6081,7 @@ BOOST_AUTO_TEST_CASE( claim_reward_balance_apply )
       auto alice_vests = db.get_account( "alice" ).vesting_shares;
 
 
-      BOOST_TEST_MESSAGE( "--- Attempting to claim more STEEM than exists in the reward balance." );
+      BOOST_TEST_MESSAGE( "--- Attempting to claim more SMOKE than exists in the reward balance." );
 
       claim_reward_balance_operation op;
       signed_transaction tx;

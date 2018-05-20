@@ -18,18 +18,18 @@ performing (simulated) actions with that account.
 Why this isn't unsafe
 ---------------------
 
-Anyone (even you!) can edit their account to contain 1 million STEEM.  It's really
+Anyone (even you!) can edit their account to contain 1 million SMOKE.  It's really
 impossible for the developers to physically stop you from editing the memory/disk of your own
 computer to make your local node think any account balance is any amount, so you can "give"
-yourself 1 million STEEM.  Just like it's really impossible for your bank to physically stop
+yourself 1 million SMOKE.  Just like it's really impossible for your bank to physically stop
 you from writing any numbers you'd like when balancing your checkbook, so you can "give"
 yourself 1 million dollars.
 
 But you have no way to control what other nodes do (or what your bank's clerks and computer systems do).
 They do their own bookkeeping and keep track of what your real balance is (without all
-the fake STEEM or fake dollars you "gave" yourself).  So you can believe whatever you want
+the fake SMOKE or fake dollars you "gave" yourself).  So you can believe whatever you want
 about your balance and rewrite the rules of your own bookkeeping system to show you whatever balance you
-want to be shown, but as soon as you try to actually spend STEEM (or dollars) that you don't actually have,
+want to be shown, but as soon as you try to actually spend SMOKE (or dollars) that you don't actually have,
 you'll be stopped because every other node on the network is a system you don't control that's keeping the
 books properly (without all your edits to give yourself extra funds), and they do their own verification
 of every transaction and will suppress any that doesn't have sufficient balance and a proper cryptographic

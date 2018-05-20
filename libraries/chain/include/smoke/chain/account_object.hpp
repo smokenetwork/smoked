@@ -54,8 +54,8 @@ namespace smoke { namespace chain {
          uint16_t          voting_power = SMOKE_100_PERCENT;   ///< current voting power of this account, it falls after every vote
          time_point_sec    last_vote_time; ///< used to increase the voting power of this account the longer it goes without voting.
 
-         asset             balance = asset( 0, STEEM_SYMBOL );  ///< total liquid shares held by this account
-         asset             savings_balance = asset( 0, STEEM_SYMBOL );  ///< total liquid shares held by this account
+         asset             balance = asset( 0, SMOKE_SYMBOL );  ///< total liquid shares held by this account
+         asset             savings_balance = asset( 0, SMOKE_SYMBOL );  ///< total liquid shares held by this account
 
          /**
           *  SBD Deposits pay interest based upon the interest rate set by witnesses. The purpose of these
@@ -86,9 +86,9 @@ namespace smoke { namespace chain {
          ///@}
 
          asset             reward_sbd_balance = asset( 0, SBD_SYMBOL );
-         asset             reward_steem_balance = asset( 0, STEEM_SYMBOL );
+         asset             reward_steem_balance = asset( 0, SMOKE_SYMBOL );
          asset             reward_vesting_balance = asset( 0, VESTS_SYMBOL );
-         asset             reward_vesting_steem = asset( 0, STEEM_SYMBOL );
+         asset             reward_vesting_steem = asset( 0, SMOKE_SYMBOL );
 
          share_type        curation_rewards = 0;
          share_type        posting_rewards = 0;

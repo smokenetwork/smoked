@@ -739,7 +739,7 @@ vector<extended_limit_order> database_api::get_open_orders( string owner )const
       while( itr != idx.end() && itr->seller == owner ) {
          result.push_back( *itr );
 
-         if( itr->sell_price.base.symbol == STEEM_SYMBOL )
+         if( itr->sell_price.base.symbol == SMOKE_SYMBOL )
             result.back().real_price = (~result.back().sell_price).to_real();
          else
             result.back().real_price = (result.back().sell_price).to_real();
@@ -754,8 +754,8 @@ order_book database_api_impl::get_order_book( uint32_t limit )const
    FC_ASSERT( limit <= 1000 );
    order_book result;
 
-   auto max_sell = price::max( SBD_SYMBOL, STEEM_SYMBOL );
-   auto max_buy = price::max( STEEM_SYMBOL, SBD_SYMBOL );
+   auto max_sell = price::max( SBD_SYMBOL, SMOKE_SYMBOL );
+   auto max_buy = price::max( SMOKE_SYMBOL, SBD_SYMBOL );
 
    const auto& limit_price_idx = _db.get_index<limit_order_index>().indices().get<by_price>();
    auto sell_itr = limit_price_idx.lower_bound(max_sell);
@@ -777,14 +777,14 @@ order_book database_api_impl::get_order_book( uint32_t limit )const
       result.bids.push_back( cur );
       ++sell_itr;
    }
-   while(  buy_itr != end && buy_itr->sell_price.base.symbol == STEEM_SYMBOL && result.asks.size() < limit )
+   while(  buy_itr != end && buy_itr->sell_price.base.symbol == SMOKE_SYMBOL && result.asks.size() < limit )
    {
       auto itr = buy_itr;
       order cur;
       cur.order_price = itr->sell_price;
       cur.real_price  = (~cur.order_price).to_real();
       cur.steem   = itr->for_sale;
-      cur.sbd     = ( asset( itr->for_sale, STEEM_SYMBOL ) * cur.order_price ).amount;
+      cur.sbd     = ( asset( itr->for_sale, SMOKE_SYMBOL ) * cur.order_price ).amount;
       cur.created = itr->created;
       result.asks.push_back( cur );
       ++buy_itr;
@@ -1082,7 +1082,7 @@ void database_api::set_pending_payout( discussion& d )const
    else
       pot = props.total_reward_fund_steem;
 
-   // comment this line to get the pending_payout_value in STEEM_SYMBOL instead of SBD_SYMBOL
+   // comment this line to get the pending_payout_value in SMOKE_SYMBOL instead of SBD_SYMBOL
 //   if( !hist.current_median_history.is_null() ) pot = pot * hist.current_median_history;
 
 

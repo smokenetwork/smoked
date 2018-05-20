@@ -228,7 +228,7 @@ const account_object& database_fixture::account_create(
          account_create_with_delegation_operation op;
          op.new_account_name = name;
          op.creator = creator;
-         op.fee = asset( fee, STEEM_SYMBOL );
+         op.fee = asset( fee, SMOKE_SYMBOL );
          op.delegation = asset( 0, VESTS_SYMBOL );
          op.owner = authority( 1, key, 1 );
          op.active = authority( 1, key, 1 );
@@ -243,7 +243,7 @@ const account_object& database_fixture::account_create(
          account_create_operation op;
          op.new_account_name = name;
          op.creator = creator;
-         op.fee = asset( fee, STEEM_SYMBOL );
+         op.fee = asset( fee, SMOKE_SYMBOL );
          op.owner = authority( 1, key, 1 );
          op.active = authority( 1, key, 1 );
          op.posting = authority( 1, post_key, 1 );
@@ -308,7 +308,7 @@ const witness_object& database_fixture::witness_create(
       op.owner = owner;
       op.url = url;
       op.block_signing_key = signing_key;
-      op.fee = asset( fee, STEEM_SYMBOL );
+      op.fee = asset( fee, SMOKE_SYMBOL );
 
       trx.operations.push_back( op );
       trx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
@@ -346,7 +346,7 @@ void database_fixture::fund(
       {
          db.modify( db.get_account( account_name ), [&]( account_object& a )
          {
-            if( amount.symbol == STEEM_SYMBOL )
+            if( amount.symbol == SMOKE_SYMBOL )
                a.balance += amount;
             else if( amount.symbol == SBD_SYMBOL )
             {
@@ -357,7 +357,7 @@ void database_fixture::fund(
 
          db.modify( db.get_dynamic_global_properties(), [&]( dynamic_global_property_object& gpo )
          {
-            if( amount.symbol == STEEM_SYMBOL )
+            if( amount.symbol == SMOKE_SYMBOL )
                gpo.current_supply += amount;
             else if( amount.symbol == SBD_SYMBOL )
                gpo.current_sbd_supply += amount;
@@ -369,7 +369,7 @@ void database_fixture::fund(
             if( median_feed.current_median_history.is_null() )
                db.modify( median_feed, [&]( feed_history_object& f )
                {
-                  f.current_median_history = price( asset( 1, SBD_SYMBOL ), asset( 1, STEEM_SYMBOL ) );
+                  f.current_median_history = price( asset( 1, SBD_SYMBOL ), asset( 1, SMOKE_SYMBOL ) );
                });
          }
 
@@ -388,7 +388,7 @@ void database_fixture::convert(
       const account_object& account = db.get_account( account_name );
 
 
-      if ( amount.symbol == STEEM_SYMBOL )
+      if ( amount.symbol == SMOKE_SYMBOL )
       {
          db.adjust_balance( account, -amount );
          db.adjust_balance( account, db.to_sbd( amount ) );
@@ -432,7 +432,7 @@ void database_fixture::vest( const string& from, const share_type& amount )
       transfer_to_vesting_operation op;
       op.from = from;
       op.to = "";
-      op.amount = asset( amount, STEEM_SYMBOL );
+      op.amount = asset( amount, SMOKE_SYMBOL );
 
       trx.operations.push_back( op );
       trx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
@@ -444,7 +444,7 @@ void database_fixture::vest( const string& from, const share_type& amount )
 
 void database_fixture::vest( const string& account, const asset& amount )
 {
-   if( amount.symbol != STEEM_SYMBOL )
+   if( amount.symbol != SMOKE_SYMBOL )
       return;
 
    db_plugin->debug_update( [=]( database& db )

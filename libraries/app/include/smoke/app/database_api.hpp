@@ -282,7 +282,7 @@ class database_api
       ////////////
 
       /**
-       * @breif Gets the current order book for STEEM:SBD market
+       * @breif Gets the current order book for SMOKE:SBD market
        * @param limit Maximum number of orders for each side of the spread to return -- Must not exceed 1000
        */
       order_book get_order_book( uint32_t limit = 1000 )const;
