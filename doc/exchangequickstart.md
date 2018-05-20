@@ -1,9 +1,29 @@
 Exchange Quickstart
 -------------------
 
-System Requirements: A dedicated server or virtual machine with a minimum of 16GB of RAM, and at least 50GB of fast local SSD storage. SMOKE can handle an incredibly large amount of transactions per second, as such, it requires fast storage to run efficiently.
+System Requirements:
 
-We recommend using docker to both build and run SMOKE for exchanges. Docker is the world's leading containerization platform and using it guarantees that your build and run environment is identical to what our developers use. You can still build from source and you can keep both blockchain data and wallet data outside of the docker container. The instructions below will show you how to do this in just a few easy steps.
+For testnet 4GB RAM and few GB of disk free is OK.
+
+For production, a dedicated server or VPS with:
+- a minimum of 16GB of RAM, 
+- and at least 50GB of fast local SSD storage.
+
+Smoked can handle an incredibly large amount of transactions per second, as such, it requires fast storage to run efficiently.
+
+OS: Best with Ubuntu 16.04 LTS
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### Install docker and git (if not already installed)
 
@@ -18,27 +38,14 @@ curl -fsSL get.docker.com -o get-docker.sh
 sh get-docker.sh
 ```
 
-### Clone the smoke repo
+### Clone the smoked repo
 
-Pull in the smoke repo from the official source on github and then change into the directory that's created for it.
+Pull in the smoked repo from the official source on github and then change into the directory that's created for it.
 ```
 git clone https://github.com/smokenetwork/smoked
 cd smoked
 ```
 
-### Build the image from source with docker
-
-Docker isn't just for downloading already built images, it can be used to build from source the same way you would otherwise build. By doing this you ensure that your build environment is identical to what we use to develop the software. Use the below command to start the build:
-
-```
-docker build -t=smoke/smoked .
-```
-
-Don't forget the `.` at the end of the line which indicates the build target is in the current directory.
-
-This will build everything including running our full suite of tests during the build process. It will anywhere from thirty minutes to a couple hours depending on how fast your equipment is.
-
-When the build completes you will see a message indicating that it is 'successfully built'.
 
 ### Using our official Docker images without building from source
 
