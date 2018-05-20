@@ -2410,12 +2410,7 @@ void database::init_genesis( uint64_t init_supply )
             a.name = SMOKE_INIT_MINER_NAME + ( i ? fc::to_string( i ) : std::string() );
             a.memo_key = init_public_key;
             a.balance  = asset( i ? 0 : init_supply, STEEM_SYMBOL );
-
-            // usefull:
-            // https://github.com/steemit/steem/pull/1431/commits/ad861236e16fcffadc804b925f9b358e9a2fb176
-            // Add SMOKE_INIT_SBD_SUPPLY config option
-
-            a.sbd_balance = asset( i ? 0 : init_supply_sbd, SBD_SYMBOL );
+            a.sbd_balance = asset( 0, SBD_SYMBOL );
          } );
 
          create< account_authority_object >( [&]( account_authority_object& auth )
