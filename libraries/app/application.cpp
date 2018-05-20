@@ -310,7 +310,7 @@ namespace detail {
          if( !read_only )
          {
             _self->_read_only = false;
-            ilog( "Starting Steem node in write mode." );
+            ilog( "Starting Smoke node in write mode." );
             _max_block_age =_options->at("max-block-age").as<int32_t>();
 
             if( _options->count("resync-blockchain") )
