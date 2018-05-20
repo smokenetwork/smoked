@@ -16,7 +16,7 @@
 #define SBD_SYMBOL    (uint64_t(3) | (uint64_t('T') << 8) | (uint64_t('B') << 16) | (uint64_t('D') << 24) ) ///< Test Backed Dollars with 3 digits of precision
 #define STMD_SYMBOL   (uint64_t(3) | (uint64_t('T') << 8) | (uint64_t('S') << 16) | (uint64_t('T') << 24) | (uint64_t('D') << 32) ) ///< Test Dollars with 3 digits of precision
 
-#define SMOKE_SYMBOL                          "TEST"
+#define SMOKE_SYMBOL_STR                      "TEST"
 #define SMOKE_ADDRESS_PREFIX                  "TST"
 
 // 1451606400 ~ Sun Jan 18 1970 02:13:26 GMT+0700 (+08)
@@ -50,7 +50,7 @@
 #define STEEM_SYMBOL  (uint64_t(3) | (uint64_t('S') << 8) | (uint64_t('M') << 16) | (uint64_t('O') << 24) | (uint64_t('K') << 32) | (uint64_t('E') << 40)) ///< SMOKE with 3 digits of precision
 #define SBD_SYMBOL    (uint64_t(3) | (uint64_t('S') << 8) | (uint64_t('B') << 16) | (uint64_t('D') << 24) ) ///< SMOKE Backed Dollars with 3 digits of precision
 #define STMD_SYMBOL   (uint64_t(3) | (uint64_t('S') << 8) | (uint64_t('M') << 16) | (uint64_t('K') << 24) | (uint64_t('D') << 32) ) ///< SMOKE Dollars with 3 digits of precision
-#define SMOKE_SYMBOL                          "SMOKE"
+#define SMOKE_SYMBOL_STR                      "SMOKE"
 #define SMOKE_ADDRESS_PREFIX                  "SMK"
 
 #define SMOKE_GENESIS_TIME_EPOCH              1518000000  // Wed Feb 07 2018 17:40:00 GMT+0700 (+07)
