@@ -95,7 +95,7 @@ database::~database()
    clear_pending();
 }
 
-void database::open( const fc::path& data_dir, const fc::path& shared_mem_dir, uint64_t initial_supply, uint64_t initial_supply_sbd, uint64_t shared_file_size, uint32_t chainbase_flags )
+void database::open( const fc::path& data_dir, const fc::path& shared_mem_dir, uint64_t initial_supply, uint64_t shared_file_size, uint32_t chainbase_flags )
 {
    try
    {
@@ -110,7 +110,7 @@ void database::open( const fc::path& data_dir, const fc::path& shared_mem_dir, u
          if( !find< dynamic_global_property_object >() )
             with_write_lock( [&]()
             {
-               init_genesis( initial_supply, initial_supply_sbd );
+               init_genesis( initial_supply);
             });
 
          _block_log.open( data_dir / "block_log" );
@@ -150,8 +150,7 @@ void database::reindex( const fc::path& data_dir, const fc::path& shared_mem_dir
    {
       ilog( "Reindexing Blockchain" );
       wipe( data_dir, shared_mem_dir, false );
-//      open( data_dir, shared_mem_dir, 0, shared_file_size, chainbase::database::read_write );
-      open( data_dir, shared_mem_dir, SMOKE_INIT_SUPPLY, SMOKE_INIT_SUPPLY_SBD, shared_file_size, chainbase::database::read_write );
+      open( data_dir, shared_mem_dir, SMOKE_INIT_SUPPLY, shared_file_size, chainbase::database::read_write );
       _fork_db.reset();    // override effect of _fork_db.start_block() call in open()
 
       auto start = fc::time_point::now();
@@ -2353,7 +2352,7 @@ void database::init_schema()
    return;*/
 }
 
-void database::init_genesis( uint64_t init_supply, uint64_t init_supply_sbd )
+void database::init_genesis( uint64_t init_supply )
 {
    try
    {
@@ -2443,14 +2442,8 @@ void database::init_genesis( uint64_t init_supply, uint64_t init_supply_sbd )
          p.recent_slots_filled = fc::uint128::max_value();
          p.participation_count = 128;
          p.current_supply = asset( init_supply, STEEM_SYMBOL );
-
-         p.current_sbd_supply = asset( init_supply_sbd, SBD_SYMBOL );
-
-          p.virtual_supply = p.current_supply;
-//          virtual_supply = steem_supply + sbd_supply * price_feed
-         // there is no price_feed at genesis, make it 1 ( 1 STEEM = 1 SBD )
-//         p.virtual_supply = p.current_supply + asset( init_supply_sbd, STEEM_SYMBOL );
-
+         p.current_sbd_supply = asset( 0, SBD_SYMBOL );
+         p.virtual_supply = p.current_supply;
          p.maximum_block_size = SMOKE_MAX_BLOCK_SIZE;
       } );
 
@@ -2471,7 +2464,6 @@ void database::init_genesis( uint64_t init_supply, uint64_t init_supply_sbd )
    }
    FC_CAPTURE_AND_RETHROW()
 }
-
 
 void database::validate_transaction( const signed_transaction& trx )
 {
@@ -2713,7 +2705,6 @@ void database::_apply_block( const signed_block& next_block )
    expire_escrow_ratification();
    process_decline_voting_rights();
 
-   // tuanpa comment out - dont need hardfork anymore, because we applied all hardfork at init_genesis
    process_hardforks();
 
    // notify observers that the block has been applied
@@ -2771,8 +2762,6 @@ void database::process_header_extensions( const signed_block& next_block )
       ++itr;
    }
 }
-
-
 
 void database::update_median_feed() {
   try {

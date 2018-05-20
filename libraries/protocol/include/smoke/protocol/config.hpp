@@ -42,7 +42,7 @@
 #define SMOKE_ACCOUNT_RECOVERY_REQUEST_EXPIRATION_PERIOD  fc::seconds(12)
 #define SMOKE_OWNER_UPDATE_LIMIT                          fc::seconds(0)
 #define SMOKE_OWNER_AUTH_HISTORY_TRACKING_START_BLOCK_NUM 1
-#else // IS LIVE STEEM NETWORK
+#else // IS LIVE SMOKE NETWORK
 
 #define SMOKE_INIT_PUBLIC_KEY_STR             "SMK6LLegbAgLAy28EHrffBVuANFWcFgmqRMW13wBmTExqFE9SCkg4"
 #define SMOKE_CHAIN_ID                        (fc::sha256::hash("smoke")) // a66e00caa50e6817bbe24e927bf48c5d4ba1b33f36bdbb5fa262a04012c4e3ee
@@ -223,11 +223,9 @@
 #define SMOKE_MAX_PERMLINK_LENGTH             256
 #define SMOKE_MAX_WITNESS_URL_LENGTH          2048
 
-#define SMOKE_INIT_SUPPLY                     int64_t(349379987000ll) // 50m = 50000000000ll, 349379987
+#define SMOKE_INIT_SUPPLY                     int64_t(42000000000ll) // 42m SMOKE
 #define SMOKE_MAX_SHARE_SUPPLY                int64_t(1000000000000000ll)
 #define SMOKE_MAX_SIG_CHECK_DEPTH             2
-
-#define SMOKE_INIT_SUPPLY_SBD                 int64_t(1000000000ll) // 1000000000ll = 1m tokens
 
 #define SMOKE_MIN_TRANSACTION_SIZE_LIMIT      1024
 #define SMOKE_SECONDS_PER_YEAR                (uint64_t(60*60*24*365ll))
