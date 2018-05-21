@@ -3771,7 +3771,7 @@ void database::apply_hardfork( uint32_t hardfork )
                rfo.name = SMOKE_POST_REWARD_FUND_NAME;
                rfo.last_update = head_block_time();
                rfo.content_constant = SMOKE_CONTENT_CONSTANT_HF0;
-               rfo.percent_curation_rewards = SMOKE_1_PERCENT * 25;
+               rfo.percent_curation_rewards = SMOKE_CONTENT_CURATE_REWARD_PERCENT;
                rfo.percent_content_rewards = SMOKE_100_PERCENT;
                rfo.reward_balance = gpo.total_reward_fund_steem;
 #ifndef IS_TEST_NET

@@ -131,6 +131,8 @@
 #define SMOKE_CONTENT_REWARD_PERCENT          (75*SMOKE_1_PERCENT) //75% of inflation, 7.125% inflation
 #define SMOKE_VESTING_FUND_PERCENT            (15*SMOKE_1_PERCENT) //15% of inflation, 1.425% inflation
 
+#define SMOKE_CONTENT_CURATE_REWARD_PERCENT   (50*SMOKE_1_PERCENT) // % of SMOKE_CONTENT_REWARD_PERCENT only
+
 #define SMOKE_MINER_PAY_PERCENT               (SMOKE_1_PERCENT) // 1%
 #define SMOKE_MIN_RATION                      100000
 #define SMOKE_MAX_RATION_DECAY_RATE           (1000000)
