@@ -82,20 +82,21 @@
 //#define SMOKE_START_MINER_VOTING_BLOCK        (SMOKE_BLOCKS_PER_DAY * 30)
 #define SMOKE_START_MINER_VOTING_BLOCK        (1 * 30)
 
+#define SMOKE_MAX_WITNESSES                   21
+
 #define SMOKE_INIT_MINER_NAME                 "initminer"
-#define SMOKE_NUM_INIT_MINERS                 1
+#define SMOKE_NUM_INIT_MINERS                 SMOKE_MAX_WITNESSES
 #define SMOKE_INIT_TIME                       (fc::time_point_sec());
 
-#define SMOKE_MAX_WITNESSES                   5 // 21
-#define SMOKE_MAX_VOTED_WITNESSES_HF0         3 // 19
+#define SMOKE_MAX_VOTED_WITNESSES_HF0         19
 #define SMOKE_MAX_MINER_WITNESSES_HF0         1
 #define SMOKE_MAX_RUNNER_WITNESSES_HF0        1
 
-#define SMOKE_MAX_VOTED_WITNESSES_HF17        4 // 20
+#define SMOKE_MAX_VOTED_WITNESSES_HF17        20
 #define SMOKE_MAX_MINER_WITNESSES_HF17        0
 #define SMOKE_MAX_RUNNER_WITNESSES_HF17       1
 
-#define SMOKE_HARDFORK_REQUIRED_WITNESSES     3 // 17 of the 21 dpos witnesses (20 elected and 1 virtual time) required for hardfork. This guarantees 75% participation on all subsequent rounds.
+#define SMOKE_HARDFORK_REQUIRED_WITNESSES     17 // 17 of the 21 dpos witnesses (20 elected and 1 virtual time) required for hardfork. This guarantees 75% participation on all subsequent rounds.
 #define SMOKE_MAX_TIME_UNTIL_EXPIRATION       (60*60) // seconds,  aka: 1 hour
 #define SMOKE_MAX_MEMO_SIZE                   2048
 #define SMOKE_MAX_PROXY_RECURSION_DEPTH       4
