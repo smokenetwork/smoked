@@ -1074,17 +1074,12 @@ void database_api::set_pending_payout( discussion& d )const
    }
 
    const auto& props = my->_db.get_dynamic_global_properties();
-   const auto& hist  = my->_db.get_feed_history();
 
    asset pot;
    if( my->_db.has_hardfork( SMOKE_HARDFORK_0_17__774 ) )
       pot = my->_db.get_reward_fund( my->_db.get_comment( d.author, d.permlink ) ).reward_balance;
    else
       pot = props.total_reward_fund_steem;
-
-   // comment this line to get the pending_payout_value in SMOKE_SYMBOL instead of SBD_SYMBOL
-//   if( !hist.current_median_history.is_null() ) pot = pot * hist.current_median_history;
-
 
    u256 total_r2 = 0;
    if( my->_db.has_hardfork( SMOKE_HARDFORK_0_17__774 ) )
