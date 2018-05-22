@@ -26,16 +26,11 @@
 //#define SMOKE_MINING_TIME                     (fc::time_point_sec(1451606400))
 #define SMOKE_MINING_TIME                     (fc::time_point_sec(1515765200))
 #define SMOKE_CASHOUT_WINDOW_SECONDS          (60*60) /// 1 hr
-#define SMOKE_CASHOUT_WINDOW_SECONDS_PRE_HF12 (SMOKE_CASHOUT_WINDOW_SECONDS)
-#define SMOKE_CASHOUT_WINDOW_SECONDS_PRE_HF17 (SMOKE_CASHOUT_WINDOW_SECONDS)
 #define SMOKE_SECOND_CASHOUT_WINDOW           (60*60*24*3) /// 3 days
 #define SMOKE_MAX_CASHOUT_WINDOW_SECONDS      (60*60*24) /// 1 day
 #define SMOKE_VOTE_CHANGE_LOCKOUT_PERIOD      (60*10) /// 10 minutes
-#define SMOKE_UPVOTE_LOCKOUT_HF7              (fc::minutes(1))
-#define SMOKE_UPVOTE_LOCKOUT_HF17             (fc::minutes(5))
+#define SMOKE_UPVOTE_LOCKOUT                  (fc::minutes(5))
 
-
-#define SMOKE_ORIGINAL_MIN_ACCOUNT_CREATION_FEE 0
 #define SMOKE_MIN_ACCOUNT_CREATION_FEE          0
 
 #define SMOKE_OWNER_AUTH_RECOVERY_PERIOD                  fc::seconds(60)
@@ -56,17 +51,13 @@
 #define SMOKE_GENESIS_TIME_EPOCH              1518000000  // Wed Feb 07 2018 17:40:00 GMT+0700 (+07)
 #define SMOKE_GENESIS_TIME                    (fc::time_point_sec(SMOKE_GENESIS_TIME_EPOCH))
 #define SMOKE_MINING_TIME                     (fc::time_point_sec(SMOKE_GENESIS_TIME_EPOCH + 9000))
-#define SMOKE_CASHOUT_WINDOW_SECONDS_PRE_HF12 (60*60*24)    /// 1 day
-#define SMOKE_CASHOUT_WINDOW_SECONDS_PRE_HF17 (60*60*12)    /// 12 hours
 #define SMOKE_CASHOUT_WINDOW_SECONDS          (60*60*24*7)  /// 7 days
 #define SMOKE_SECOND_CASHOUT_WINDOW           (60*60*24*30) /// 30 days
 #define SMOKE_MAX_CASHOUT_WINDOW_SECONDS      (60*60*24*14) /// 2 weeks
 #define SMOKE_VOTE_CHANGE_LOCKOUT_PERIOD      (60*60*2)     /// 2 hours
-#define SMOKE_UPVOTE_LOCKOUT_HF7              (fc::minutes(1))
-#define SMOKE_UPVOTE_LOCKOUT_HF17             (fc::hours(12))
+#define SMOKE_UPVOTE_LOCKOUT                  (fc::hours(12))
 
-#define SMOKE_ORIGINAL_MIN_ACCOUNT_CREATION_FEE  100000
-#define SMOKE_MIN_ACCOUNT_CREATION_FEE           0 // 1
+#define SMOKE_MIN_ACCOUNT_CREATION_FEE         0 // 1
 
 #define SMOKE_OWNER_AUTH_RECOVERY_PERIOD                  fc::days(30)
 #define SMOKE_ACCOUNT_RECOVERY_REQUEST_EXPIRATION_PERIOD  fc::days(1)
@@ -95,7 +86,6 @@
 #define SMOKE_MAX_TIME_UNTIL_EXPIRATION       (60*60) // seconds,  aka: 1 hour
 #define SMOKE_MAX_MEMO_SIZE                   2048
 #define SMOKE_MAX_PROXY_RECURSION_DEPTH       4
-#define SMOKE_VESTING_WITHDRAW_INTERVALS_PRE_HF_16 104
 #define SMOKE_VESTING_WITHDRAW_INTERVALS      13
 #define SMOKE_VESTING_WITHDRAW_INTERVAL_SECONDS (60*60*24*7) /// 1 week per interval
 
@@ -136,7 +126,6 @@
 
 #define SMOKE_BANDWIDTH_AVERAGE_WINDOW_SECONDS (60*60*24*7) ///< 1 week
 #define SMOKE_BANDWIDTH_PRECISION             (uint64_t(1000000)) ///< 1 million
-#define SMOKE_MAX_COMMENT_DEPTH_PRE_HF17      6
 #define SMOKE_MAX_COMMENT_DEPTH               0xffff // 64k
 #define SMOKE_SOFT_MAX_COMMENT_DEPTH          0xff // 255
 
@@ -167,9 +156,8 @@
 
 #define SMOKE_POST_REWARD_FUND_NAME           ("post")
 #define SMOKE_COMMENT_REWARD_FUND_NAME        ("comment")
-#define SMOKE_RECENT_RSHARES_DECAY_RATE_HF17  (fc::days(30))
-#define SMOKE_RECENT_RSHARES_DECAY_RATE_HF19  (fc::days(15))
-#define SMOKE_CONTENT_CONSTANT_HF0            (uint128_t(uint64_t(2000000000000ll)))
+#define SMOKE_RECENT_RSHARES_DECAY_RATE       (fc::days(15))
+#define SMOKE_CONTENT_CONSTANT                (uint128_t(uint64_t(2000000000000ll)))
 // note, if redefining these constants make sure calculate_claims doesn't overflow
 
 // 5ccc e802 de5f
@@ -210,9 +198,6 @@
 #define SMOKE_MIN_PAYOUT_SBD                  (asset(20,SBD_SYMBOL))
 #define SMOKE_MIN_PAYOUT_STEEM                20
 
-#define SMOKE_SBD_STOP_PERCENT                (5*SMOKE_1_PERCENT ) // Stop printing SBD at 5% Market Cap
-#define SMOKE_SBD_START_PERCENT               (2*SMOKE_1_PERCENT) // Start reducing printing of SBD at 2% Market Cap
-
 #define SMOKE_MIN_ACCOUNT_NAME_LENGTH          3
 #define SMOKE_MAX_ACCOUNT_NAME_LENGTH         16
 
@@ -234,17 +219,8 @@
 #define SMOKE_SOFT_MAX_BLOCK_SIZE             (2*1024*1024)
 #define SMOKE_MIN_BLOCK_SIZE                  115
 #define SMOKE_BLOCKS_PER_HOUR                 (60*60/SMOKE_BLOCK_INTERVAL)
-#define SMOKE_FEED_INTERVAL_BLOCKS            (SMOKE_BLOCKS_PER_HOUR)
-//#define SMOKE_FEED_INTERVAL_BLOCKS            (120)
-#define SMOKE_FEED_HISTORY_WINDOW_PRE_HF_16   (24*7) /// 7 days * 24 hours per day
-//#define SMOKE_FEED_HISTORY_WINDOW_PRE_HF_16   (1)
 #define SMOKE_FEED_HISTORY_WINDOW             (12*7) // 3.5 days
 //#define SMOKE_FEED_HISTORY_WINDOW             (1) // 1h
-//#define SMOKE_MAX_FEED_AGE_SECONDS            (60*60*24*7) // 7 days
-#define SMOKE_MAX_FEED_AGE_SECONDS            (60*60*24*365*10) // 10 years
-#define SMOKE_MIN_FEEDS                       (SMOKE_MAX_WITNESSES/3) /// protects the network from conversions before price has been established
-//#define SMOKE_MIN_FEEDS                       (1) /// protects the network from conversions before price has been established
-#define SMOKE_CONVERSION_DELAY_PRE_HF_16      (fc::days(7))
 #define SMOKE_CONVERSION_DELAY                (fc::hours(SMOKE_FEED_HISTORY_WINDOW)) //3.5 day conversion
 
 #define SMOKE_MIN_UNDO_HISTORY                10
@@ -254,16 +230,14 @@
 #define SMOKE_BLOCKCHAIN_PRECISION            uint64_t( 1000 )
 
 #define SMOKE_BLOCKCHAIN_PRECISION_DIGITS     3
-#define SMOKE_MAX_INSTANCE_ID                 (uint64_t(-1)>>16)
+
 /** NOTE: making this a power of 2 (say 2^15) would greatly accelerate fee calcs */
 #define SMOKE_MAX_AUTHORITY_MEMBERSHIP        10
 #define SMOKE_MAX_ASSET_WHITELIST_AUTHORITIES 10
 #define SMOKE_MAX_URL_LENGTH                  127
 
 #define SMOKE_IRREVERSIBLE_THRESHOLD          (75 * SMOKE_1_PERCENT)
-
-#define VIRTUAL_SCHEDULE_LAP_LENGTH  ( fc::uint128(uint64_t(-1)) )
-#define VIRTUAL_SCHEDULE_LAP_LENGTH2 ( fc::uint128::max_value() )
+#define VIRTUAL_SCHEDULE_LAP_LENGTH           ( fc::uint128::max_value() )
 
 /**
  *  Reserved Account IDs with special meaning

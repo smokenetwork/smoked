@@ -1154,7 +1154,7 @@ void database::adjust_witness_vote( const witness_object& witness, share_type de
       w.votes += delta;
       FC_ASSERT( w.votes <= get_dynamic_global_properties().total_vesting_shares.amount, "", ("w.votes", w.votes)("props",get_dynamic_global_properties().total_vesting_shares) );
 
-      w.virtual_scheduled_time = w.virtual_last_update + (VIRTUAL_SCHEDULE_LAP_LENGTH2 - w.virtual_position)/(w.votes.value+1);
+      w.virtual_scheduled_time = w.virtual_last_update + (VIRTUAL_SCHEDULE_LAP_LENGTH - w.virtual_position)/(w.votes.value+1);
 
       /** witnesses with a low number of votes could overflow the time field and end up with a scheduled time in the past */
       if( w.virtual_scheduled_time < wso.current_virtual_time )
@@ -1615,7 +1615,7 @@ void database::process_comment_cashout()
       {
          fc::microseconds decay_rate;
 
-         decay_rate = SMOKE_RECENT_RSHARES_DECAY_RATE_HF19;
+         decay_rate = SMOKE_RECENT_RSHARES_DECAY_RATE;
 
          rfo.recent_claims -= ( rfo.recent_claims * ( head_block_time() - rfo.last_update ).to_seconds() ) / decay_rate.to_seconds();
          rfo.last_update = head_block_time();
@@ -2468,7 +2468,7 @@ void database::init_genesis( uint64_t init_supply )
                                                       {
                                                           rfo.name = SMOKE_POST_REWARD_FUND_NAME;
                                                           rfo.last_update = head_block_time();
-                                                          rfo.content_constant = SMOKE_CONTENT_CONSTANT_HF0;
+                                                          rfo.content_constant = SMOKE_CONTENT_CONSTANT;
                                                           rfo.percent_curation_rewards = SMOKE_CONTENT_CURATE_REWARD_PERCENT;
                                                           rfo.percent_content_rewards = SMOKE_100_PERCENT;
                                                           rfo.reward_balance = gpo.total_reward_fund_steem;
@@ -3751,7 +3751,7 @@ void database::perform_vesting_share_split( uint32_t magnitude )
             a.vesting_shares.amount *= magnitude;
             a.withdrawn             *= magnitude;
             a.to_withdraw           *= magnitude;
-            a.vesting_withdraw_rate  = asset( a.to_withdraw / SMOKE_VESTING_WITHDRAW_INTERVALS_PRE_HF_16, VESTS_SYMBOL );
+            a.vesting_withdraw_rate  = asset( a.to_withdraw / SMOKE_VESTING_WITHDRAW_INTERVALS, VESTS_SYMBOL );
             if( a.vesting_withdraw_rate.amount == 0 )
                a.vesting_withdraw_rate.amount = 1;
 

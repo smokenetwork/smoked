@@ -498,7 +498,6 @@ void comment_evaluator::do_apply( const comment_operation& o )
             from_string( com.parent_permlink, o.parent_permlink );
             from_string( com.category, o.parent_permlink );
             com.root_comment = com.id;
-            com.cashout_time = _db.head_block_time() + SMOKE_CASHOUT_WINDOW_SECONDS_PRE_HF17;
          }
          else
          {
@@ -507,7 +506,6 @@ void comment_evaluator::do_apply( const comment_operation& o )
             com.depth = parent->depth + 1;
             com.category = parent->category;
             com.root_comment = parent->root_comment;
-            com.cashout_time = fc::time_point_sec::maximum();
          }
 
          com.cashout_time = com.created + SMOKE_CASHOUT_WINDOW_SECONDS;
@@ -1093,7 +1091,7 @@ void vote_evaluator::do_apply( const vote_operation& o )
 
       if( rshares > 0 )
       {
-         FC_ASSERT( _db.head_block_time() < comment.cashout_time - SMOKE_UPVOTE_LOCKOUT_HF17, "Cannot increase payout within last twelve hours before payout." );
+         FC_ASSERT( _db.head_block_time() < comment.cashout_time - SMOKE_UPVOTE_LOCKOUT, "Cannot increase payout within last twelve hours before payout." );
       }
 
       //used_power /= (50*7); /// a 100% vote means use .28% of voting power which should force users to spread their votes around over 50+ posts day for a week
@@ -1215,7 +1213,7 @@ void vote_evaluator::do_apply( const vote_operation& o )
 
       if( itr->rshares < rshares )
       {
-         FC_ASSERT( _db.head_block_time() < comment.cashout_time - SMOKE_UPVOTE_LOCKOUT_HF17, "Cannot increase payout within last twelve hours before payout." );
+         FC_ASSERT( _db.head_block_time() < comment.cashout_time - SMOKE_UPVOTE_LOCKOUT, "Cannot increase payout within last twelve hours before payout." );
       }
 
       _db.modify( voter, [&]( account_object& a ){

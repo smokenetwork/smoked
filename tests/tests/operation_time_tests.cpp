@@ -351,7 +351,7 @@ BOOST_AUTO_TEST_CASE( recent_claims_decay )
 
       while( db.head_block_time() < bob_cashout_time )
       {
-         alice_vshares -= ( alice_vshares * SMOKE_BLOCK_INTERVAL ) / SMOKE_RECENT_RSHARES_DECAY_RATE_HF19.to_seconds();
+         alice_vshares -= ( alice_vshares * SMOKE_BLOCK_INTERVAL ) / SMOKE_RECENT_RSHARES_DECAY_RATE.to_seconds();
          const auto& post_rf = db.get< reward_fund_object, by_name >( SMOKE_POST_REWARD_FUND_NAME );
 
          BOOST_REQUIRE( post_rf.recent_claims == alice_vshares );
@@ -361,7 +361,7 @@ BOOST_AUTO_TEST_CASE( recent_claims_decay )
       }
 
       {
-         alice_vshares -= ( alice_vshares * SMOKE_BLOCK_INTERVAL ) / SMOKE_RECENT_RSHARES_DECAY_RATE_HF19.to_seconds();
+         alice_vshares -= ( alice_vshares * SMOKE_BLOCK_INTERVAL ) / SMOKE_RECENT_RSHARES_DECAY_RATE.to_seconds();
          const auto& post_rf = db.get< reward_fund_object, by_name >( SMOKE_POST_REWARD_FUND_NAME );
 
          BOOST_REQUIRE( post_rf.recent_claims == alice_vshares + bob_vshares );
@@ -2658,152 +2658,6 @@ BOOST_AUTO_TEST_CASE( comment_freeze )
    }
    FC_LOG_AND_RETHROW()
 }
-
-// This test is too intensive without optimizations. Disable it when we build in debug
-#ifndef DEBUG
-BOOST_AUTO_TEST_CASE( sbd_stability )
-{
-   try
-   {
-      resize_shared_mem( 1024 * 1024 * 512 ); // Due to number of blocks in the test, it requires a large file. (64 MB)
-
-      // Using the debug node plugin to manually set account balances to create required market conditions for this test
-      auto db_plugin = app.register_plugin< smoke::plugin::debug_node::debug_node_plugin >();
-      boost::program_options::variables_map options;
-      db_plugin->logging = false;
-      db_plugin->plugin_initialize( options );
-      db_plugin->plugin_startup();
-      auto debug_key = "5JdouSvkK75TKWrJixYufQgePT21V7BAVWbNUWt3ktqhPmy8Z78"; //get_dev_key debug node
-
-      ACTORS( (alice)(bob)(sam)(dave)(greg) );
-
-      fund( "alice", 10000 );
-      fund( "bob", 10000 );
-
-      vest( "alice", 10000 );
-      vest( "bob", 10000 );
-
-      auto exchange_rate = price( ASSET( "1.000 TBD" ), ASSET( "10.000 TESTS" ) );
-      set_price_feed( exchange_rate );
-
-      BOOST_REQUIRE( db.get_dynamic_global_properties().sbd_print_rate == SMOKE_100_PERCENT );
-
-      comment_operation comment;
-      comment.author = "alice";
-      comment.permlink = "test";
-      comment.parent_permlink = "test";
-      comment.title = "test";
-      comment.body = "test";
-
-      signed_transaction tx;
-      tx.operations.push_back( comment );
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.sign( alice_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      vote_operation vote;
-      vote.voter = "bob";
-      vote.author = "alice";
-      vote.permlink = "test";
-      vote.weight = SMOKE_100_PERCENT;
-
-      tx.operations.clear();
-      tx.signatures.clear();
-
-      tx.operations.push_back( vote );
-      tx.sign( bob_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      BOOST_TEST_MESSAGE( "Generating blocks up to comment payout" );
-
-      db_plugin->debug_generate_blocks_until( debug_key, fc::time_point_sec( db.get_comment( comment.author, comment.permlink ).cashout_time.sec_since_epoch() - 2 * SMOKE_BLOCK_INTERVAL ), true, database::skip_witness_signature );
-
-      auto& gpo = db.get_dynamic_global_properties();
-
-      BOOST_TEST_MESSAGE( "Changing sam and gpo to set up market cap conditions" );
-
-      asset sbd_balance = asset( ( gpo.virtual_supply.amount * ( SMOKE_SBD_STOP_PERCENT + 30 ) ) / SMOKE_100_PERCENT, SMOKE_SYMBOL ) * exchange_rate;
-      db_plugin->debug_update( [=]( database& db )
-      {
-         db.modify( db.get_account( "sam" ), [&]( account_object& a )
-         {
-            a.sbd_balance = sbd_balance;
-         });
-      }, database::skip_witness_signature );
-
-      db_plugin->debug_update( [=]( database& db )
-      {
-         db.modify( db.get_dynamic_global_properties(), [&]( dynamic_global_property_object& gpo )
-         {
-            gpo.current_sbd_supply = sbd_balance;
-            gpo.virtual_supply = gpo.virtual_supply + sbd_balance * exchange_rate;
-         });
-      }, database::skip_witness_signature );
-
-      validate_database();
-
-      db_plugin->debug_generate_blocks( debug_key, 1, database::skip_witness_signature );
-
-      auto comment_reward = ( gpo.total_reward_fund_steem.amount + 2000 ) - ( ( gpo.total_reward_fund_steem.amount + 2000 ) * 25 * SMOKE_1_PERCENT ) / SMOKE_100_PERCENT ;
-      comment_reward /= 2;
-      auto sbd_reward = ( comment_reward * gpo.sbd_print_rate ) / SMOKE_100_PERCENT;
-      auto alice_sbd = db.get_account( "alice" ).sbd_balance + db.get_account( "alice" ).reward_sbd_balance + asset( sbd_reward, SMOKE_SYMBOL ) * exchange_rate;
-      auto alice_steem = db.get_account( "alice" ).balance + db.get_account( "alice" ).reward_steem_balance ;
-
-      BOOST_TEST_MESSAGE( "Checking printing SBD has slowed" );
-      BOOST_REQUIRE( db.get_dynamic_global_properties().sbd_print_rate < SMOKE_100_PERCENT );
-
-      BOOST_TEST_MESSAGE( "Pay out comment and check rewards are paid as SMOKE" );
-      db_plugin->debug_generate_blocks( debug_key, 1, database::skip_witness_signature );
-
-      validate_database();
-
-      BOOST_REQUIRE( db.get_account( "alice" ).sbd_balance + db.get_account( "alice" ).reward_sbd_balance == alice_sbd );
-      BOOST_REQUIRE( db.get_account( "alice" ).balance + db.get_account( "alice" ).reward_steem_balance > alice_steem );
-
-      BOOST_TEST_MESSAGE( "Letting percent market cap fall to 2% to verify printing of SBD turns back on" );
-
-      // Get close to 1.5% for printing SBD to start again, but not all the way
-      db_plugin->debug_update( [=]( database& db )
-      {
-         db.modify( db.get_account( "sam" ), [&]( account_object& a )
-         {
-            a.sbd_balance = asset( ( 194 * sbd_balance.amount ) / 500, SBD_SYMBOL );
-         });
-      }, database::skip_witness_signature );
-
-      db_plugin->debug_update( [=]( database& db )
-      {
-         db.modify( db.get_dynamic_global_properties(), [&]( dynamic_global_property_object& gpo )
-         {
-            gpo.current_sbd_supply = alice_sbd + asset( ( 194 * sbd_balance.amount ) / 500, SBD_SYMBOL );
-         });
-      }, database::skip_witness_signature );
-
-      db_plugin->debug_generate_blocks( debug_key, 1, database::skip_witness_signature );
-      validate_database();
-
-      BOOST_REQUIRE( db.get_dynamic_global_properties().sbd_print_rate < SMOKE_100_PERCENT );
-
-      auto last_print_rate = db.get_dynamic_global_properties().sbd_print_rate;
-
-      // Keep producing blocks until printing SBD is back
-      while( ( db.get_dynamic_global_properties().current_sbd_supply * exchange_rate ).amount >= ( db.get_dynamic_global_properties().virtual_supply.amount * SMOKE_SBD_START_PERCENT ) / SMOKE_100_PERCENT )
-      {
-         auto& gpo = db.get_dynamic_global_properties();
-         BOOST_REQUIRE( gpo.sbd_print_rate >= last_print_rate );
-         last_print_rate = gpo.sbd_print_rate;
-         db_plugin->debug_generate_blocks( debug_key, 1, database::skip_witness_signature );
-         validate_database();
-      }
-
-      validate_database();
-
-      BOOST_REQUIRE( db.get_dynamic_global_properties().sbd_print_rate == SMOKE_100_PERCENT );
-   }
-   FC_LOG_AND_RETHROW()
-}
-#endif
 
 BOOST_AUTO_TEST_CASE( sbd_price_feed_limit )
 {
