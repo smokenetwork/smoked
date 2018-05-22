@@ -1,7 +1,0 @@
-#ifndef SMOKE_HARDFORK_0_18
-#define SMOKE_HARDFORK_0_18 18
-
-#define SMOKE_HARDFORK_0_18_TIME (SMOKE_GENESIS_TIME+180000)
-#define SMOKE_HARDFORK_0_18_VERSION hardfork_version( 0, 18 )
-
-#endif

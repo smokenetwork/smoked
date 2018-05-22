@@ -3,7 +3,7 @@
  */
 #pragma once
 
-#define SMOKE_BLOCKCHAIN_VERSION              ( version(0, 20, 0) )
+#define SMOKE_BLOCKCHAIN_VERSION              ( version(0, 0, 0) )
 #define SMOKE_BLOCKCHAIN_HARDFORK_VERSION     ( hardfork_version( SMOKE_BLOCKCHAIN_VERSION ) )
 
 #ifdef IS_TEST_NET
@@ -87,13 +87,9 @@
 #define SMOKE_NUM_INIT_MINERS                 SMOKE_MAX_WITNESSES
 #define SMOKE_INIT_TIME                       (fc::time_point_sec());
 
-#define SMOKE_MAX_VOTED_WITNESSES_HF0         19
-#define SMOKE_MAX_MINER_WITNESSES_HF0         1
-#define SMOKE_MAX_RUNNER_WITNESSES_HF0        1
-
-#define SMOKE_MAX_VOTED_WITNESSES_HF17        20
-#define SMOKE_MAX_MINER_WITNESSES_HF17        0
-#define SMOKE_MAX_RUNNER_WITNESSES_HF17       1
+#define SMOKE_MAX_VOTED_WITNESSES             20
+#define SMOKE_MAX_MINER_WITNESSES             0
+#define SMOKE_MAX_RUNNER_WITNESSES            1
 
 #define SMOKE_HARDFORK_REQUIRED_WITNESSES     17 // 17 of the 21 dpos witnesses (20 elected and 1 virtual time) required for hardfork. This guarantees 75% participation on all subsequent rounds.
 #define SMOKE_MAX_TIME_UNTIL_EXPIRATION       (60*60) // seconds,  aka: 1 hour
