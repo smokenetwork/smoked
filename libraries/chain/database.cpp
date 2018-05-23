@@ -2008,8 +2008,6 @@ void database::initialize_evaluators()
    _my->_evaluator_registry.register_evaluator< custom_evaluator                         >();
    _my->_evaluator_registry.register_evaluator< custom_binary_evaluator                  >();
    _my->_evaluator_registry.register_evaluator< custom_json_evaluator                    >();
-   _my->_evaluator_registry.register_evaluator< pow_evaluator                            >();
-   _my->_evaluator_registry.register_evaluator< pow2_evaluator                           >();
    _my->_evaluator_registry.register_evaluator< feed_publish_evaluator                   >();
    _my->_evaluator_registry.register_evaluator< convert_evaluator                        >();
    _my->_evaluator_registry.register_evaluator< challenge_authority_evaluator            >();

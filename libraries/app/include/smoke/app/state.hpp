@@ -134,7 +134,7 @@ namespace smoke { namespace app {
 FC_REFLECT_DERIVED( smoke::app::extended_account,
                    (smoke::app::account_api_obj),
                    (vesting_balance)(reputation)
-                   (transfer_history)(post_history)(vote_history)(other_history)(witness_votes)(tags_usage)(guest_bloggers)(open_orders)(comments)(feed)(blog)(recent_replies)(recommended) )
+                   (transfer_history)(post_history)(vote_history)(other_history)(witness_votes)(tags_usage)(guest_bloggers)(comments)(feed)(blog)(recent_replies)(recommended) )
 
 
 FC_REFLECT( smoke::app::vote_state, (voter)(weight)(rshares)(percent)(reputation)(time) );
