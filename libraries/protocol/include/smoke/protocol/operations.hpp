@@ -17,7 +17,6 @@ namespace smoke { namespace protocol {
             transfer_to_vesting_operation,
             withdraw_vesting_operation,
 
-            feed_publish_operation,
             convert_operation,
 
             account_create_operation,

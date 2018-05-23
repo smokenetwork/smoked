@@ -2017,20 +2017,6 @@ annotated_signed_transaction wallet_api::convert_sbd(string from, asset amount, 
    return my->sign_transaction( tx, broadcast );
 }
 
-annotated_signed_transaction wallet_api::publish_feed(string witness, price exchange_rate, bool broadcast )
-{
-   FC_ASSERT( !is_locked() );
-    feed_publish_operation op;
-    op.publisher     = witness;
-    op.exchange_rate = exchange_rate;
-
-    signed_transaction tx;
-    tx.operations.push_back( op );
-    tx.validate();
-
-   return my->sign_transaction( tx, broadcast );
-}
-
 vector< convert_request_api_obj > wallet_api::get_conversion_requests( string owner_account )
 {
    return my->_remote_db->get_conversion_requests( owner_account );

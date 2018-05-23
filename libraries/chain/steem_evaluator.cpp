@@ -1326,15 +1326,6 @@ void custom_binary_evaluator::do_apply( const custom_binary_operation& o )
    }
 }
 
-void feed_publish_evaluator::do_apply( const feed_publish_operation& o )
-{
-  const auto& witness = _db.get_witness( o.publisher );
-  _db.modify( witness, [&]( witness_object& w ){
-      w.sbd_exchange_rate = o.exchange_rate;
-      w.last_sbd_exchange_update = _db.head_block_time();
-  });
-}
-
 void convert_evaluator::do_apply( const convert_operation& o )
 {
   FC_ASSERT( false, "convert_operation is disabled" );
