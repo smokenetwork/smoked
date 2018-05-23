@@ -160,11 +160,6 @@ struct get_impacted_account_visitor
       }
    };
 
-   void operator()( const pow2_operation& op )
-   {
-      _impacted.insert( op.work.visit( pow2_impacted_visitor() ) );
-   }
-
    void operator()( const request_account_recovery_operation& op )
    {
       _impacted.insert( op.account_to_recover );

@@ -146,8 +146,6 @@ statistics& statistics::operator +=( const bucket_object& b )
    this->sbd_to_be_converted                    += b.sbd_to_be_converted;
    this->sbd_conversion_requests_filled         += b.sbd_conversion_requests_filled;
    this->steem_converted                        += b.steem_converted;
-   this->total_pow                              += b.total_pow;
-   this->estimated_hashpower                    += b.estimated_hashpower;
 
    return ( *this );
 }

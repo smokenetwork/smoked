@@ -1326,11 +1326,6 @@ void custom_binary_evaluator::do_apply( const custom_binary_operation& o )
    }
 }
 
-void pow2_evaluator::do_apply( const pow2_operation& o )
-{
-   FC_ASSERT( false, "mining is now disabled" );
-}
-
 void feed_publish_evaluator::do_apply( const feed_publish_operation& o )
 {
   const auto& witness = _db.get_witness( o.publisher );
