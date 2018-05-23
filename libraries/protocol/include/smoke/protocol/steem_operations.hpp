@@ -618,43 +618,6 @@ namespace smoke { namespace protocol {
       void validate() const;
    };
 
-
-   /**
-    *  This operation allows recovery_accoutn to change account_to_reset's owner authority to
-    *  new_owner_authority after 60 days of inactivity.
-    */
-   struct reset_account_operation : public base_operation {
-      account_name_type reset_account;
-      account_name_type account_to_reset;
-      authority         new_owner_authority;
-
-      void get_required_active_authorities( flat_set<account_name_type>& a )const { a.insert( reset_account ); }
-      void validate()const;
-   };
-
-   /**
-    * This operation allows 'account' owner to control which account has the power
-    * to execute the 'reset_account_operation' after 60 days.
-    */
-   struct set_reset_account_operation : public base_operation {
-      account_name_type account;
-      account_name_type current_reset_account;
-      account_name_type reset_account;
-      void validate()const;
-      void get_required_owner_authorities( flat_set<account_name_type>& a )const
-      {
-         if( current_reset_account.size() )
-            a.insert( account );
-      }
-
-      void get_required_posting_authorities( flat_set<account_name_type>& a )const
-      {
-         if( !current_reset_account.size() )
-            a.insert( account );
-      }
-   };
-
-
    /**
     * Each account lists another account as their recovery account.
     * The recovery account has the ability to create account_recovery_requests
@@ -760,9 +723,6 @@ namespace smoke { namespace protocol {
 FC_REFLECT( smoke::protocol::transfer_to_savings_operation, (from)(to)(amount)(memo) )
 FC_REFLECT( smoke::protocol::transfer_from_savings_operation, (from)(request_id)(to)(amount)(memo) )
 FC_REFLECT( smoke::protocol::cancel_transfer_from_savings_operation, (from)(request_id) )
-
-FC_REFLECT( smoke::protocol::reset_account_operation, (reset_account)(account_to_reset)(new_owner_authority) )
-FC_REFLECT( smoke::protocol::set_reset_account_operation, (account)(current_reset_account)(reset_account) )
 
 FC_REFLECT( smoke::protocol::convert_operation, (owner)(requestid)(amount) )
 FC_REFLECT( smoke::protocol::chain_properties, (account_creation_fee)(maximum_block_size)(sbd_interest_rate) );
