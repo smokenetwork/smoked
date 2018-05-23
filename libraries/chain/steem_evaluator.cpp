@@ -1534,28 +1534,7 @@ void transfer_to_savings_evaluator::do_apply( const transfer_to_savings_operatio
 
 void transfer_from_savings_evaluator::do_apply( const transfer_from_savings_operation& op )
 {
-   const auto& from = _db.get_account( op.from );
-   _db.get_account(op.to); // Verify to account exists
-
-   FC_ASSERT( from.savings_withdraw_requests < SMOKE_SAVINGS_WITHDRAW_REQUEST_LIMIT, "Account has reached limit for pending withdraw requests." );
-
-   FC_ASSERT( _db.get_savings_balance( from, op.amount.symbol ) >= op.amount );
-   _db.adjust_savings_balance( from, -op.amount );
-   _db.create<savings_withdraw_object>( [&]( savings_withdraw_object& s ) {
-      s.from   = op.from;
-      s.to     = op.to;
-      s.amount = op.amount;
-#ifndef IS_LOW_MEM
-      from_string( s.memo, op.memo );
-#endif
-      s.request_id = op.request_id;
-      s.complete = _db.head_block_time() + SMOKE_SAVINGS_WITHDRAW_TIME;
-   });
-
-   _db.modify( from, [&]( account_object& a )
-   {
-      a.savings_withdraw_requests++;
-   });
+   FC_ASSERT( false, "transfer_from_savings_evaluator is disabled" );
 }
 
 void cancel_transfer_from_savings_evaluator::do_apply( const cancel_transfer_from_savings_operation& op )
