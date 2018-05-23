@@ -342,24 +342,6 @@ namespace smoke { namespace protocol {
       validate_account_name( account );
    }
 
-   void reset_account_operation::validate()const
-   {
-      validate_account_name( reset_account );
-      validate_account_name( account_to_reset );
-      FC_ASSERT( !new_owner_authority.is_impossible(), "new owner authority cannot be impossible" );
-      FC_ASSERT( new_owner_authority.weight_threshold, "new owner authority cannot be trivial" );
-      new_owner_authority.validate();
-   }
-
-   void set_reset_account_operation::validate()const
-   {
-      validate_account_name( account );
-      if( current_reset_account.size() )
-         validate_account_name( current_reset_account );
-      validate_account_name( reset_account );
-      FC_ASSERT( current_reset_account != reset_account, "new reset account cannot be current reset account" );
-   }
-
    void claim_reward_balance_operation::validate()const
    {
       validate_account_name( account );

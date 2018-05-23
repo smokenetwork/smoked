@@ -46,8 +46,6 @@ namespace smoke { namespace protocol {
             cancel_transfer_from_savings_operation,
             custom_binary_operation,
             decline_voting_rights_operation,
-            reset_account_operation,
-            set_reset_account_operation,
             claim_reward_balance_operation,
             delegate_vesting_shares_operation,
             account_create_with_delegation_operation,
