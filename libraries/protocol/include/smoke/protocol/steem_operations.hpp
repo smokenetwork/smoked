@@ -646,39 +646,6 @@ namespace smoke { namespace protocol {
       void validate() const;
    };
 
-
-   struct transfer_to_savings_operation : public base_operation {
-      account_name_type from;
-      account_name_type to;
-      asset             amount;
-      string            memo;
-
-      void get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert( from ); }
-      void validate() const;
-   };
-
-
-   struct transfer_from_savings_operation : public base_operation {
-      account_name_type from;
-      uint32_t          request_id = 0;
-      account_name_type to;
-      asset             amount;
-      string            memo;
-
-      void get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert( from ); }
-      void validate() const;
-   };
-
-
-   struct cancel_transfer_from_savings_operation : public base_operation {
-      account_name_type from;
-      uint32_t          request_id = 0;
-
-      void get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert( from ); }
-      void validate() const;
-   };
-
-
    struct decline_voting_rights_operation : public base_operation
    {
       account_name_type account;
@@ -718,11 +685,6 @@ namespace smoke { namespace protocol {
       void validate() const;
    };
 } } // smoke::protocol
-
-
-FC_REFLECT( smoke::protocol::transfer_to_savings_operation, (from)(to)(amount)(memo) )
-FC_REFLECT( smoke::protocol::transfer_from_savings_operation, (from)(request_id)(to)(amount)(memo) )
-FC_REFLECT( smoke::protocol::cancel_transfer_from_savings_operation, (from)(request_id) )
 
 FC_REFLECT( smoke::protocol::convert_operation, (owner)(requestid)(amount) )
 FC_REFLECT( smoke::protocol::chain_properties, (account_creation_fee)(maximum_block_size)(sbd_interest_rate) );

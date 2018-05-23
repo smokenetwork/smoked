@@ -1736,27 +1736,6 @@ void database::process_funds()
   push_virtual_operation( producer_reward_operation( cwit.owner, producer_reward ) );
 }
 
-void database::process_savings_withdraws()
-{
-  const auto& idx = get_index< savings_withdraw_index >().indices().get< by_complete_from_rid >();
-  auto itr = idx.begin();
-  while( itr != idx.end() ) {
-     if( itr->complete > head_block_time() )
-        break;
-     adjust_balance( get_account( itr->to ), itr->amount );
-
-     modify( get_account( itr->from ), [&]( account_object& a )
-     {
-        a.savings_withdraw_requests--;
-     });
-
-     push_virtual_operation( fill_transfer_from_savings_operation( itr->from, itr->to, itr->amount, itr->request_id, to_string( itr->memo) ) );
-
-     remove( *itr );
-     itr = idx.begin();
-  }
-}
-
 asset database::get_liquidity_reward()const
 {
    return asset( 0, SMOKE_SYMBOL );
@@ -2018,9 +1997,6 @@ void database::initialize_evaluators()
    _my->_evaluator_registry.register_evaluator< escrow_approve_evaluator                 >();
    _my->_evaluator_registry.register_evaluator< escrow_dispute_evaluator                 >();
    _my->_evaluator_registry.register_evaluator< escrow_release_evaluator                 >();
-   _my->_evaluator_registry.register_evaluator< transfer_to_savings_evaluator            >();
-   _my->_evaluator_registry.register_evaluator< transfer_from_savings_evaluator          >();
-   _my->_evaluator_registry.register_evaluator< cancel_transfer_from_savings_evaluator   >();
    _my->_evaluator_registry.register_evaluator< decline_voting_rights_evaluator          >();
    _my->_evaluator_registry.register_evaluator< claim_reward_balance_evaluator           >();
    _my->_evaluator_registry.register_evaluator< account_create_with_delegation_evaluator >();
@@ -2725,7 +2701,6 @@ void database::_apply_block( const signed_block& next_block )
    process_conversions();
    process_comment_cashout();
    process_vesting_withdrawals();
-   process_savings_withdraws();
    pay_liquidity_reward();
    update_virtual_supply();
 

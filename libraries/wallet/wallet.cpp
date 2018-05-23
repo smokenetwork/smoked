@@ -1899,64 +1899,6 @@ annotated_signed_transaction wallet_api::escrow_release(
    return my->sign_transaction( tx, broadcast );
 }
 
-/**
- *  Transfers into savings happen immediately, transfers from savings take 72 hours
- */
-annotated_signed_transaction wallet_api::transfer_to_savings( string from, string to, asset amount, string memo, bool broadcast  )
-{
-   FC_ASSERT( !is_locked() );
-   check_memo( memo, get_account( from ) );
-   transfer_to_savings_operation op;
-   op.from = from;
-   op.to   = to;
-   op.memo = get_encrypted_memo( from, to, memo );
-   op.amount = amount;
-
-   signed_transaction tx;
-   tx.operations.push_back( op );
-   tx.validate();
-
-   return my->sign_transaction( tx, broadcast );
-}
-
-/**
- * @param request_id - an unique ID assigned by from account, the id is used to cancel the operation and can be reused after the transfer completes
- */
-annotated_signed_transaction wallet_api::transfer_from_savings( string from, uint32_t request_id, string to, asset amount, string memo, bool broadcast  )
-{
-   FC_ASSERT( !is_locked() );
-   check_memo( memo, get_account( from ) );
-   transfer_from_savings_operation op;
-   op.from = from;
-   op.request_id = request_id;
-   op.to = to;
-   op.amount = amount;
-   op.memo = get_encrypted_memo( from, to, memo );
-
-   signed_transaction tx;
-   tx.operations.push_back( op );
-   tx.validate();
-
-   return my->sign_transaction( tx, broadcast );
-}
-
-/**
- *  @param request_id the id used in transfer_from_savings
- *  @param from the account that initiated the transfer
- */
-annotated_signed_transaction wallet_api::cancel_transfer_from_savings( string from, uint32_t request_id, bool broadcast  )
-{
-   FC_ASSERT( !is_locked() );
-   cancel_transfer_from_savings_operation op;
-   op.from = from;
-   op.request_id = request_id;
-   signed_transaction tx;
-   tx.operations.push_back( op );
-   tx.validate();
-
-   return my->sign_transaction( tx, broadcast );
-}
-
 annotated_signed_transaction wallet_api::transfer_to_vesting(string from, string to, asset amount, bool broadcast )
 {
    FC_ASSERT( !is_locked() );
@@ -2090,14 +2032,6 @@ map<uint32_t,applied_operation> wallet_api::get_account_history( string account,
       for( auto& item : result ) {
          if( item.second.op.which() == operation::tag<transfer_operation>::value ) {
             auto& top = item.second.op.get<transfer_operation>();
-            top.memo = decrypt_memo( top.memo );
-         }
-         else if( item.second.op.which() == operation::tag<transfer_from_savings_operation>::value ) {
-            auto& top = item.second.op.get<transfer_from_savings_operation>();
-            top.memo = decrypt_memo( top.memo );
-         }
-         else if( item.second.op.which() == operation::tag<transfer_to_savings_operation>::value ) {
-            auto& top = item.second.op.get<transfer_to_savings_operation>();
             top.memo = decrypt_memo( top.memo );
          }
       }

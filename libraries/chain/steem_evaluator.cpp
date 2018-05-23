@@ -1488,29 +1488,6 @@ void change_recovery_account_evaluator::do_apply( const change_recovery_account_
    }
 }
 
-void transfer_to_savings_evaluator::do_apply( const transfer_to_savings_operation& op )
-{
-  FC_ASSERT( false, "transfer_to_savings_operation is disabled" );
-}
-
-void transfer_from_savings_evaluator::do_apply( const transfer_from_savings_operation& op )
-{
-   FC_ASSERT( false, "transfer_from_savings_evaluator is disabled" );
-}
-
-void cancel_transfer_from_savings_evaluator::do_apply( const cancel_transfer_from_savings_operation& op )
-{
-   const auto& swo = _db.get_savings_withdraw( op.from, op.request_id );
-   _db.adjust_savings_balance( _db.get_account( swo.from ), swo.amount );
-   _db.remove( swo );
-
-   const auto& from = _db.get_account( op.from );
-   _db.modify( from, [&]( account_object& a )
-   {
-      a.savings_withdraw_requests--;
-   });
-}
-
 void decline_voting_rights_evaluator::do_apply( const decline_voting_rights_operation& o )
 {
    const auto& account = _db.get_account( o.account );
