@@ -1889,7 +1889,6 @@ BOOST_AUTO_TEST_CASE( liquidity_rewards )
 
       auto ops = get_last_operations( 1 );
       const auto& liquidity_idx = db.get_index< liquidity_reward_balance_index >().indices().get< by_owner >();
-      const auto& limit_order_idx = db.get_index< limit_order_index >().indices().get< by_account >();
 
       auto reward = liquidity_idx.find( db.get_account( "alice" ).id );
       BOOST_REQUIRE( reward == liquidity_idx.end() );

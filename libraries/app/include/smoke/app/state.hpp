@@ -10,15 +10,6 @@ namespace smoke { namespace app {
    using std::string;
    using std::vector;
 
-   struct extended_limit_order : public limit_order_api_obj
-   {
-      extended_limit_order(){}
-      extended_limit_order( const limit_order_object& o ):limit_order_api_obj(o){}
-
-      double real_price  = 0;
-      bool   rewarded    = false;
-   };
-
    struct discussion_index
    {
       string           category;    /// category by which everything is filtered
@@ -98,44 +89,11 @@ namespace smoke { namespace app {
       vector<pair<string,uint32_t>>            tags_usage;
       vector<pair<account_name_type,uint32_t>> guest_bloggers;
 
-      optional<map<uint32_t,extended_limit_order>> open_orders;
       optional<vector<string>>                comments; /// permlinks for this user
       optional<vector<string>>                blog; /// blog posts for this user
       optional<vector<string>>                feed; /// feed posts for this user
       optional<vector<string>>                recent_replies; /// blog posts for this user
       optional<vector<string>>                recommended; /// posts recommened for this user
-   };
-
-
-
-   struct candle_stick {
-      time_point_sec  open_time;
-      uint32_t        period = 0;
-      double          high = 0;
-      double          low = 0;
-      double          open = 0;
-      double          close = 0;
-      double          steem_volume = 0;
-      double          dollar_volume = 0;
-   };
-
-   struct order_history_item {
-      time_point_sec time;
-      string         type; // buy or sell
-      asset          sbd_quantity;
-      asset          steem_quantity;
-      double         real_price = 0;
-   };
-
-   struct market {
-      vector<extended_limit_order> bids;
-      vector<extended_limit_order> asks;
-      vector<order_history_item>   history;
-      vector<int>                  available_candlesticks;
-      vector<int>                  available_zoom;
-      int                          current_candlestick = 0;
-      int                          current_zoom = 0;
-      vector<candle_stick>         price_history;
    };
 
    /**
@@ -169,7 +127,6 @@ namespace smoke { namespace app {
         witness_schedule_api_obj          witness_schedule;
         price                             feed_price;
         string                            error;
-        optional< market >                market_data;
    };
 
 } }
@@ -187,9 +144,4 @@ FC_REFLECT( smoke::app::discussion_index, (category)(trending)(payout)(payout_co
 FC_REFLECT( smoke::app::tag_index, (trending) )
 FC_REFLECT_DERIVED( smoke::app::discussion, (smoke::app::comment_api_obj), (url)(root_title)(pending_payout_value)(total_pending_payout_value)(active_votes)(replies)(author_reputation)(promoted)(body_length)(reblogged_by)(first_reblogged_by)(first_reblogged_on) )
 
-FC_REFLECT( smoke::app::state, (current_route)(props)(tag_idx)(tags)(content)(accounts)(pow_queue)(witnesses)(discussion_idx)(witness_schedule)(feed_price)(error)(market_data) )
-
-FC_REFLECT_DERIVED( smoke::app::extended_limit_order, (smoke::app::limit_order_api_obj), (real_price)(rewarded) )
-FC_REFLECT( smoke::app::order_history_item, (time)(type)(sbd_quantity)(steem_quantity)(real_price) );
-FC_REFLECT( smoke::app::market, (bids)(asks)(history)(price_history)(available_candlesticks)(available_zoom)(current_candlestick)(current_zoom) )
-FC_REFLECT( smoke::app::candle_stick, (open_time)(period)(high)(low)(open)(close)(steem_volume)(dollar_volume) );
+FC_REFLECT( smoke::app::state, (current_route)(props)(tag_idx)(tags)(content)(accounts)(pow_queue)(witnesses)(discussion_idx)(witness_schedule)(feed_price)(error) )

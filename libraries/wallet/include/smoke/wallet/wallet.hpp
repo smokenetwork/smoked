@@ -811,14 +811,6 @@ class wallet_api
       vector< variant > network_get_connected_peers();
 
       /**
-       * Gets the current order book for SMOKE:SBD
-       *
-       * @param limit Maximum number of orders to return for bids and asks. Max is 1000.
-       */
-      order_book  get_order_book( uint32_t limit = 1000 );
-      vector<extended_limit_order>  get_open_orders( string accountname );
-
-      /**
        *  Post or update a comment.
        *
        *  @param author the name of the account authoring the comment
@@ -1029,8 +1021,6 @@ FC_API( smoke::wallet::wallet_api,
         (set_withdraw_vesting_route)
         (convert_sbd)
         (publish_feed)
-        (get_order_book)
-        (get_open_orders)
         (post_comment)
         (vote)
         (set_transaction_expiration)

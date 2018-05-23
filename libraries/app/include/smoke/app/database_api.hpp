@@ -282,13 +282,6 @@ class database_api
       ////////////
 
       /**
-       * @breif Gets the current order book for SMOKE:SBD market
-       * @param limit Maximum number of orders for each side of the spread to return -- Must not exceed 1000
-       */
-      order_book get_order_book( uint32_t limit = 1000 )const;
-      vector<extended_limit_order> get_open_orders( string owner )const;
-
-      /**
        * @breif Gets the current liquidity reward queue.
        * @param start_account The account to start the list from, or "" to get the head of the queue
        * @param limit Maxmimum number of accounts to return -- Must not exceed 1000
@@ -508,8 +501,6 @@ FC_API(smoke::app::database_api,
    (get_expiring_vesting_delegations)
 
    // Market
-   (get_order_book)
-   (get_open_orders)
    (get_liquidity_queue)
 
    // Authority / validation

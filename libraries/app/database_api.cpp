@@ -61,7 +61,6 @@ class database_api_impl : public std::enable_shared_from_this<database_api_impl>
       uint64_t get_witness_count()const;
 
       // Market
-      order_book get_order_book( uint32_t limit )const;
       vector< liquidity_balance > get_liquidity_queue( string start_account, uint32_t limit )const;
 
       // Authority / validation
@@ -720,79 +719,6 @@ uint64_t database_api_impl::get_witness_count()const
 // Market                                                           //
 //                                                                  //
 //////////////////////////////////////////////////////////////////////
-
-order_book database_api::get_order_book( uint32_t limit )const
-{
-   return my->_db.with_read_lock( [&]()
-   {
-      return my->get_order_book( limit );
-   });
-}
-
-vector<extended_limit_order> database_api::get_open_orders( string owner )const
-{
-   return my->_db.with_read_lock( [&]()
-   {
-      vector<extended_limit_order> result;
-      const auto& idx = my->_db.get_index<limit_order_index>().indices().get<by_account>();
-      auto itr = idx.lower_bound( owner );
-      while( itr != idx.end() && itr->seller == owner ) {
-         result.push_back( *itr );
-
-         if( itr->sell_price.base.symbol == SMOKE_SYMBOL )
-            result.back().real_price = (~result.back().sell_price).to_real();
-         else
-            result.back().real_price = (result.back().sell_price).to_real();
-         ++itr;
-      }
-      return result;
-   });
-}
-
-order_book database_api_impl::get_order_book( uint32_t limit )const
-{
-   FC_ASSERT( limit <= 1000 );
-   order_book result;
-
-   auto max_sell = price::max( SBD_SYMBOL, SMOKE_SYMBOL );
-   auto max_buy = price::max( SMOKE_SYMBOL, SBD_SYMBOL );
-
-   const auto& limit_price_idx = _db.get_index<limit_order_index>().indices().get<by_price>();
-   auto sell_itr = limit_price_idx.lower_bound(max_sell);
-   auto buy_itr  = limit_price_idx.lower_bound(max_buy);
-   auto end = limit_price_idx.end();
-//   idump((max_sell)(max_buy));
-//   if( sell_itr != end ) idump((*sell_itr));
-//   if( buy_itr != end ) idump((*buy_itr));
-
-   while(  sell_itr != end && sell_itr->sell_price.base.symbol == SBD_SYMBOL && result.bids.size() < limit )
-   {
-      auto itr = sell_itr;
-      order cur;
-      cur.order_price = itr->sell_price;
-      cur.real_price  = (cur.order_price).to_real();
-      cur.sbd = itr->for_sale;
-      cur.steem = ( asset( itr->for_sale, SBD_SYMBOL ) * cur.order_price ).amount;
-      cur.created = itr->created;
-      result.bids.push_back( cur );
-      ++sell_itr;
-   }
-   while(  buy_itr != end && buy_itr->sell_price.base.symbol == SMOKE_SYMBOL && result.asks.size() < limit )
-   {
-      auto itr = buy_itr;
-      order cur;
-      cur.order_price = itr->sell_price;
-      cur.real_price  = (~cur.order_price).to_real();
-      cur.steem   = itr->for_sale;
-      cur.sbd     = ( asset( itr->for_sale, SMOKE_SYMBOL ) * cur.order_price ).amount;
-      cur.created = itr->created;
-      result.asks.push_back( cur );
-      ++buy_itr;
-   }
-
-
-   return result;
-}
 
 vector< liquidity_balance > database_api::get_liquidity_queue( string start_account, uint32_t limit )const
 {
