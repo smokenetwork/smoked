@@ -335,7 +335,6 @@ void database_fixture::fund(
             else if( amount.symbol == SBD_SYMBOL )
             {
                a.sbd_balance += amount;
-               a.sbd_seconds_last_update = db.head_block_time();
             }
          });
 

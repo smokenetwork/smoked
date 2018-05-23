@@ -55,7 +55,6 @@ namespace smoke { namespace chain {
          time_point_sec    last_vote_time; ///< used to increase the voting power of this account the longer it goes without voting.
 
          asset             balance = asset( 0, SMOKE_SYMBOL );  ///< total liquid shares held by this account
-         asset             savings_balance = asset( 0, SMOKE_SYMBOL );  ///< total liquid shares held by this account
 
          /**
           *  SBD Deposits pay interest based upon the interest rate set by witnesses. The purpose of these
@@ -72,14 +71,7 @@ namespace smoke { namespace chain {
           */
          ///@{
          asset             sbd_balance = asset( 0, SBD_SYMBOL ); /// total sbd balance
-         time_point_sec    sbd_seconds_last_update; ///< the last time the sbd_seconds was updated
-         time_point_sec    sbd_last_interest_payment; ///< used to pay interest at most once per month
 
-         uint128_t         savings_sbd_seconds; ///< total sbd * how long it has been hel
-         time_point_sec    savings_sbd_seconds_last_update; ///< the last time the sbd_seconds was updated
-         time_point_sec    savings_sbd_last_interest_payment; ///< used to pay interest at most once per month
-
-         uint8_t           savings_withdraw_requests = 0;
          ///@}
 
          asset             reward_sbd_balance = asset( 0, SBD_SYMBOL );
@@ -460,9 +452,7 @@ FC_REFLECT( smoke::chain::account_object,
              (owner_challenged)(active_challenged)(last_owner_proved)(last_active_proved)(recovery_account)(last_account_recovery)(reset_account)
              (comment_count)(lifetime_vote_count)(post_count)(can_vote)(voting_power)(last_vote_time)
              (balance)
-             (savings_balance)
-             (sbd_balance)(sbd_seconds_last_update)(sbd_last_interest_payment)
-             (savings_sbd_seconds)(savings_sbd_seconds_last_update)(savings_sbd_last_interest_payment)(savings_withdraw_requests)
+             (sbd_balance)
              (reward_steem_balance)(reward_sbd_balance)(reward_vesting_balance)(reward_vesting_steem)
              (vesting_shares)(delegated_vesting_shares)(received_vesting_shares)
              (vesting_withdraw_rate)(next_vesting_withdrawal)(withdrawn)(to_withdraw)(withdraw_routes)

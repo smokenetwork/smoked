@@ -3303,7 +3303,6 @@ void database::validate_invariants()const
      for( auto itr = account_idx.begin(); itr != account_idx.end(); ++itr )
      {
         total_supply += itr->balance;
-        total_supply += itr->savings_balance;
         total_supply += itr->reward_steem_balance;
         total_sbd += itr->sbd_balance;
         total_sbd += itr->reward_sbd_balance;
