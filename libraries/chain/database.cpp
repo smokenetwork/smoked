@@ -399,16 +399,6 @@ const escrow_object* database::find_escrow( const account_name_type& name, uint3
    return find< escrow_object, by_from_id >( boost::make_tuple( name, escrow_id ) );
 }
 
-const limit_order_object& database::get_limit_order( const account_name_type& name, uint32_t orderid )const
-{ try {
-   return get< limit_order_object, by_account >( boost::make_tuple( name, orderid ) );
-} FC_CAPTURE_AND_RETHROW( (name)(orderid) ) }
-
-const limit_order_object* database::find_limit_order( const account_name_type& name, uint32_t orderid )const
-{
-   return find< limit_order_object, by_account >( boost::make_tuple( name, orderid ) );
-}
-
 const savings_withdraw_object& database::get_savings_withdraw( const account_name_type& owner, uint32_t request_id )const
 { try {
    return get< savings_withdraw_object, by_from_rid >( boost::make_tuple( owner, request_id ) );
@@ -2018,14 +2008,8 @@ void database::initialize_evaluators()
    _my->_evaluator_registry.register_evaluator< custom_evaluator                         >();
    _my->_evaluator_registry.register_evaluator< custom_binary_evaluator                  >();
    _my->_evaluator_registry.register_evaluator< custom_json_evaluator                    >();
-   _my->_evaluator_registry.register_evaluator< pow_evaluator                            >();
-   _my->_evaluator_registry.register_evaluator< pow2_evaluator                           >();
-   _my->_evaluator_registry.register_evaluator< report_over_production_evaluator         >();
    _my->_evaluator_registry.register_evaluator< feed_publish_evaluator                   >();
    _my->_evaluator_registry.register_evaluator< convert_evaluator                        >();
-   _my->_evaluator_registry.register_evaluator< limit_order_create_evaluator             >();
-   _my->_evaluator_registry.register_evaluator< limit_order_create2_evaluator            >();
-   _my->_evaluator_registry.register_evaluator< limit_order_cancel_evaluator             >();
    _my->_evaluator_registry.register_evaluator< challenge_authority_evaluator            >();
    _my->_evaluator_registry.register_evaluator< prove_authority_evaluator                >();
    _my->_evaluator_registry.register_evaluator< request_account_recovery_evaluator       >();
@@ -2073,7 +2057,6 @@ void database::initialize_indexes()
    add_core_index< comment_index                           >(*this);
    add_core_index< comment_vote_index                      >(*this);
    add_core_index< witness_vote_index                      >(*this);
-   add_core_index< limit_order_index                       >(*this);
    add_core_index< feed_history_index                      >(*this);
    add_core_index< convert_request_index                   >(*this);
    add_core_index< liquidity_reward_balance_index          >(*this);
@@ -2734,7 +2717,6 @@ void database::_apply_block( const signed_block& next_block )
 
    create_block_summary(next_block);
    clear_expired_transactions();
-   clear_expired_orders();
    clear_expired_delegations();
    update_witness_schedule(*this);
 
@@ -3101,75 +3083,6 @@ void database::update_last_irreversible_block()
    _fork_db.set_max_size( dpo.head_block_number - dpo.last_irreversible_block_num + 1 );
 } FC_CAPTURE_AND_RETHROW() }
 
-
-bool database::apply_order( const limit_order_object& new_order_object )
-{
-   auto order_id = new_order_object.id;
-
-   const auto& limit_price_idx = get_index<limit_order_index>().indices().get<by_price>();
-
-   auto max_price = ~new_order_object.sell_price;
-   auto limit_itr = limit_price_idx.lower_bound(max_price.max());
-   auto limit_end = limit_price_idx.upper_bound(max_price);
-
-   bool finished = false;
-   while( !finished && limit_itr != limit_end )
-   {
-      auto old_limit_itr = limit_itr;
-      ++limit_itr;
-      // match returns 2 when only the old order was fully filled. In this case, we keep matching; otherwise, we stop.
-      finished = ( match(new_order_object, *old_limit_itr, old_limit_itr->sell_price) & 0x1 );
-   }
-
-   return find< limit_order_object >( order_id ) == nullptr;
-}
-
-int database::match( const limit_order_object& new_order, const limit_order_object& old_order, const price& match_price )
-{
-   assert( new_order.sell_price.quote.symbol == old_order.sell_price.base.symbol );
-   assert( new_order.sell_price.base.symbol  == old_order.sell_price.quote.symbol );
-   assert( new_order.for_sale > 0 && old_order.for_sale > 0 );
-   assert( match_price.quote.symbol == new_order.sell_price.base.symbol );
-   assert( match_price.base.symbol == old_order.sell_price.base.symbol );
-
-   auto new_order_for_sale = new_order.amount_for_sale();
-   auto old_order_for_sale = old_order.amount_for_sale();
-
-   asset new_order_pays, new_order_receives, old_order_pays, old_order_receives;
-
-   if( new_order_for_sale <= old_order_for_sale * match_price )
-   {
-      old_order_receives = new_order_for_sale;
-      new_order_receives  = new_order_for_sale * match_price;
-   }
-   else
-   {
-      //This line once read: assert( old_order_for_sale < new_order_for_sale * match_price );
-      //This assert is not always true -- see trade_amount_equals_zero in operation_tests.cpp
-      //Although new_order_for_sale is greater than old_order_for_sale * match_price, old_order_for_sale == new_order_for_sale * match_price
-      //Removing the assert seems to be safe -- apparently no asset is created or destroyed.
-      new_order_receives = old_order_for_sale;
-      old_order_receives = old_order_for_sale * match_price;
-   }
-
-   old_order_pays = new_order_receives;
-   new_order_pays = old_order_receives;
-
-   assert( new_order_pays == new_order.amount_for_sale() ||
-           old_order_pays == old_order.amount_for_sale() );
-
-//   auto age = head_block_time() - old_order.created;
-
-   push_virtual_operation( fill_order_operation( new_order.seller, new_order.orderid, new_order_pays, old_order.seller, old_order.orderid, old_order_pays ) );
-
-   int result = 0;
-   result |= fill_order( new_order, new_order_pays, new_order_receives );
-   result |= fill_order( old_order, old_order_pays, old_order_receives ) << 1;
-   assert( result != 0 );
-   return result;
-}
-
-
 void database::adjust_liquidity_reward( const account_object& owner, const asset& volume, bool is_sdb )
 {
    const auto& ridx = get_index< liquidity_reward_balance_index >().indices().get< by_owner >();
@@ -3210,53 +3123,6 @@ void database::adjust_liquidity_reward( const account_object& owner, const asset
    }
 }
 
-
-bool database::fill_order( const limit_order_object& order, const asset& pays, const asset& receives )
-{
-   try
-   {
-      FC_ASSERT( order.amount_for_sale().symbol == pays.symbol );
-      FC_ASSERT( pays.symbol != receives.symbol );
-
-      const account_object& seller = get_account( order.seller );
-
-      adjust_balance( seller, receives );
-
-      if( pays == order.amount_for_sale() )
-      {
-         remove( order );
-         return true;
-      }
-      else
-      {
-         modify( order, [&]( limit_order_object& b )
-         {
-            b.for_sale -= pays.amount;
-         } );
-         /**
-          *  There are times when the AMOUNT_FOR_SALE * SALE_PRICE == 0 which means that we
-          *  have hit the limit where the seller is asking for nothing in return.  When this
-          *  happens we must refund any balance back to the seller, it is too small to be
-          *  sold at the sale price.
-          */
-         if( order.amount_to_receive().amount == 0 )
-         {
-            cancel_order(order);
-            return true;
-         }
-         return false;
-      }
-   }
-   FC_CAPTURE_AND_RETHROW( (order)(pays)(receives) )
-}
-
-void database::cancel_order( const limit_order_object& order )
-{
-   adjust_balance( get_account(order.seller), order.amount_for_sale() );
-   remove(order);
-}
-
-
 void database::clear_expired_transactions()
 {
    //Look for expired transactions in the deduplication list, and remove them.
@@ -3265,18 +3131,6 @@ void database::clear_expired_transactions()
    const auto& dedupe_index = transaction_idx.indices().get< by_expiration >();
    while( ( !dedupe_index.empty() ) && ( head_block_time() > dedupe_index.begin()->expiration ) )
       remove( *dedupe_index.begin() );
-}
-
-void database::clear_expired_orders()
-{
-   auto now = head_block_time();
-   const auto& orders_by_exp = get_index<limit_order_index>().indices().get<by_expiration>();
-   auto itr = orders_by_exp.begin();
-   while( itr != orders_by_exp.end() && itr->expiration < now )
-   {
-      cancel_order( *itr );
-      itr = orders_by_exp.begin();
-   }
 }
 
 void database::clear_expired_delegations()
@@ -3600,20 +3454,6 @@ void database::validate_invariants()const
            total_sbd += itr->amount;
         else
            FC_ASSERT( false, "Encountered illegal symbol in convert_request_object" );
-     }
-
-     const auto& limit_order_idx = get_index< limit_order_index >().indices();
-
-     for( auto itr = limit_order_idx.begin(); itr != limit_order_idx.end(); ++itr )
-     {
-        if( itr->sell_price.base.symbol == SMOKE_SYMBOL )
-        {
-           total_supply += asset( itr->for_sale, SMOKE_SYMBOL );
-        }
-        else if ( itr->sell_price.base.symbol == SBD_SYMBOL )
-        {
-           total_sbd += asset( itr->for_sale, SBD_SYMBOL );
-        }
      }
 
      const auto& escrow_idx = get_index< escrow_index >().indices().get< by_id >();

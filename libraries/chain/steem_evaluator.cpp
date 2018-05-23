@@ -1326,16 +1326,6 @@ void custom_binary_evaluator::do_apply( const custom_binary_operation& o )
    }
 }
 
-void pow_evaluator::do_apply( const pow_operation& o ) {
-   FC_ASSERT( false, "pow is deprecated. Use pow2 instead" );
-}
-
-
-void pow2_evaluator::do_apply( const pow2_operation& o )
-{
-   FC_ASSERT( false, "mining is now disabled" );
-}
-
 void feed_publish_evaluator::do_apply( const feed_publish_operation& o )
 {
   const auto& witness = _db.get_witness( o.publisher );
@@ -1367,26 +1357,6 @@ void convert_evaluator::do_apply( const convert_operation& o )
       obj.conversion_date = _db.head_block_time() + steemit_conversion_delay;
   });
 
-}
-
-void limit_order_create_evaluator::do_apply( const limit_order_create_operation& o )
-{
-  FC_ASSERT( false, "limit_order_create_operation is disabled" );
-}
-
-void limit_order_create2_evaluator::do_apply( const limit_order_create2_operation& o )
-{
-  FC_ASSERT( false, "limit_order_create2_operation disabled since hardfork 20" );
-}
-
-void limit_order_cancel_evaluator::do_apply( const limit_order_cancel_operation& o )
-{
-   _db.cancel_order( _db.get_limit_order( o.owner, o.orderid ) );
-}
-
-void report_over_production_evaluator::do_apply( const report_over_production_operation& o )
-{
-   FC_ASSERT( false, "report_over_production_operation is disabled." );
 }
 
 void challenge_authority_evaluator::do_apply( const challenge_authority_operation& o )

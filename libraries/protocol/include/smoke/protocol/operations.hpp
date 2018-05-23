@@ -17,9 +17,6 @@ namespace smoke { namespace protocol {
             transfer_to_vesting_operation,
             withdraw_vesting_operation,
 
-            limit_order_create_operation,
-            limit_order_cancel_operation,
-
             feed_publish_operation,
             convert_operation,
 
@@ -30,17 +27,12 @@ namespace smoke { namespace protocol {
             account_witness_vote_operation,
             account_witness_proxy_operation,
 
-            pow_operation,
-
             custom_operation,
-
-            report_over_production_operation,
 
             delete_comment_operation,
             custom_json_operation,
             comment_options_operation,
             set_withdraw_vesting_route_operation,
-            limit_order_create2_operation,
             challenge_authority_operation,
             prove_authority_operation,
             request_account_recovery_operation,
@@ -49,7 +41,6 @@ namespace smoke { namespace protocol {
             escrow_transfer_operation,
             escrow_dispute_operation,
             escrow_release_operation,
-            pow2_operation,
             escrow_approve_operation,
             transfer_to_savings_operation,
             transfer_from_savings_operation,
@@ -70,7 +61,6 @@ namespace smoke { namespace protocol {
             liquidity_reward_operation,
             interest_operation,
             fill_vesting_withdraw_operation,
-            fill_order_operation,
             shutdown_witness_operation,
             fill_transfer_from_savings_operation,
             hardfork_operation,

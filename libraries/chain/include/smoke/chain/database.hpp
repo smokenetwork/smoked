@@ -131,9 +131,6 @@ namespace smoke { namespace chain {
          const escrow_object&   get_escrow(  const account_name_type& name, uint32_t escrow_id )const;
          const escrow_object*   find_escrow( const account_name_type& name, uint32_t escrow_id )const;
 
-         const limit_order_object& get_limit_order(  const account_name_type& owner, uint32_t id )const;
-         const limit_order_object* find_limit_order( const account_name_type& owner, uint32_t id )const;
-
          const savings_withdraw_object& get_savings_withdraw(  const account_name_type& owner, uint32_t request_id )const;
          const savings_withdraw_object* find_savings_withdraw( const account_name_type& owner, uint32_t request_id )const;
 
@@ -373,11 +370,6 @@ namespace smoke { namespace chain {
          std::deque< signed_transaction >       _popped_tx;
          vector< signed_transaction >           _pending_tx;
 
-         bool apply_order( const limit_order_object& new_order_object );
-         bool fill_order( const limit_order_object& order, const asset& pays, const asset& receives );
-         void cancel_order( const limit_order_object& obj );
-         int  match( const limit_order_object& bid, const limit_order_object& ask, const price& trade_price );
-
          void perform_vesting_share_split( uint32_t magnitude );
          void retally_comment_children();
          void retally_witness_votes();
@@ -434,7 +426,6 @@ namespace smoke { namespace chain {
          void update_signing_witness(const witness_object& signing_witness, const signed_block& new_block);
          void update_last_irreversible_block();
          void clear_expired_transactions();
-         void clear_expired_orders();
          void clear_expired_delegations();
          void process_header_extensions( const signed_block& next_block );
 

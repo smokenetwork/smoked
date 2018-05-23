@@ -100,21 +100,6 @@ namespace smoke { namespace protocol {
    };
 
 
-   struct fill_order_operation : public virtual_operation
-   {
-      fill_order_operation(){}
-      fill_order_operation( const string& c_o, uint32_t c_id, const asset& c_p, const string& o_o, uint32_t o_id, const asset& o_p )
-      :current_owner(c_o), current_orderid(c_id), current_pays(c_p), open_owner(o_o), open_orderid(o_id), open_pays(o_p) {}
-
-      account_name_type current_owner;
-      uint32_t          current_orderid = 0;
-      asset             current_pays;
-      account_name_type open_owner;
-      uint32_t          open_orderid = 0;
-      asset             open_pays;
-   };
-
-
    struct fill_transfer_from_savings_operation : public virtual_operation
    {
       fill_transfer_from_savings_operation() {}
@@ -186,7 +171,6 @@ FC_REFLECT( smoke::protocol::liquidity_reward_operation, (owner)(payout) )
 FC_REFLECT( smoke::protocol::interest_operation, (owner)(interest) )
 FC_REFLECT( smoke::protocol::fill_vesting_withdraw_operation, (from_account)(to_account)(withdrawn)(deposited) )
 FC_REFLECT( smoke::protocol::shutdown_witness_operation, (owner) )
-FC_REFLECT( smoke::protocol::fill_order_operation, (current_owner)(current_orderid)(current_pays)(open_owner)(open_orderid)(open_pays) )
 FC_REFLECT( smoke::protocol::fill_transfer_from_savings_operation, (from)(to)(amount)(request_id)(memo) )
 FC_REFLECT( smoke::protocol::hardfork_operation, (hardfork_id) )
 FC_REFLECT( smoke::protocol::comment_payout_update_operation, (author)(permlink) )

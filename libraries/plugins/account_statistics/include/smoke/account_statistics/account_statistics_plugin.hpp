@@ -96,15 +96,6 @@ struct account_stats_bucket_object : public object< account_stats_bucket_object_
    share_type           sbd_to_be_converted = 0;                  ///< Amount of SBD to be converted
    uint32_t             sbd_conversion_requests_filled = 0;       ///< SBD conversion requests filled
    share_type           steem_converted = 0;                      ///< Amount of SMOKE that was converted
-   uint32_t             limit_orders_created = 0;                 ///< Limit orders created by this account
-   uint32_t             limit_orders_filled = 0;                  ///< Limit orders filled by this account
-   uint32_t             limit_orders_cancelled = 0;               ///< Limit orders cancelled by this account
-   share_type           limit_order_steem_paid = 0;               ///< SMOKE paid by limit orders
-   share_type           limit_order_steem_received = 0;           ///< SMOKE received from limit orders
-   share_type           limit_order_sbd_paid = 0;                 ///< SBD paid by limit orders
-   share_type           limit_order_sbd_received = 0;             ///< SBD received by limit orders
-   uint32_t             total_pow = 0;                            ///< POW completed
-   uint128_t            estimated_hashpower = 0;                  ///< Estimated hashpower
 };
 
 typedef account_stats_bucket_object::id_type account_stats_bucket_id_type;
@@ -214,15 +205,6 @@ FC_REFLECT( smoke::account_statistics::account_stats_bucket_object,
    (sbd_to_be_converted)
    (sbd_conversion_requests_filled)
    (steem_converted)
-   (limit_orders_created)
-   (limit_orders_filled)
-   (limit_orders_cancelled)
-   (limit_order_steem_paid)
-   (limit_order_steem_received)
-   (limit_order_sbd_paid)
-   (limit_order_sbd_received)
-   (total_pow)
-   (estimated_hashpower)
 )
 //SET_INDEX_TYPE( smoke::account_statistics::account_stats_bucket_object,)
 

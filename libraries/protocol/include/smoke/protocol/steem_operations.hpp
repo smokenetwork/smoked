@@ -533,176 +533,6 @@ namespace smoke { namespace protocol {
       void  get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert(owner); }
    };
 
-
-   /**
-    * This operation creates a limit order and matches it against existing open orders.
-    */
-   struct limit_order_create_operation : public base_operation
-   {
-      account_name_type owner;
-      uint32_t          orderid = 0; /// an ID assigned by owner, must be unique
-      asset             amount_to_sell;
-      asset             min_to_receive;
-      bool              fill_or_kill = false;
-      time_point_sec    expiration = time_point_sec::maximum();
-
-      void  validate()const;
-      void  get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert(owner); }
-
-      price             get_price()const { return amount_to_sell / min_to_receive; }
-
-      pair< asset_symbol_type, asset_symbol_type > get_market()const
-      {
-         return amount_to_sell.symbol < min_to_receive.symbol ?
-                std::make_pair(amount_to_sell.symbol, min_to_receive.symbol) :
-                std::make_pair(min_to_receive.symbol, amount_to_sell.symbol);
-      }
-   };
-
-
-   /**
-    *  This operation is identical to limit_order_create except it serializes the price rather
-    *  than calculating it from other fields.
-    */
-   struct limit_order_create2_operation : public base_operation
-   {
-      account_name_type owner;
-      uint32_t          orderid = 0; /// an ID assigned by owner, must be unique
-      asset             amount_to_sell;
-      bool              fill_or_kill = false;
-      price             exchange_rate;
-      time_point_sec    expiration = time_point_sec::maximum();
-
-      void  validate()const;
-      void  get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert(owner); }
-
-      price             get_price()const { return exchange_rate; }
-
-      pair< asset_symbol_type, asset_symbol_type > get_market()const
-      {
-         return exchange_rate.base.symbol < exchange_rate.quote.symbol ?
-                std::make_pair(exchange_rate.base.symbol, exchange_rate.quote.symbol) :
-                std::make_pair(exchange_rate.quote.symbol, exchange_rate.base.symbol);
-      }
-   };
-
-
-   /**
-    *  Cancels an order and returns the balance to owner.
-    */
-   struct limit_order_cancel_operation : public base_operation
-   {
-      account_name_type owner;
-      uint32_t          orderid = 0;
-
-      void  validate()const;
-      void  get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert(owner); }
-   };
-
-
-   struct pow
-   {
-      public_key_type worker;
-      digest_type     input;
-      signature_type  signature;
-      digest_type     work;
-
-      void create( const fc::ecc::private_key& w, const digest_type& i );
-      void validate()const;
-   };
-
-
-   struct pow_operation : public base_operation
-   {
-      account_name_type worker_account;
-      block_id_type     block_id;
-      uint64_t          nonce = 0;
-      pow               work;
-      chain_properties  props;
-
-      void validate()const;
-      fc::sha256 work_input()const;
-
-      const account_name_type& get_worker_account()const { return worker_account; }
-
-      /** there is no need to verify authority, the proof of work is sufficient */
-      void get_required_active_authorities( flat_set<account_name_type>& a )const{  }
-   };
-
-
-   struct pow2_input
-   {
-      account_name_type worker_account;
-      block_id_type     prev_block;
-      uint64_t          nonce = 0;
-   };
-
-
-   struct pow2
-   {
-      pow2_input        input;
-      uint32_t          pow_summary = 0;
-
-      void create( const block_id_type& prev_block, const account_name_type& account_name, uint64_t nonce );
-      void validate()const;
-   };
-
-   struct equihash_pow
-   {
-      pow2_input           input;
-      fc::equihash::proof  proof;
-      block_id_type        prev_block;
-      uint32_t             pow_summary = 0;
-
-      void create( const block_id_type& recent_block, const account_name_type& account_name, uint32_t nonce );
-      void validate() const;
-   };
-
-   typedef fc::static_variant< pow2, equihash_pow > pow2_work;
-
-   struct pow2_operation : public base_operation
-   {
-      pow2_work                     work;
-      optional< public_key_type >   new_owner_key;
-      chain_properties              props;
-
-      void validate()const;
-
-      void get_required_active_authorities( flat_set<account_name_type>& a )const;
-
-      void get_required_authorities( vector< authority >& a )const
-      {
-         if( new_owner_key )
-         {
-            a.push_back( authority( 1, *new_owner_key, 1 ) );
-         }
-      }
-   };
-
-
-   /**
-    * This operation is used to report a miner who signs two blocks
-    * at the same time. To be valid, the violation must be reported within
-    * SMOKE_MAX_WITNESSES blocks of the head block (1 round) and the
-    * producer must be in the ACTIVE witness set.
-    *
-    * Users not in the ACTIVE witness set should not have to worry about their
-    * key getting compromised and being used to produced multiple blocks so
-    * the attacker can report it and steel their vesting steem.
-    *
-    * The result of the operation is to transfer the full VESTING SMOKE balance
-    * of the block producer to the reporter.
-    */
-   struct report_over_production_operation : public base_operation
-   {
-      account_name_type    reporter;
-      signed_block_header  first_block;
-      signed_block_header  second_block;
-
-      void validate()const;
-   };
-
-
    /**
     * All account recovery requests come from a listed recovery account. This
     * is secure based on the assumption that only a trusted account should be
@@ -949,19 +779,9 @@ FC_REFLECT( smoke::protocol::cancel_transfer_from_savings_operation, (from)(requ
 FC_REFLECT( smoke::protocol::reset_account_operation, (reset_account)(account_to_reset)(new_owner_authority) )
 FC_REFLECT( smoke::protocol::set_reset_account_operation, (account)(current_reset_account)(reset_account) )
 
-
-FC_REFLECT( smoke::protocol::report_over_production_operation, (reporter)(first_block)(second_block) )
 FC_REFLECT( smoke::protocol::convert_operation, (owner)(requestid)(amount) )
 FC_REFLECT( smoke::protocol::feed_publish_operation, (publisher)(exchange_rate) )
-FC_REFLECT( smoke::protocol::pow, (worker)(input)(signature)(work) )
-FC_REFLECT( smoke::protocol::pow2, (input)(pow_summary) )
-FC_REFLECT( smoke::protocol::pow2_input, (worker_account)(prev_block)(nonce) )
-FC_REFLECT( smoke::protocol::equihash_pow, (input)(proof)(prev_block)(pow_summary) )
 FC_REFLECT( smoke::protocol::chain_properties, (account_creation_fee)(maximum_block_size)(sbd_interest_rate) );
-
-FC_REFLECT_TYPENAME( smoke::protocol::pow2_work )
-FC_REFLECT( smoke::protocol::pow_operation, (worker_account)(block_id)(nonce)(work)(props) )
-FC_REFLECT( smoke::protocol::pow2_operation, (work)(new_owner_key)(props) )
 
 FC_REFLECT( smoke::protocol::account_create_operation,
             (fee)
@@ -1005,9 +825,6 @@ FC_REFLECT( smoke::protocol::vote_operation, (voter)(author)(permlink)(weight) )
 FC_REFLECT( smoke::protocol::custom_operation, (required_auths)(id)(data) )
 FC_REFLECT( smoke::protocol::custom_json_operation, (required_auths)(required_posting_auths)(id)(json) )
 FC_REFLECT( smoke::protocol::custom_binary_operation, (required_owner_auths)(required_active_auths)(required_posting_auths)(required_auths)(id)(data) )
-FC_REFLECT( smoke::protocol::limit_order_create_operation, (owner)(orderid)(amount_to_sell)(min_to_receive)(fill_or_kill)(expiration) )
-FC_REFLECT( smoke::protocol::limit_order_create2_operation, (owner)(orderid)(amount_to_sell)(exchange_rate)(fill_or_kill)(expiration) )
-FC_REFLECT( smoke::protocol::limit_order_cancel_operation, (owner)(orderid) )
 
 FC_REFLECT( smoke::protocol::delete_comment_operation, (author)(permlink) );
 
