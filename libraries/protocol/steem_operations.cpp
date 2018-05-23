@@ -317,26 +317,6 @@ namespace smoke { namespace protocol {
       validate_account_name( new_recovery_account );
    }
 
-   void transfer_to_savings_operation::validate()const {
-      validate_account_name( from );
-      validate_account_name( to );
-      FC_ASSERT( amount.amount > 0 );
-      FC_ASSERT( amount.symbol == SMOKE_SYMBOL || amount.symbol == SBD_SYMBOL );
-      FC_ASSERT( memo.size() < SMOKE_MAX_MEMO_SIZE, "Memo is too large" );
-      FC_ASSERT( fc::is_utf8( memo ), "Memo is not UTF8" );
-   }
-   void transfer_from_savings_operation::validate()const {
-      validate_account_name( from );
-      validate_account_name( to );
-      FC_ASSERT( amount.amount > 0 );
-      FC_ASSERT( amount.symbol == SMOKE_SYMBOL || amount.symbol == SBD_SYMBOL );
-      FC_ASSERT( memo.size() < SMOKE_MAX_MEMO_SIZE, "Memo is too large" );
-      FC_ASSERT( fc::is_utf8( memo ), "Memo is not UTF8" );
-   }
-   void cancel_transfer_from_savings_operation::validate()const {
-      validate_account_name( from );
-   }
-
    void decline_voting_rights_operation::validate()const
    {
       validate_account_name( account );

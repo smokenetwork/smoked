@@ -320,7 +320,6 @@ namespace smoke { namespace chain {
          void process_comment_cashout();
          void process_funds();
          void process_conversions();
-         void process_savings_withdraws();
          void account_recovery_processing();
          void expire_escrow_ratification();
          void process_decline_voting_rights();

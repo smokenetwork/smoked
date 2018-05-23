@@ -2531,16 +2531,6 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
       vest.to = SMOKE_NULL_ACCOUNT;
       vest.amount = ASSET( "3.000 TESTS" );
 
-      transfer_to_savings_operation save1;
-      save1.from = "alice";
-      save1.to = SMOKE_NULL_ACCOUNT;
-      save1.amount = ASSET( "4.000 TESTS" );
-
-      transfer_to_savings_operation save2;
-      save2.from = "alice";
-      save2.to = SMOKE_NULL_ACCOUNT;
-      save2.amount = ASSET( "5.000 TBD" );
-
       BOOST_TEST_MESSAGE( "--- Transferring to NULL Account" );
 
       signed_transaction tx;

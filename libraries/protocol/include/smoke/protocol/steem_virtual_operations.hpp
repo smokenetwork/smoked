@@ -99,20 +99,6 @@ namespace smoke { namespace protocol {
       account_name_type owner;
    };
 
-
-   struct fill_transfer_from_savings_operation : public virtual_operation
-   {
-      fill_transfer_from_savings_operation() {}
-      fill_transfer_from_savings_operation( const account_name_type& f, const account_name_type& t, const asset& a, const uint32_t r, const string& m )
-         :from(f), to(t), amount(a), request_id(r), memo(m) {}
-
-      account_name_type from;
-      account_name_type to;
-      asset             amount;
-      uint32_t          request_id = 0;
-      string            memo;
-   };
-
    struct hardfork_operation : public virtual_operation
    {
       hardfork_operation() {}
@@ -171,7 +157,6 @@ FC_REFLECT( smoke::protocol::liquidity_reward_operation, (owner)(payout) )
 FC_REFLECT( smoke::protocol::interest_operation, (owner)(interest) )
 FC_REFLECT( smoke::protocol::fill_vesting_withdraw_operation, (from_account)(to_account)(withdrawn)(deposited) )
 FC_REFLECT( smoke::protocol::shutdown_witness_operation, (owner) )
-FC_REFLECT( smoke::protocol::fill_transfer_from_savings_operation, (from)(to)(amount)(request_id)(memo) )
 FC_REFLECT( smoke::protocol::hardfork_operation, (hardfork_id) )
 FC_REFLECT( smoke::protocol::comment_payout_update_operation, (author)(permlink) )
 FC_REFLECT( smoke::protocol::return_vesting_delegation_operation, (account)(vesting_shares) )
