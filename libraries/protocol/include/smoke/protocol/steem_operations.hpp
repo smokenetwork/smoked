@@ -545,25 +545,6 @@ namespace smoke { namespace protocol {
       void validate()const;
    };
 
-
-   struct pow_operation : public base_operation
-   {
-      account_name_type worker_account;
-      block_id_type     block_id;
-      uint64_t          nonce = 0;
-      pow               work;
-      chain_properties  props;
-
-      void validate()const;
-      fc::sha256 work_input()const;
-
-      const account_name_type& get_worker_account()const { return worker_account; }
-
-      /** there is no need to verify authority, the proof of work is sufficient */
-      void get_required_active_authorities( flat_set<account_name_type>& a )const{  }
-   };
-
-
    struct pow2_input
    {
       account_name_type worker_account;
@@ -869,7 +850,7 @@ FC_REFLECT( smoke::protocol::equihash_pow, (input)(proof)(prev_block)(pow_summar
 FC_REFLECT( smoke::protocol::chain_properties, (account_creation_fee)(maximum_block_size)(sbd_interest_rate) );
 
 FC_REFLECT_TYPENAME( smoke::protocol::pow2_work )
-FC_REFLECT( smoke::protocol::pow_operation, (worker_account)(block_id)(nonce)(work)(props) )
+
 FC_REFLECT( smoke::protocol::pow2_operation, (work)(new_owner_key)(props) )
 
 FC_REFLECT( smoke::protocol::account_create_operation,

@@ -1326,11 +1326,6 @@ void custom_binary_evaluator::do_apply( const custom_binary_operation& o )
    }
 }
 
-void pow_evaluator::do_apply( const pow_operation& o ) {
-   FC_ASSERT( false, "pow is deprecated. Use pow2 instead" );
-}
-
-
 void pow2_evaluator::do_apply( const pow2_operation& o )
 {
    FC_ASSERT( false, "mining is now disabled" );

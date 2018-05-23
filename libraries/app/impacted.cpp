@@ -147,11 +147,6 @@ struct get_impacted_account_visitor
       _impacted.insert( op.publisher );
    }
 
-   void operator()( const pow_operation& op )
-   {
-      _impacted.insert( op.worker_account );
-   }
-
    struct pow2_impacted_visitor
    {
       pow2_impacted_visitor(){}

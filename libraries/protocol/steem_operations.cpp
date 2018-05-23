@@ -229,22 +229,6 @@ namespace smoke { namespace protocol {
       for( const auto& a : required_auths ) a.validate();
    }
 
-
-   fc::sha256 pow_operation::work_input()const
-   {
-      auto hash = fc::sha256::hash( block_id );
-      hash._hash[0] = nonce;
-      return fc::sha256::hash( hash );
-   }
-
-   void pow_operation::validate()const
-   {
-      props.validate();
-      validate_account_name( worker_account );
-      FC_ASSERT( work_input() == work.input, "Determninistic input does not match recorded input" );
-      work.validate();
-   }
-
    struct pow2_operation_validate_visitor
    {
       typedef void result_type;

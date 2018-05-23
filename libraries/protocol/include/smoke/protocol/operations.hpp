@@ -27,8 +27,6 @@ namespace smoke { namespace protocol {
             account_witness_vote_operation,
             account_witness_proxy_operation,
 
-            pow_operation,
-
             custom_operation,
 
             delete_comment_operation,
