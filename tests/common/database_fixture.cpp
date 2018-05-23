@@ -28,53 +28,53 @@ using std::cerr;
 
 clean_database_fixture::clean_database_fixture()
 {
-   try {
-   int argc = boost::unit_test::framework::master_test_suite().argc;
-   char** argv = boost::unit_test::framework::master_test_suite().argv;
-   for( int i=1; i<argc; i++ )
-   {
-      const std::string arg = argv[i];
-      if( arg == "--record-assert-trip" )
-         fc::enable_record_assert_trip = true;
-      if( arg == "--show-test-names" )
-         std::cout << "running test " << boost::unit_test::framework::current_test_case().p_name << std::endl;
-   }
-   auto ahplugin = app.register_plugin< smoke::account_history::account_history_plugin >();
-   db_plugin = app.register_plugin< smoke::plugin::debug_node::debug_node_plugin >();
-   auto wit_plugin = app.register_plugin< smoke::witness::witness_plugin >();
-   init_account_pub_key = init_account_priv_key.get_public_key();
-
-   boost::program_options::variables_map options;
-
-   db_plugin->logging = false;
-   ahplugin->plugin_initialize( options );
-   db_plugin->plugin_initialize( options );
-   wit_plugin->plugin_initialize( options );
-
-   open_database();
-
-   generate_block();
-   db.set_hardfork( SMOKE_NUM_HARDFORKS );
-   generate_block();
-
-   //ahplugin->plugin_startup();
-   db_plugin->plugin_startup();
-   vest( "initminer", 10000 );
-
-   // Fill up the rest of the required miners
-   for( int i = SMOKE_NUM_INIT_MINERS; i < SMOKE_MAX_WITNESSES; i++ )
-   {
-      account_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_pub_key );
-      fund( SMOKE_INIT_MINER_NAME + fc::to_string( i ), SMOKE_MIN_PRODUCER_REWARD.amount.value );
-      witness_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_priv_key, "foo.bar", init_account_pub_key, SMOKE_MIN_PRODUCER_REWARD.amount );
-   }
-
-   validate_database();
-   } catch ( const fc::exception& e )
-   {
-      edump( (e.to_detail_string()) );
-      throw;
-   }
+//   try {
+//   int argc = boost::unit_test::framework::master_test_suite().argc;
+//   char** argv = boost::unit_test::framework::master_test_suite().argv;
+//   for( int i=1; i<argc; i++ )
+//   {
+//      const std::string arg = argv[i];
+//      if( arg == "--record-assert-trip" )
+//         fc::enable_record_assert_trip = true;
+//      if( arg == "--show-test-names" )
+//         std::cout << "running test " << boost::unit_test::framework::current_test_case().p_name << std::endl;
+//   }
+//   auto ahplugin = app.register_plugin< smoke::account_history::account_history_plugin >();
+//   db_plugin = app.register_plugin< smoke::plugin::debug_node::debug_node_plugin >();
+//   auto wit_plugin = app.register_plugin< smoke::witness::witness_plugin >();
+//   init_account_pub_key = init_account_priv_key.get_public_key();
+//
+//   boost::program_options::variables_map options;
+//
+//   db_plugin->logging = false;
+//   ahplugin->plugin_initialize( options );
+//   db_plugin->plugin_initialize( options );
+//   wit_plugin->plugin_initialize( options );
+//
+//   open_database();
+//
+//   generate_block();
+//   db.set_hardfork( SMOKE_NUM_HARDFORKS );
+//   generate_block();
+//
+//   //ahplugin->plugin_startup();
+//   db_plugin->plugin_startup();
+//   vest( "initminer", 10000 );
+//
+//   // Fill up the rest of the required miners
+//   for( int i = SMOKE_NUM_INIT_MINERS; i < SMOKE_MAX_WITNESSES; i++ )
+//   {
+//      account_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_pub_key );
+//      fund( SMOKE_INIT_MINER_NAME + fc::to_string( i ), SMOKE_MIN_PRODUCER_REWARD.amount.value );
+//      witness_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_priv_key, "foo.bar", init_account_pub_key, SMOKE_MIN_PRODUCER_REWARD.amount );
+//   }
+//
+//   validate_database();
+//   } catch ( const fc::exception& e )
+//   {
+//      edump( (e.to_detail_string()) );
+//      throw;
+//   }
 
    return;
 }
@@ -95,39 +95,39 @@ clean_database_fixture::~clean_database_fixture()
 
 void clean_database_fixture::resize_shared_mem( uint64_t size )
 {
-   db.wipe( data_dir->path(), data_dir->path(), true );
-   int argc = boost::unit_test::framework::master_test_suite().argc;
-   char** argv = boost::unit_test::framework::master_test_suite().argv;
-   for( int i=1; i<argc; i++ )
-   {
-      const std::string arg = argv[i];
-      if( arg == "--record-assert-trip" )
-         fc::enable_record_assert_trip = true;
-      if( arg == "--show-test-names" )
-         std::cout << "running test " << boost::unit_test::framework::current_test_case().p_name << std::endl;
-   }
-   init_account_pub_key = init_account_priv_key.get_public_key();
-
-   db.open( data_dir->path(), data_dir->path(), INITIAL_TEST_SUPPLY, size, chainbase::database::read_write );
-
-   boost::program_options::variables_map options;
-
-
-   generate_block();
-   db.set_hardfork( SMOKE_NUM_HARDFORKS );
-   generate_block();
-
-   vest( "initminer", 10000 );
-
-   // Fill up the rest of the required miners
-   for( int i = SMOKE_NUM_INIT_MINERS; i < SMOKE_MAX_WITNESSES; i++ )
-   {
-      account_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_pub_key );
-      fund( SMOKE_INIT_MINER_NAME + fc::to_string( i ), SMOKE_MIN_PRODUCER_REWARD.amount.value );
-      witness_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_priv_key, "foo.bar", init_account_pub_key, SMOKE_MIN_PRODUCER_REWARD.amount );
-   }
-
-   validate_database();
+//   db.wipe( data_dir->path(), data_dir->path(), true );
+//   int argc = boost::unit_test::framework::master_test_suite().argc;
+//   char** argv = boost::unit_test::framework::master_test_suite().argv;
+//   for( int i=1; i<argc; i++ )
+//   {
+//      const std::string arg = argv[i];
+//      if( arg == "--record-assert-trip" )
+//         fc::enable_record_assert_trip = true;
+//      if( arg == "--show-test-names" )
+//         std::cout << "running test " << boost::unit_test::framework::current_test_case().p_name << std::endl;
+//   }
+//   init_account_pub_key = init_account_priv_key.get_public_key();
+//
+//   db.open( data_dir->path(), data_dir->path(), INITIAL_TEST_SUPPLY, size, chainbase::database::read_write );
+//
+//   boost::program_options::variables_map options;
+//
+//
+//   generate_block();
+//   db.set_hardfork( SMOKE_NUM_HARDFORKS );
+//   generate_block();
+//
+//   vest( "initminer", 10000 );
+//
+//   // Fill up the rest of the required miners
+//   for( int i = SMOKE_NUM_INIT_MINERS; i < SMOKE_MAX_WITNESSES; i++ )
+//   {
+//      account_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_pub_key );
+//      fund( SMOKE_INIT_MINER_NAME + fc::to_string( i ), SMOKE_MIN_PRODUCER_REWARD.amount.value );
+//      witness_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_priv_key, "foo.bar", init_account_pub_key, SMOKE_MIN_PRODUCER_REWARD.amount );
+//   }
+//
+//   validate_database();
 }
 
 live_database_fixture::live_database_fixture()
@@ -223,35 +223,19 @@ const account_object& database_fixture::account_create(
 {
    try
    {
-      if( db.has_hardfork( SMOKE_HARDFORK_0_17 ) )
-      {
-         account_create_with_delegation_operation op;
-         op.new_account_name = name;
-         op.creator = creator;
-         op.fee = asset( fee, SMOKE_SYMBOL );
-         op.delegation = asset( 0, VESTS_SYMBOL );
-         op.owner = authority( 1, key, 1 );
-         op.active = authority( 1, key, 1 );
-         op.posting = authority( 1, post_key, 1 );
-         op.memo_key = key;
-         op.json_metadata = json_metadata;
+      account_create_with_delegation_operation op;
+      op.new_account_name = name;
+      op.creator = creator;
+      op.fee = asset( fee, SMOKE_SYMBOL );
+      op.delegation = asset( 0, VESTS_SYMBOL );
+      op.owner = authority( 1, key, 1 );
+      op.active = authority( 1, key, 1 );
+      op.posting = authority( 1, post_key, 1 );
+      op.memo_key = key;
+      op.json_metadata = json_metadata;
 
-         trx.operations.push_back( op );
-      }
-      else
-      {
-         account_create_operation op;
-         op.new_account_name = name;
-         op.creator = creator;
-         op.fee = asset( fee, SMOKE_SYMBOL );
-         op.owner = authority( 1, key, 1 );
-         op.active = authority( 1, key, 1 );
-         op.posting = authority( 1, post_key, 1 );
-         op.memo_key = key;
-         op.json_metadata = json_metadata;
+      trx.operations.push_back( op );
 
-         trx.operations.push_back( op );
-      }
 
       trx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
       trx.sign( creator_key, db.get_chain_id() );
