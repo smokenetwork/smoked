@@ -769,16 +769,6 @@ class wallet_api
        */
       annotated_signed_transaction convert_sbd( string from, asset amount, bool broadcast = false );
 
-      /**
-       * A witness can public a price feed for the SMOKE:SBD market. The median price feed is used
-       * to process conversion requests from SBD to SMOKE.
-       *
-       * @param witness The witness publishing the price feed
-       * @param exchange_rate The desired exchange rate
-       * @param broadcast true if you wish to broadcast the transaction
-       */
-      annotated_signed_transaction publish_feed(string witness, price exchange_rate, bool broadcast );
-
       /** Signs a transaction.
        *
        * Given a fully-formed transaction that is only lacking signatures, this signs
@@ -1020,7 +1010,6 @@ FC_API( smoke::wallet::wallet_api,
         (withdraw_vesting)
         (set_withdraw_vesting_route)
         (convert_sbd)
-        (publish_feed)
         (post_comment)
         (vote)
         (set_transaction_expiration)

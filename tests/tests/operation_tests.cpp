@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE( account_create_apply )
    {
       BOOST_TEST_MESSAGE( "Testing: account_create_apply" );
 
-      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
+//      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
 
       signed_transaction tx;
       private_key_type priv_key = generate_private_key( "alice" );
@@ -608,7 +608,7 @@ BOOST_AUTO_TEST_CASE( comment_delete_apply )
 
       generate_block();
 
-      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
+//      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
 
       signed_transaction tx;
       comment_operation comment;
@@ -2198,119 +2198,6 @@ BOOST_AUTO_TEST_CASE( custom_binary_authorities )
    BOOST_REQUIRE( auths == expected );
 }
 
-BOOST_AUTO_TEST_CASE( feed_publish_validate )
-{
-   try
-   {
-      BOOST_TEST_MESSAGE( "Testing: feed_publish_validate" );
-   }
-   FC_LOG_AND_RETHROW()
-}
-
-BOOST_AUTO_TEST_CASE( feed_publish_authorities )
-{
-   try
-   {
-      BOOST_TEST_MESSAGE( "Testing: feed_publish_authorities" );
-
-      ACTORS( (alice)(bob) )
-      fund( "alice", 10000 );
-      witness_create( "alice", alice_private_key, "foo.bar", alice_private_key.get_public_key(), 1000 );
-
-      feed_publish_operation op;
-      op.publisher = "alice";
-      op.exchange_rate = price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) );
-
-      signed_transaction tx;
-      tx.operations.push_back( op );
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-
-      BOOST_TEST_MESSAGE( "--- Test failure when no signature." );
-      SMOKE_REQUIRE_THROW( db.push_transaction( tx, database::skip_transaction_dupe_check ), tx_missing_active_auth );
-
-      BOOST_TEST_MESSAGE( "--- Test failure with incorrect signature" );
-      tx.signatures.clear();
-      tx.sign( alice_post_key, db.get_chain_id() );
-      SMOKE_REQUIRE_THROW( db.push_transaction( tx, database::skip_transaction_dupe_check ), tx_missing_active_auth );
-
-      BOOST_TEST_MESSAGE( "--- Test failure with duplicate signature" );
-      tx.sign( alice_private_key, db.get_chain_id() );
-      tx.sign( alice_private_key, db.get_chain_id() );
-      SMOKE_REQUIRE_THROW( db.push_transaction( tx, database::skip_transaction_dupe_check ), tx_duplicate_sig );
-
-      BOOST_TEST_MESSAGE( "--- Test failure with additional incorrect signature" );
-      tx.signatures.clear();
-      tx.sign( alice_private_key, db.get_chain_id() );
-      tx.sign( bob_private_key, db.get_chain_id() );
-      SMOKE_REQUIRE_THROW( db.push_transaction( tx, database::skip_transaction_dupe_check ), tx_irrelevant_sig );
-
-      BOOST_TEST_MESSAGE( "--- Test success with witness account signature" );
-      tx.signatures.clear();
-      tx.sign( alice_private_key, db.get_chain_id() );
-      db.push_transaction( tx, database::skip_transaction_dupe_check );
-
-      validate_database();
-   }
-   FC_LOG_AND_RETHROW()
-}
-
-BOOST_AUTO_TEST_CASE( feed_publish_apply )
-{
-   try
-   {
-      BOOST_TEST_MESSAGE( "Testing: feed_publish_apply" );
-
-      ACTORS( (alice) )
-      fund( "alice", 10000 );
-      witness_create( "alice", alice_private_key, "foo.bar", alice_private_key.get_public_key(), 1000 );
-
-      BOOST_TEST_MESSAGE( "--- Test publishing price feed" );
-      feed_publish_operation op;
-      op.publisher = "alice";
-      op.exchange_rate = price( ASSET( "1000.000 TESTS" ), ASSET( "1.000 TBD" ) ); // 1000 SMOKE : 1 SBD
-
-      signed_transaction tx;
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.operations.push_back( op );
-      tx.sign( alice_private_key, db.get_chain_id() );
-
-      db.push_transaction( tx, 0 );
-
-      witness_object& alice_witness = const_cast< witness_object& >( db.get_witness( "alice" ) );
-
-      BOOST_REQUIRE( alice_witness.sbd_exchange_rate == op.exchange_rate );
-      BOOST_REQUIRE( alice_witness.last_sbd_exchange_update == db.head_block_time() );
-      validate_database();
-
-      BOOST_TEST_MESSAGE( "--- Test failure publishing to non-existent witness" );
-
-      tx.operations.clear();
-      tx.signatures.clear();
-      op.publisher = "bob";
-      tx.sign( alice_private_key, db.get_chain_id() );
-
-      SMOKE_REQUIRE_THROW( db.push_transaction( tx, 0 ), fc::exception );
-      validate_database();
-
-      BOOST_TEST_MESSAGE( "--- Test updating price feed" );
-
-      tx.operations.clear();
-      tx.signatures.clear();
-      op.exchange_rate = price( ASSET(" 1500.000 TESTS" ), ASSET( "1.000 TBD" ) );
-      op.publisher = "alice";
-      tx.operations.push_back( op );
-      tx.sign( alice_private_key, db.get_chain_id() );
-
-      db.push_transaction( tx, 0 );
-
-      alice_witness = const_cast< witness_object& >( db.get_witness( "alice" ) );
-      BOOST_REQUIRE( std::abs( alice_witness.sbd_exchange_rate.to_real() - op.exchange_rate.to_real() ) < 0.0000005 );
-      BOOST_REQUIRE( alice_witness.last_sbd_exchange_update == db.head_block_time() );
-      validate_database();
-   }
-   FC_LOG_AND_RETHROW()
-}
-
 BOOST_AUTO_TEST_CASE( convert_validate )
 {
    try
@@ -2329,7 +2216,7 @@ BOOST_AUTO_TEST_CASE( convert_authorities )
       ACTORS( (alice)(bob) )
       fund( "alice", 10000 );
 
-      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
+//      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
 
       convert( "alice", ASSET( "2.500 TESTS" ) );
 
@@ -2387,7 +2274,7 @@ BOOST_AUTO_TEST_CASE( convert_apply )
 
       const auto& convert_request_idx = db.get_index< convert_request_index >().indices().get< by_owner >();
 
-      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
+//      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
 
       convert( "alice", ASSET( "2.500 TESTS" ) );
       convert( "bob", ASSET( "7.000 TESTS" ) );
@@ -5249,7 +5136,7 @@ BOOST_AUTO_TEST_CASE( claim_reward_balance_apply )
       ACTORS( (alice) )
       generate_block();
 
-      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
+//      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
 
       db_plugin->debug_update( []( database& db )
       {
@@ -5737,7 +5624,7 @@ BOOST_AUTO_TEST_CASE( comment_beneficiaries_apply )
       ACTORS( (alice)(bob)(sam)(dave) )
       generate_block();
 
-      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
+//      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
 
       comment_operation comment;
       vote_operation vote;

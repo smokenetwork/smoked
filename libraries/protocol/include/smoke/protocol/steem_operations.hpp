@@ -504,21 +504,6 @@ namespace smoke { namespace protocol {
       void get_required_authorities( vector< authority >& a )const{ for( const auto& i : required_auths ) a.push_back( i ); }
    };
 
-
-   /**
-    *  Feeds can only be published by the top N witnesses which are included in every round and are
-    *  used to define the exchange rate between steem and the dollar.
-    */
-   struct feed_publish_operation : public base_operation
-   {
-      account_name_type publisher;
-      price             exchange_rate;
-
-      void  validate()const;
-      void  get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert(publisher); }
-   };
-
-
    /**
     *  This operation instructs the blockchain to start a conversion between SMOKE and SBD,
     *  The funds are deposited after SMOKE_CONVERSION_DELAY
@@ -780,7 +765,6 @@ FC_REFLECT( smoke::protocol::reset_account_operation, (reset_account)(account_to
 FC_REFLECT( smoke::protocol::set_reset_account_operation, (account)(current_reset_account)(reset_account) )
 
 FC_REFLECT( smoke::protocol::convert_operation, (owner)(requestid)(amount) )
-FC_REFLECT( smoke::protocol::feed_publish_operation, (publisher)(exchange_rate) )
 FC_REFLECT( smoke::protocol::chain_properties, (account_creation_fee)(maximum_block_size)(sbd_interest_rate) );
 
 FC_REFLECT( smoke::protocol::account_create_operation,

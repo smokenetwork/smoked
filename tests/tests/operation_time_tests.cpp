@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE( comment_payout_equalize )
       // U,V,W : voters
 
       // set a ridiculously high SMOKE price ($1 / satoshi) to disable dust threshold
-      set_price_feed( price( ASSET( "0.001 TESTS" ), ASSET( "1.000 TBD" ) ) );
+//      set_price_feed( price( ASSET( "0.001 TESTS" ), ASSET( "1.000 TBD" ) ) );
 
       for( const auto& voter : voters )
       {
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE( comment_payout_dust )
       vest( "alice", ASSET( "10.000 TESTS" ) );
       vest( "bob", ASSET( "10.000 TESTS" ) );
 
-      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
+//      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
 
       generate_block();
       validate_database();
@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE( reward_funds )
       ACTORS( (alice)(bob) )
       generate_block();
 
-      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
+//      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
       generate_block();
 
       comment_operation comment;
@@ -296,7 +296,7 @@ BOOST_AUTO_TEST_CASE( recent_claims_decay )
       ACTORS( (alice)(bob) )
       generate_block();
 
-      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
+//      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
       generate_block();
 
       comment_operation comment;
@@ -1410,107 +1410,6 @@ BOOST_AUTO_TEST_CASE( vesting_withdraw_route )
    FC_LOG_AND_RETHROW()
 }
 
-BOOST_AUTO_TEST_CASE( feed_publish_mean )
-{
-   try
-   {
-      resize_shared_mem( 1024 * 1024 * 32 );
-
-      ACTORS( (alice0)(alice1)(alice2)(alice3)(alice4)(alice5)(alice6) )
-
-      BOOST_TEST_MESSAGE( "Setup" );
-
-      generate_blocks( 30 / SMOKE_BLOCK_INTERVAL );
-
-      vector< string > accounts;
-      accounts.push_back( "alice0" );
-      accounts.push_back( "alice1" );
-      accounts.push_back( "alice2" );
-      accounts.push_back( "alice3" );
-      accounts.push_back( "alice4" );
-      accounts.push_back( "alice5" );
-      accounts.push_back( "alice6" );
-
-      vector< private_key_type > keys;
-      keys.push_back( alice0_private_key );
-      keys.push_back( alice1_private_key );
-      keys.push_back( alice2_private_key );
-      keys.push_back( alice3_private_key );
-      keys.push_back( alice4_private_key );
-      keys.push_back( alice5_private_key );
-      keys.push_back( alice6_private_key );
-
-      vector< feed_publish_operation > ops;
-      vector< signed_transaction > txs;
-
-      // Upgrade accounts to witnesses
-      for( int i = 0; i < 7; i++ )
-      {
-         transfer( SMOKE_INIT_MINER_NAME, accounts[i], 10000 );
-         witness_create( accounts[i], keys[i], "foo.bar", keys[i].get_public_key(), 1000 );
-
-         ops.push_back( feed_publish_operation() );
-         ops[i].publisher = accounts[i];
-
-         txs.push_back( signed_transaction() );
-      }
-
-      ops[0].exchange_rate = price( asset( 100000, SMOKE_SYMBOL ), asset( 1000, SBD_SYMBOL ) );
-      ops[1].exchange_rate = price( asset( 105000, SMOKE_SYMBOL ), asset( 1000, SBD_SYMBOL ) );
-      ops[2].exchange_rate = price( asset(  98000, SMOKE_SYMBOL ), asset( 1000, SBD_SYMBOL ) );
-      ops[3].exchange_rate = price( asset(  97000, SMOKE_SYMBOL ), asset( 1000, SBD_SYMBOL ) );
-      ops[4].exchange_rate = price( asset(  99000, SMOKE_SYMBOL ), asset( 1000, SBD_SYMBOL ) );
-      ops[5].exchange_rate = price( asset(  97500, SMOKE_SYMBOL ), asset( 1000, SBD_SYMBOL ) );
-      ops[6].exchange_rate = price( asset( 102000, SMOKE_SYMBOL ), asset( 1000, SBD_SYMBOL ) );
-
-      for( int i = 0; i < 7; i++ )
-      {
-         txs[i].set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-         txs[i].operations.push_back( ops[i] );
-         txs[i].sign( keys[i], db.get_chain_id() );
-         db.push_transaction( txs[i], 0 );
-      }
-
-      BOOST_TEST_MESSAGE( "Jump forward an hour" );
-
-      generate_blocks( SMOKE_BLOCKS_PER_HOUR ); // Jump forward 1 hour
-      BOOST_TEST_MESSAGE( "Get feed history object" );
-      feed_history_object feed_history = db.get_feed_history();
-      BOOST_TEST_MESSAGE( "Check state" );
-      BOOST_REQUIRE( feed_history.current_median_history == price( asset( 99000, SMOKE_SYMBOL), asset( 1000, SBD_SYMBOL ) ) );
-      BOOST_REQUIRE( feed_history.price_history[ 0 ] == price( asset( 99000, SMOKE_SYMBOL), asset( 1000, SBD_SYMBOL ) ) );
-      validate_database();
-
-      for ( int i = 0; i < 23; i++ )
-      {
-         BOOST_TEST_MESSAGE( "Updating ops" );
-
-         for( int j = 0; j < 7; j++ )
-         {
-            txs[j].operations.clear();
-            txs[j].signatures.clear();
-            ops[j].exchange_rate = price( ops[j].exchange_rate.base, asset( ops[j].exchange_rate.quote.amount + 10, SBD_SYMBOL ) );
-            txs[j].set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-            txs[j].operations.push_back( ops[j] );
-            txs[j].sign( keys[j], db.get_chain_id() );
-            db.push_transaction( txs[j], 0 );
-         }
-
-         BOOST_TEST_MESSAGE( "Generate Blocks" );
-
-         generate_blocks( SMOKE_BLOCKS_PER_HOUR  ); // Jump forward 1 hour
-
-         BOOST_TEST_MESSAGE( "Check feed_history" );
-
-         feed_history = db.get(feed_history_id_type());
-         BOOST_REQUIRE( feed_history.current_median_history == feed_history.price_history[ ( i + 1 ) / 2 ] );
-         BOOST_REQUIRE( feed_history.price_history[ i + 1 ] == ops[4].exchange_rate );
-         validate_database();
-      }
-   }
-   FC_LOG_AND_RETHROW();
-}
-
 BOOST_AUTO_TEST_CASE( convert_delay )
 {
    try
@@ -1520,7 +1419,7 @@ BOOST_AUTO_TEST_CASE( convert_delay )
       vest( "alice", ASSET( "10.000 TESTS" ) );
       fund( "alice", ASSET( "25.000 TBD" ) );
 
-      set_price_feed( price( asset::from_string( "1.250 TESTS" ), asset::from_string( "1.000 TBD" ) ) );
+//      set_price_feed( price( asset::from_string( "1.250 TESTS" ), asset::from_string( "1.000 TBD" ) ) );
 
       convert_operation op;
       signed_transaction tx;
@@ -1764,7 +1663,7 @@ BOOST_AUTO_TEST_CASE( sbd_interest )
       vest( "alice", ASSET( "10.000 TESTS" ) );
       vest( "bob", ASSET( "10.000 TESTS" ) );
 
-      set_price_feed( price( asset::from_string( "1.000 TESTS" ), asset::from_string( "1.000 TBD" ) ) );
+//      set_price_feed( price( asset::from_string( "1.000 TESTS" ), asset::from_string( "1.000 TBD" ) ) );
 
       BOOST_TEST_MESSAGE( "Testing interest over smallest interest period" );
 
@@ -1853,8 +1752,8 @@ BOOST_AUTO_TEST_CASE( liquidity_rewards )
 
       BOOST_TEST_MESSAGE( "Rewarding Bob with TESTS" );
 
-      auto exchange_rate = price( ASSET( "1.250 TESTS" ), ASSET( "1.000 TBD" ) );
-      set_price_feed( exchange_rate );
+//      auto exchange_rate = price( ASSET( "1.250 TESTS" ), ASSET( "1.000 TBD" ) );
+//      set_price_feed( exchange_rate );
 
       signed_transaction tx;
 
@@ -2453,8 +2352,8 @@ BOOST_AUTO_TEST_CASE( comment_freeze )
       vest( "sam", 10000 );
       vest( "dave", 10000 );
 
-      auto exchange_rate = price( ASSET( "1.250 TESTS" ), ASSET( "1.000 TBD" ) );
-      set_price_feed( exchange_rate );
+//      auto exchange_rate = price( ASSET( "1.250 TESTS" ), ASSET( "1.000 TBD" ) );
+//      set_price_feed( exchange_rate );
 
       signed_transaction tx;
 
@@ -2565,8 +2464,8 @@ BOOST_AUTO_TEST_CASE( sbd_price_feed_limit )
       generate_block();
       vest( "alice", ASSET( "10.000 TESTS" ) );
 
-      price exchange_rate( ASSET( "1.000 TBD" ), ASSET( "1.000 TESTS" ) );
-      set_price_feed( exchange_rate );
+//      price exchange_rate( ASSET( "1.000 TBD" ), ASSET( "1.000 TESTS" ) );
+//      set_price_feed( exchange_rate );
 
       comment_operation comment;
       comment.author = "alice";
@@ -2594,9 +2493,9 @@ BOOST_AUTO_TEST_CASE( sbd_price_feed_limit )
 
       db.skip_price_feed_limit_check = false;
       const auto& gpo = db.get_dynamic_global_properties();
-      auto new_exchange_rate = price( gpo.current_sbd_supply, asset( ( SMOKE_100_PERCENT ) * gpo.current_supply.amount ) );
-      set_price_feed( new_exchange_rate );
-      set_price_feed( new_exchange_rate );
+//      auto new_exchange_rate = price( gpo.current_sbd_supply, asset( ( SMOKE_100_PERCENT ) * gpo.current_supply.amount ) );
+//      set_price_feed( new_exchange_rate );
+//      set_price_feed( new_exchange_rate );
 
       BOOST_REQUIRE( db.get_feed_history().current_median_history > new_exchange_rate && db.get_feed_history().current_median_history < exchange_rate );
    }
@@ -2612,7 +2511,7 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
       ACTORS( (alice) );
       generate_block();
 
-      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
+//      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
 
       fund( "alice", ASSET( "10.000 TESTS" ) );
       fund( "alice", ASSET( "10.000 TBD" ) );
