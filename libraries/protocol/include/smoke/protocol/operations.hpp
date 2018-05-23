@@ -31,8 +31,6 @@ namespace smoke { namespace protocol {
 
             custom_operation,
 
-            report_over_production_operation,
-
             delete_comment_operation,
             custom_json_operation,
             comment_options_operation,

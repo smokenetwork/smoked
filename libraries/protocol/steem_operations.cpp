@@ -161,7 +161,7 @@ namespace smoke { namespace protocol {
    { try {
       validate_account_name( from );
       validate_account_name( to );
-      FC_ASSERT( amount.symbol != VESTS_SYMBOL, "transferring of Steem Power (STMP) is not allowed." );
+      FC_ASSERT( amount.symbol != VESTS_SYMBOL, "transferring of Smoke Power (STMP) is not allowed." );
       FC_ASSERT( amount.amount > 0, "Cannot transfer a negative amount (aka: stealing)" );
       FC_ASSERT( memo.size() < SMOKE_MAX_MEMO_SIZE, "Memo is too large" );
       FC_ASSERT( fc::is_utf8( memo ), "Memo is not UTF8" );
@@ -368,16 +368,6 @@ namespace smoke { namespace protocol {
       /// market fluxuations through converting large quantities without moving the price.
       FC_ASSERT( is_asset_type( amount, SBD_SYMBOL ), "Can only convert SBD to SMOKE" );
       FC_ASSERT( amount.amount > 0, "Must convert some SBD" );
-   }
-
-   void report_over_production_operation::validate()const
-   {
-      validate_account_name( reporter );
-      validate_account_name( first_block.witness );
-      FC_ASSERT( first_block.witness   == second_block.witness );
-      FC_ASSERT( first_block.timestamp == second_block.timestamp );
-      FC_ASSERT( first_block.signee()  == second_block.signee() );
-      FC_ASSERT( first_block.id() != second_block.id() );
    }
 
    void escrow_transfer_operation::validate()const

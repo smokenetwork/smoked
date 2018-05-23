@@ -1369,11 +1369,6 @@ void convert_evaluator::do_apply( const convert_operation& o )
 
 }
 
-void report_over_production_evaluator::do_apply( const report_over_production_operation& o )
-{
-   FC_ASSERT( false, "report_over_production_operation is disabled." );
-}
-
 void challenge_authority_evaluator::do_apply( const challenge_authority_operation& o )
 {
    FC_ASSERT( false, "Challenge authority operation is currently disabled." );
