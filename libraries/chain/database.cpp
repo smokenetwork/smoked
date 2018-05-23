@@ -3101,29 +3101,6 @@ void database::update_last_irreversible_block()
    _fork_db.set_max_size( dpo.head_block_number - dpo.last_irreversible_block_num + 1 );
 } FC_CAPTURE_AND_RETHROW() }
 
-
-bool database::apply_order( const limit_order_object& new_order_object )
-{
-   auto order_id = new_order_object.id;
-
-   const auto& limit_price_idx = get_index<limit_order_index>().indices().get<by_price>();
-
-   auto max_price = ~new_order_object.sell_price;
-   auto limit_itr = limit_price_idx.lower_bound(max_price.max());
-   auto limit_end = limit_price_idx.upper_bound(max_price);
-
-   bool finished = false;
-   while( !finished && limit_itr != limit_end )
-   {
-      auto old_limit_itr = limit_itr;
-      ++limit_itr;
-      // match returns 2 when only the old order was fully filled. In this case, we keep matching; otherwise, we stop.
-      finished = ( match(new_order_object, *old_limit_itr, old_limit_itr->sell_price) & 0x1 );
-   }
-
-   return find< limit_order_object >( order_id ) == nullptr;
-}
-
 int database::match( const limit_order_object& new_order, const limit_order_object& old_order, const price& match_price )
 {
    assert( new_order.sell_price.quote.symbol == old_order.sell_price.base.symbol );
@@ -3210,53 +3187,6 @@ void database::adjust_liquidity_reward( const account_object& owner, const asset
    }
 }
 
-
-bool database::fill_order( const limit_order_object& order, const asset& pays, const asset& receives )
-{
-   try
-   {
-      FC_ASSERT( order.amount_for_sale().symbol == pays.symbol );
-      FC_ASSERT( pays.symbol != receives.symbol );
-
-      const account_object& seller = get_account( order.seller );
-
-      adjust_balance( seller, receives );
-
-      if( pays == order.amount_for_sale() )
-      {
-         remove( order );
-         return true;
-      }
-      else
-      {
-         modify( order, [&]( limit_order_object& b )
-         {
-            b.for_sale -= pays.amount;
-         } );
-         /**
-          *  There are times when the AMOUNT_FOR_SALE * SALE_PRICE == 0 which means that we
-          *  have hit the limit where the seller is asking for nothing in return.  When this
-          *  happens we must refund any balance back to the seller, it is too small to be
-          *  sold at the sale price.
-          */
-         if( order.amount_to_receive().amount == 0 )
-         {
-            cancel_order(order);
-            return true;
-         }
-         return false;
-      }
-   }
-   FC_CAPTURE_AND_RETHROW( (order)(pays)(receives) )
-}
-
-void database::cancel_order( const limit_order_object& order )
-{
-   adjust_balance( get_account(order.seller), order.amount_for_sale() );
-   remove(order);
-}
-
-
 void database::clear_expired_transactions()
 {
    //Look for expired transactions in the deduplication list, and remove them.
@@ -3265,18 +3195,6 @@ void database::clear_expired_transactions()
    const auto& dedupe_index = transaction_idx.indices().get< by_expiration >();
    while( ( !dedupe_index.empty() ) && ( head_block_time() > dedupe_index.begin()->expiration ) )
       remove( *dedupe_index.begin() );
-}
-
-void database::clear_expired_orders()
-{
-   auto now = head_block_time();
-   const auto& orders_by_exp = get_index<limit_order_index>().indices().get<by_expiration>();
-   auto itr = orders_by_exp.begin();
-   while( itr != orders_by_exp.end() && itr->expiration < now )
-   {
-      cancel_order( *itr );
-      itr = orders_by_exp.begin();
-   }
 }
 
 void database::clear_expired_delegations()

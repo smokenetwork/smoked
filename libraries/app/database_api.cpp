@@ -1940,16 +1940,11 @@ state database_api::get_state( string path )const
                   case operation::tag<escrow_dispute_operation>::value:
                   case operation::tag<escrow_release_operation>::value:
                   case operation::tag<fill_convert_request_operation>::value:
-                  case operation::tag<fill_order_operation>::value:
                   case operation::tag<claim_reward_balance_operation>::value:
                      eacnt.transfer_history[item.first] =  item.second;
                      break;
                   case operation::tag<comment_operation>::value:
                   //   eacnt.post_history[item.first] =  item.second;
-                     break;
-                  case operation::tag<limit_order_create_operation>::value:
-                  case operation::tag<limit_order_cancel_operation>::value:
-                  //   eacnt.market_history[item.first] =  item.second;
                      break;
                   case operation::tag<vote_operation>::value:
                   case operation::tag<account_witness_vote_operation>::value:

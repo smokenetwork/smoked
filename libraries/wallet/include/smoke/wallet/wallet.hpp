@@ -819,28 +819,6 @@ class wallet_api
       vector<extended_limit_order>  get_open_orders( string accountname );
 
       /**
-       *  Creates a limit order at the price amount_to_sell / min_to_receive and will deduct amount_to_sell from account
-       *
-       *  @param owner The name of the account creating the order
-       *  @param order_id is a unique identifier assigned by the creator of the order, it can be reused after the order has been filled
-       *  @param amount_to_sell The amount of either SBD or SMOKE you wish to sell
-       *  @param min_to_receive The amount of the other asset you will receive at a minimum
-       *  @param fill_or_kill true if you want the order to be killed if it cannot immediately be filled
-       *  @param expiration the time the order should expire if it has not been filled
-       *  @param broadcast true if you wish to broadcast the transaction
-       */
-      annotated_signed_transaction create_order( string owner, uint32_t order_id, asset amount_to_sell, asset min_to_receive, bool fill_or_kill, uint32_t expiration, bool broadcast );
-
-      /**
-       * Cancel an order created with create_order
-       *
-       * @param owner The name of the account owning the order to cancel_order
-       * @param orderid The unique identifier assigned to the order by its creator
-       * @param broadcast true if you wish to broadcast the transaction
-       */
-      annotated_signed_transaction cancel_order( string owner, uint32_t orderid, bool broadcast );
-
-      /**
        *  Post or update a comment.
        *
        *  @param author the name of the account authoring the comment
@@ -1053,8 +1031,6 @@ FC_API( smoke::wallet::wallet_api,
         (publish_feed)
         (get_order_book)
         (get_open_orders)
-        (create_order)
-        (cancel_order)
         (post_comment)
         (vote)
         (set_transaction_expiration)

@@ -243,12 +243,6 @@ struct get_impacted_account_visitor
       _impacted.insert( op.owner );
    }
 
-   void operator()( const fill_order_operation& op )
-   {
-      _impacted.insert( op.current_owner );
-      _impacted.insert( op.open_owner );
-   }
-
    void operator()( const fill_transfer_from_savings_operation& op )
    {
       _impacted.insert( op.from );
