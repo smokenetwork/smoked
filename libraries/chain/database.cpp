@@ -399,16 +399,6 @@ const escrow_object* database::find_escrow( const account_name_type& name, uint3
    return find< escrow_object, by_from_id >( boost::make_tuple( name, escrow_id ) );
 }
 
-const savings_withdraw_object& database::get_savings_withdraw( const account_name_type& owner, uint32_t request_id )const
-{ try {
-   return get< savings_withdraw_object, by_from_rid >( boost::make_tuple( owner, request_id ) );
-} FC_CAPTURE_AND_RETHROW( (owner)(request_id) ) }
-
-const savings_withdraw_object* database::find_savings_withdraw( const account_name_type& owner, uint32_t request_id )const
-{
-   return find< savings_withdraw_object, by_from_rid >( boost::make_tuple( owner, request_id ) );
-}
-
 const dynamic_global_property_object&database::get_dynamic_global_properties() const
 { try {
    return get< dynamic_global_property_object >();
@@ -1181,22 +1171,10 @@ void database::clear_null_account_balance()
       adjust_balance( null_account, -null_account.balance );
    }
 
-   if( null_account.savings_balance.amount > 0 )
-   {
-      total_steem += null_account.savings_balance;
-      adjust_savings_balance( null_account, -null_account.savings_balance );
-   }
-
    if( null_account.sbd_balance.amount > 0 )
    {
       total_sbd += null_account.sbd_balance;
       adjust_balance( null_account, -null_account.sbd_balance );
-   }
-
-   if( null_account.savings_sbd_balance.amount > 0 )
-   {
-      total_sbd += null_account.savings_sbd_balance;
-      adjust_savings_balance( null_account, -null_account.savings_sbd_balance );
    }
 
    if( null_account.vesting_shares.amount > 0 )
@@ -2041,7 +2019,6 @@ void database::initialize_indexes()
    add_core_index< account_recovery_request_index          >(*this);
    add_core_index< change_recovery_account_request_index   >(*this);
    add_core_index< escrow_index                            >(*this);
-   add_core_index< savings_withdraw_index                  >(*this);
    add_core_index< decline_voting_rights_request_index     >(*this);
    add_core_index< reward_fund_index                       >(*this);
    add_core_index< vesting_delegation_index                >(*this);
@@ -3134,85 +3111,12 @@ void database::adjust_balance( const account_object& a, const asset& delta )
             acnt.balance += delta;
             break;
          case SBD_SYMBOL:
-            if( a.sbd_seconds_last_update != head_block_time() )
-            {
-               acnt.sbd_seconds += fc::uint128_t(a.sbd_balance.amount.value) * (head_block_time() - a.sbd_seconds_last_update).to_seconds();
-               acnt.sbd_seconds_last_update = head_block_time();
-
-               if( acnt.sbd_seconds > 0 &&
-                   (acnt.sbd_seconds_last_update - acnt.sbd_last_interest_payment).to_seconds() > SMOKE_SBD_INTEREST_COMPOUND_INTERVAL_SEC )
-               {
-                  auto interest = acnt.sbd_seconds / SMOKE_SECONDS_PER_YEAR;
-                  interest *= get_dynamic_global_properties().sbd_interest_rate;
-                  interest /= SMOKE_100_PERCENT;
-                  asset interest_paid(interest.to_uint64(), SBD_SYMBOL);
-                  acnt.sbd_balance += interest_paid;
-                  acnt.sbd_seconds = 0;
-                  acnt.sbd_last_interest_payment = head_block_time();
-
-                  if(interest > 0)
-                     push_virtual_operation( interest_operation( a.name, interest_paid ) );
-
-                  modify( get_dynamic_global_properties(), [&]( dynamic_global_property_object& props)
-                  {
-                     props.current_sbd_supply += interest_paid;
-                     props.virtual_supply += interest_paid * get_feed_history().current_median_history;
-                  } );
-               }
-            }
-            acnt.sbd_balance += delta;
             break;
          default:
             FC_ASSERT( false, "invalid symbol" );
       }
    } );
 }
-
-
-void database::adjust_savings_balance( const account_object& a, const asset& delta )
-{
-   modify( a, [&]( account_object& acnt )
-   {
-      switch( delta.symbol )
-      {
-         case SMOKE_SYMBOL:
-            acnt.savings_balance += delta;
-            break;
-         case SBD_SYMBOL:
-            if( a.savings_sbd_seconds_last_update != head_block_time() )
-            {
-               acnt.savings_sbd_seconds += fc::uint128_t(a.savings_sbd_balance.amount.value) * (head_block_time() - a.savings_sbd_seconds_last_update).to_seconds();
-               acnt.savings_sbd_seconds_last_update = head_block_time();
-
-               if( acnt.savings_sbd_seconds > 0 &&
-                   (acnt.savings_sbd_seconds_last_update - acnt.savings_sbd_last_interest_payment).to_seconds() > SMOKE_SBD_INTEREST_COMPOUND_INTERVAL_SEC )
-               {
-                  auto interest = acnt.savings_sbd_seconds / SMOKE_SECONDS_PER_YEAR;
-                  interest *= get_dynamic_global_properties().sbd_interest_rate;
-                  interest /= SMOKE_100_PERCENT;
-                  asset interest_paid(interest.to_uint64(), SBD_SYMBOL);
-                  acnt.savings_sbd_balance += interest_paid;
-                  acnt.savings_sbd_seconds = 0;
-                  acnt.savings_sbd_last_interest_payment = head_block_time();
-
-                  if(interest > 0)
-                     push_virtual_operation( interest_operation( a.name, interest_paid ) );
-
-                  modify( get_dynamic_global_properties(), [&]( dynamic_global_property_object& props)
-                  {
-                     props.current_sbd_supply += interest_paid;
-                     props.virtual_supply += interest_paid * get_feed_history().current_median_history;
-                  } );
-               }
-            }
-            acnt.savings_sbd_balance += delta;
-            break;
-         default:
-            FC_ASSERT( !"invalid symbol" );
-      }
-   } );
-}
-
 
 void database::adjust_reward_balance( const account_object& a, const asset& delta )
 {
@@ -3275,19 +3179,6 @@ asset database::get_balance( const account_object& a, asset_symbol_type symbol )
          return a.sbd_balance;
       default:
          FC_ASSERT( false, "invalid symbol" );
-   }
-}
-
-asset database::get_savings_balance( const account_object& a, asset_symbol_type symbol )const
-{
-   switch( symbol )
-   {
-      case SMOKE_SYMBOL:
-         return a.savings_balance;
-      case SBD_SYMBOL:
-         return a.savings_sbd_balance;
-      default:
-         FC_ASSERT( !"invalid symbol" );
    }
 }
 
@@ -3401,10 +3292,8 @@ void database::validate_invariants()const
      for( auto itr = account_idx.begin(); itr != account_idx.end(); ++itr )
      {
         total_supply += itr->balance;
-        total_supply += itr->savings_balance;
         total_supply += itr->reward_steem_balance;
         total_sbd += itr->sbd_balance;
-        total_sbd += itr->savings_sbd_balance;
         total_sbd += itr->reward_sbd_balance;
         total_vesting += itr->vesting_shares;
         total_vesting += itr->reward_vesting_balance;
@@ -3443,17 +3332,6 @@ void database::validate_invariants()const
            FC_ASSERT( false, "found escrow pending fee that is not SBD or SMOKE" );
      }
 
-     const auto& savings_withdraw_idx = get_index< savings_withdraw_index >().indices().get< by_id >();
-
-     for( auto itr = savings_withdraw_idx.begin(); itr != savings_withdraw_idx.end(); ++itr )
-     {
-        if( itr->amount.symbol == SMOKE_SYMBOL )
-           total_supply += itr->amount;
-        else if( itr->amount.symbol == SBD_SYMBOL )
-           total_sbd += itr->amount;
-        else
-           FC_ASSERT( false, "found savings withdraw that is not SBD or SMOKE" );
-     }
      fc::uint128_t total_rshares2;
 
      const auto& comment_idx = get_index< comment_index >().indices();

@@ -1654,87 +1654,6 @@ BOOST_AUTO_TEST_CASE( steem_inflation )
    FC_LOG_AND_RETHROW();
 }
 
-BOOST_AUTO_TEST_CASE( sbd_interest )
-{
-   try
-   {
-      ACTORS( (alice)(bob) )
-      generate_block();
-      vest( "alice", ASSET( "10.000 TESTS" ) );
-      vest( "bob", ASSET( "10.000 TESTS" ) );
-
-//      set_price_feed( price( asset::from_string( "1.000 TESTS" ), asset::from_string( "1.000 TBD" ) ) );
-
-      BOOST_TEST_MESSAGE( "Testing interest over smallest interest period" );
-
-      convert_operation op;
-      signed_transaction tx;
-
-      fund( "alice", ASSET( "31.903 TBD" ) );
-
-      auto start_time = db.get_account( "alice" ).sbd_seconds_last_update;
-      auto alice_sbd = db.get_account( "alice" ).sbd_balance;
-
-      generate_blocks( db.head_block_time() + fc::seconds( SMOKE_SBD_INTEREST_COMPOUND_INTERVAL_SEC ), true );
-
-      transfer_operation transfer;
-      transfer.to = "bob";
-      transfer.from = "alice";
-      transfer.amount = ASSET( "1.000 TBD" );
-      tx.operations.clear();
-      tx.signatures.clear();
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.operations.push_back( transfer );
-      tx.sign( alice_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      auto gpo = db.get_dynamic_global_properties();
-      auto interest_op = get_last_operations( 1 )[0].get< interest_operation >();
-
-      BOOST_REQUIRE( gpo.sbd_interest_rate > 0 );
-      BOOST_REQUIRE( db.get_account( "alice" ).sbd_balance.amount.value == alice_sbd.amount.value - ASSET( "1.000 TBD" ).amount.value + ( ( ( ( uint128_t( alice_sbd.amount.value ) * ( db.head_block_time() - start_time ).to_seconds() ) / SMOKE_SECONDS_PER_YEAR ) * gpo.sbd_interest_rate ) / SMOKE_100_PERCENT ).to_uint64() );
-      BOOST_REQUIRE( interest_op.owner == "alice" );
-      BOOST_REQUIRE( interest_op.interest.amount.value == db.get_account( "alice" ).sbd_balance.amount.value - ( alice_sbd.amount.value - ASSET( "1.000 TBD" ).amount.value ) );
-      validate_database();
-
-      BOOST_TEST_MESSAGE( "Testing interest under interest period" );
-
-      start_time = db.get_account( "alice" ).sbd_seconds_last_update;
-      alice_sbd = db.get_account( "alice" ).sbd_balance;
-
-      generate_blocks( db.head_block_time() + fc::seconds( SMOKE_SBD_INTEREST_COMPOUND_INTERVAL_SEC / 2 ), true );
-
-      tx.operations.clear();
-      tx.signatures.clear();
-      tx.operations.push_back( transfer );
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.sign( alice_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      BOOST_REQUIRE( db.get_account( "alice" ).sbd_balance.amount.value == alice_sbd.amount.value - ASSET( "1.000 TBD" ).amount.value );
-      validate_database();
-
-      auto alice_coindays = uint128_t( alice_sbd.amount.value ) * ( db.head_block_time() - start_time ).to_seconds();
-      alice_sbd = db.get_account( "alice" ).sbd_balance;
-      start_time = db.get_account( "alice" ).sbd_seconds_last_update;
-
-      BOOST_TEST_MESSAGE( "Testing longer interest period" );
-
-      generate_blocks( db.head_block_time() + fc::seconds( ( SMOKE_SBD_INTEREST_COMPOUND_INTERVAL_SEC * 7 ) / 3 ), true );
-
-      tx.operations.clear();
-      tx.signatures.clear();
-      tx.operations.push_back( transfer );
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.sign( alice_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      BOOST_REQUIRE( db.get_account( "alice" ).sbd_balance.amount.value == alice_sbd.amount.value - ASSET( "1.000 TBD" ).amount.value + ( ( ( ( uint128_t( alice_sbd.amount.value ) * ( db.head_block_time() - start_time ).to_seconds() + alice_coindays ) / SMOKE_SECONDS_PER_YEAR ) * gpo.sbd_interest_rate ) / SMOKE_100_PERCENT ).to_uint64() );
-      validate_database();
-   }
-   FC_LOG_AND_RETHROW();
-}
-
 BOOST_AUTO_TEST_CASE( liquidity_rewards )
 {
    using std::abs;
@@ -2569,8 +2488,6 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).balance == ASSET( "1.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).sbd_balance == ASSET( "2.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).vesting_shares > ASSET( "0.000000 VESTS" ) );
-      BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).savings_balance == ASSET( "4.000 TESTS" ) );
-      BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).savings_sbd_balance == ASSET( "5.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_sbd_balance == ASSET( "1.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_steem_balance == ASSET( "1.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_balance == ASSET( "1.000000 VESTS" ) );
@@ -2585,8 +2502,6 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).balance == ASSET( "0.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).sbd_balance == ASSET( "0.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).vesting_shares == ASSET( "0.000000 VESTS" ) );
-      BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).savings_balance == ASSET( "0.000 TESTS" ) );
-      BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).savings_sbd_balance == ASSET( "0.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_sbd_balance == ASSET( "0.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_steem_balance == ASSET( "0.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_balance == ASSET( "0.000000 VESTS" ) );
