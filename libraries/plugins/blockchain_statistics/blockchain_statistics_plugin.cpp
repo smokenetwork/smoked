@@ -60,14 +60,6 @@ struct operation_process
       });
    }
 
-   void operator()( const interest_operation& op )const
-   {
-      _db.modify( _bucket, [&]( bucket_object& b )
-      {
-         b.sbd_paid_as_interest += op.interest.amount;
-      });
-   }
-
    void operator()( const account_create_operation& op )const
    {
       _db.modify( _bucket, [&]( bucket_object& b )
