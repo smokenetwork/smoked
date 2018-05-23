@@ -328,29 +328,6 @@ struct account_history_api_obj
 
 };
 
-struct savings_withdraw_api_obj
-{
-   savings_withdraw_api_obj( const chain::savings_withdraw_object& o ) :
-      id( o.id ),
-      from( o.from ),
-      to( o.to ),
-      memo( to_string( o.memo ) ),
-      request_id( o.request_id ),
-      amount( o.amount ),
-      complete( o.complete )
-   {}
-
-   savings_withdraw_api_obj() {}
-
-   savings_withdraw_id_type   id;
-   account_name_type          from;
-   account_name_type          to;
-   string                     memo;
-   uint32_t                   request_id = 0;
-   asset                      amount;
-   time_point_sec             complete;
-};
-
 struct feed_history_api_obj
 {
    feed_history_api_obj( const chain::feed_history_object& f ) :
@@ -503,16 +480,6 @@ FC_REFLECT( smoke::app::account_recovery_request_api_obj,
              (account_to_recover)
              (new_owner_authority)
              (expires)
-          )
-
-FC_REFLECT( smoke::app::savings_withdraw_api_obj,
-             (id)
-             (from)
-             (to)
-             (memo)
-             (request_id)
-             (amount)
-             (complete)
           )
 
 FC_REFLECT( smoke::app::feed_history_api_obj,

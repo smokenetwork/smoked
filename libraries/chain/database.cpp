@@ -399,16 +399,6 @@ const escrow_object* database::find_escrow( const account_name_type& name, uint3
    return find< escrow_object, by_from_id >( boost::make_tuple( name, escrow_id ) );
 }
 
-const savings_withdraw_object& database::get_savings_withdraw( const account_name_type& owner, uint32_t request_id )const
-{ try {
-   return get< savings_withdraw_object, by_from_rid >( boost::make_tuple( owner, request_id ) );
-} FC_CAPTURE_AND_RETHROW( (owner)(request_id) ) }
-
-const savings_withdraw_object* database::find_savings_withdraw( const account_name_type& owner, uint32_t request_id )const
-{
-   return find< savings_withdraw_object, by_from_rid >( boost::make_tuple( owner, request_id ) );
-}
-
 const dynamic_global_property_object&database::get_dynamic_global_properties() const
 { try {
    return get< dynamic_global_property_object >();
@@ -2029,7 +2019,6 @@ void database::initialize_indexes()
    add_core_index< account_recovery_request_index          >(*this);
    add_core_index< change_recovery_account_request_index   >(*this);
    add_core_index< escrow_index                            >(*this);
-   add_core_index< savings_withdraw_index                  >(*this);
    add_core_index< decline_voting_rights_request_index     >(*this);
    add_core_index< reward_fund_index                       >(*this);
    add_core_index< vesting_delegation_index                >(*this);
@@ -3343,17 +3332,6 @@ void database::validate_invariants()const
            FC_ASSERT( false, "found escrow pending fee that is not SBD or SMOKE" );
      }
 
-     const auto& savings_withdraw_idx = get_index< savings_withdraw_index >().indices().get< by_id >();
-
-     for( auto itr = savings_withdraw_idx.begin(); itr != savings_withdraw_idx.end(); ++itr )
-     {
-        if( itr->amount.symbol == SMOKE_SYMBOL )
-           total_supply += itr->amount;
-        else if( itr->amount.symbol == SBD_SYMBOL )
-           total_sbd += itr->amount;
-        else
-           FC_ASSERT( false, "found savings withdraw that is not SBD or SMOKE" );
-     }
      fc::uint128_t total_rshares2;
 
      const auto& comment_idx = get_index< comment_index >().indices();
