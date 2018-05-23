@@ -1772,65 +1772,6 @@ asset database::get_liquidity_reward()const
    return asset( 0, SMOKE_SYMBOL );
 }
 
-asset database::get_content_reward()const
-{
-   const auto& props = get_dynamic_global_properties();
-   static_assert( SMOKE_BLOCK_INTERVAL == 3, "this code assumes a 3-second time interval" );
-   asset percent( protocol::calc_percent_reward_per_block< SMOKE_CONTENT_APR_PERCENT >( props.virtual_supply.amount ), SMOKE_SYMBOL );
-   return std::max( percent, SMOKE_MIN_CONTENT_REWARD );
-}
-
-asset database::get_curation_reward()const
-{
-   const auto& props = get_dynamic_global_properties();
-   static_assert( SMOKE_BLOCK_INTERVAL == 3, "this code assumes a 3-second time interval" );
-   asset percent( protocol::calc_percent_reward_per_block< SMOKE_CURATE_APR_PERCENT >( props.virtual_supply.amount ), SMOKE_SYMBOL);
-   return std::max( percent, SMOKE_MIN_CURATE_REWARD );
-}
-
-asset database::get_producer_reward()
-{
-   const auto& props = get_dynamic_global_properties();
-   static_assert( SMOKE_BLOCK_INTERVAL == 3, "this code assumes a 3-second time interval" );
-   asset percent( protocol::calc_percent_reward_per_block< SMOKE_PRODUCER_APR_PERCENT >( props.virtual_supply.amount ), SMOKE_SYMBOL);
-   auto pay = std::max( percent, SMOKE_MIN_PRODUCER_REWARD );
-   const auto& witness_account = get_account( props.current_witness );
-
-   /// pay witness in vesting shares
-   if( props.head_block_number >= SMOKE_START_MINER_VOTING_BLOCK || (witness_account.vesting_shares.amount.value == 0) ) {
-      // const auto& witness_obj = get_witness( props.current_witness );
-      const auto& producer_reward = create_vesting( witness_account, pay );
-      push_virtual_operation( producer_reward_operation( witness_account.name, producer_reward ) );
-   }
-   else
-   {
-      modify( get_account( witness_account.name), [&]( account_object& a )
-      {
-         a.balance += pay;
-      } );
-   }
-
-   return pay;
-}
-
-asset database::get_pow_reward()const
-{
-   const auto& props = get_dynamic_global_properties();
-
-#ifndef IS_TEST_NET
-   /// 0 block rewards until at least SMOKE_MAX_WITNESSES have produced a POW
-   if( props.num_pow_witnesses < SMOKE_MAX_WITNESSES && props.head_block_number < SMOKE_START_VESTING_BLOCK )
-      return asset( 0, SMOKE_SYMBOL );
-#endif
-
-   static_assert( SMOKE_BLOCK_INTERVAL == 3, "this code assumes a 3-second time interval" );
-// tuanpa - temporary for private testnet only
-//   static_assert( SMOKE_MAX_WITNESSES == 21, "this code assumes 21 per round" );
-   asset percent( calc_percent_reward_per_round< SMOKE_POW_APR_PERCENT >( props.virtual_supply.amount ), SMOKE_SYMBOL);
-   return std::max( percent, SMOKE_MIN_POW_REWARD );
-}
-
-
 void database::pay_liquidity_reward()
 {
 #ifdef IS_TEST_NET

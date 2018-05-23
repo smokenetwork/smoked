@@ -3282,15 +3282,6 @@ BOOST_AUTO_TEST_CASE( pow_authorities )
    FC_LOG_AND_RETHROW()
 }
 
-BOOST_AUTO_TEST_CASE( pow_apply )
-{
-   try
-   {
-      BOOST_TEST_MESSAGE( "Testing: pow_apply" );
-   }
-   FC_LOG_AND_RETHROW()
-}
-
 BOOST_AUTO_TEST_CASE( account_recovery )
 {
    try
