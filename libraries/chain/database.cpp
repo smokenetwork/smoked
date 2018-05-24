@@ -1652,7 +1652,6 @@ void database::process_funds()
   {
       p.total_vesting_fund_steem += asset( vesting_reward, SMOKE_SYMBOL );
       p.current_supply           += asset( new_steem, SMOKE_SYMBOL );
-      p.virtual_supply           += asset( new_steem, SMOKE_SYMBOL );
   });
 
   const auto& producer_reward = create_vesting( get_account( cwit.owner ), asset( witness_reward, SMOKE_SYMBOL ) );
@@ -2067,7 +2066,6 @@ void database::init_genesis( uint64_t init_supply )
          p.participation_count = 128;
          p.current_supply = asset( init_supply, SMOKE_SYMBOL );
          p.current_sbd_supply = asset( 0, SBD_SYMBOL );
-         p.virtual_supply = p.current_supply;
          p.maximum_block_size = SMOKE_MAX_BLOCK_SIZE;
       } );
 
@@ -2550,14 +2548,11 @@ void database::_apply_block( const signed_block& next_block )
    clear_expired_delegations();
    update_witness_schedule(*this);
 
-   update_virtual_supply();
-
    clear_null_account_balance();
    process_funds();
    process_comment_cashout();
    process_vesting_withdrawals();
    pay_liquidity_reward();
-   update_virtual_supply();
 
    account_recovery_processing();
    expire_escrow_ratification();
@@ -2800,13 +2795,6 @@ void database::update_global_dynamic_data( const signed_block& b )
    }
 } FC_CAPTURE_AND_RETHROW() }
 
-void database::update_virtual_supply()
-{ try {
-     modify( get_dynamic_global_properties(), [&]( dynamic_global_property_object& dgp )
-     {
-         dgp.virtual_supply = dgp.current_supply;
-     });
-  } FC_CAPTURE_AND_RETHROW() }
 
 void database::update_signing_witness(const witness_object& signing_witness, const signed_block& new_block)
 { try {
@@ -3018,14 +3006,12 @@ void database::adjust_supply( const asset& delta, bool adjust_vesting )
          {
             asset new_vesting( (adjust_vesting && delta.amount > 0) ? delta.amount * 9 : 0, SMOKE_SYMBOL );
             props.current_supply += delta + new_vesting;
-            props.virtual_supply += delta + new_vesting;
             props.total_vesting_fund_steem += new_vesting;
             assert( props.current_supply.amount.value >= 0 );
             break;
          }
          case SBD_SYMBOL:
 //            props.current_sbd_supply += delta;
-//            props.virtual_supply = props.current_sbd_supply * get_feed_history().current_median_history + props.current_supply;
 //            assert( props.current_sbd_supply.amount.value >= 0 );
             break;
          default:
@@ -3213,7 +3199,6 @@ void database::validate_invariants()const
      FC_ASSERT( gpo.total_vesting_shares + gpo.pending_rewarded_vesting_shares == total_vesting, "", ("gpo.total_vesting_shares",gpo.total_vesting_shares)("total_vesting",total_vesting) );
      FC_ASSERT( gpo.total_vesting_shares.amount == total_vsf_votes, "", ("total_vesting_shares",gpo.total_vesting_shares)("total_vsf_votes",total_vsf_votes) );
      FC_ASSERT( gpo.pending_rewarded_vesting_steem == pending_vesting_steem, "", ("pending_rewarded_vesting_steem",gpo.pending_rewarded_vesting_steem)("pending_vesting_steem", pending_vesting_steem));
-     FC_ASSERT( gpo.virtual_supply >= gpo.current_supply );
   }
   FC_CAPTURE_LOG_AND_RETHROW( (head_block_num()) );
 }

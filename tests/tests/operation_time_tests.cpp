@@ -1418,7 +1418,6 @@ BOOST_AUTO_TEST_CASE( steem_inflation )
       BOOST_TEST_MESSAGE( "Testing SMOKE Inflation until the vesting start block" );
 
       auto gpo = db.get_dynamic_global_properties();
-      auto virtual_supply = gpo.virtual_supply;
       auto witness_name = db.get_scheduled_witness(1);
       auto old_witness_balance = db.get_account( witness_name ).balance;
       auto old_witness_shares = db.get_account( witness_name ).vesting_shares;
@@ -2370,7 +2369,6 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
          db.modify( db.get_dynamic_global_properties(), [&]( dynamic_global_property_object& gpo )
          {
             gpo.current_supply += ASSET( "2.000 TESTS" );
-            gpo.virtual_supply += ASSET( "3.000 TESTS" );
             gpo.current_sbd_supply += ASSET( "1.000 TBD" );
             gpo.pending_rewarded_vesting_shares += ASSET( "1.000000 VESTS" );
             gpo.pending_rewarded_vesting_steem += ASSET( "1.000 TESTS" );

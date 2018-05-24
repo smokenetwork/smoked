@@ -43,7 +43,6 @@ namespace smoke { namespace chain {
           */
          uint32_t num_pow_witnesses = 0;
 
-         asset       virtual_supply             = asset( 0, SMOKE_SYMBOL );
          asset       current_supply             = asset( 0, SMOKE_SYMBOL );
          asset       confidential_supply        = asset( 0, SMOKE_SYMBOL ); ///< total asset held in confidential balances
          asset       current_sbd_supply         = asset( 0, SBD_SYMBOL );
@@ -119,7 +118,6 @@ FC_REFLECT( smoke::chain::dynamic_global_property_object,
              (time)
              (current_witness)
              (num_pow_witnesses)
-             (virtual_supply)
              (current_supply)
              (confidential_supply)
              (current_sbd_supply)

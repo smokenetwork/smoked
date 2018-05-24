@@ -346,7 +346,6 @@ void database_fixture::fund(
                gpo.current_sbd_supply += amount;
          });
 
-         db.update_virtual_supply();
       }, default_skip );
    }
    FC_CAPTURE_AND_RETHROW( (account_name)(amount) )
@@ -403,7 +402,6 @@ void database_fixture::vest( const string& account, const asset& amount )
 
       db.create_vesting( db.get_account( account ), amount );
 
-      db.update_virtual_supply();
    }, default_skip );
 }
 
