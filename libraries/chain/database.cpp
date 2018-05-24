@@ -2579,7 +2579,6 @@ void database::_apply_block( const signed_block& next_block )
 
    clear_null_account_balance();
    process_funds();
-   process_conversions();
    process_comment_cashout();
    process_vesting_withdrawals();
    pay_liquidity_reward();
