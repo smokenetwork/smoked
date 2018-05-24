@@ -17,29 +17,6 @@ namespace smoke { namespace chain {
 
    typedef protocol::fixed_string_16 reward_fund_name_type;
 
-   /**
-    *  This object is used to track pending requests to convert sbd to steem
-    */
-   class convert_request_object : public object< convert_request_object_type, convert_request_object >
-   {
-      public:
-         template< typename Constructor, typename Allocator >
-         convert_request_object( Constructor&& c, allocator< Allocator > a )
-         {
-            c( *this );
-         }
-
-         convert_request_object(){}
-
-         id_type           id;
-
-         account_name_type owner;
-         uint32_t          requestid = 0; ///< id set by owner, the owner,requestid pair must be unique
-         asset             amount;
-         time_point_sec    conversion_date; ///< at this time the feed_history_median_price * amount
-   };
-
-
    class escrow_object : public object< escrow_object_type, escrow_object >
    {
       public:
@@ -69,30 +46,6 @@ namespace smoke { namespace chain {
          bool              is_approved()const { return to_approved && agent_approved; }
    };
 
-
-   class savings_withdraw_object : public object< savings_withdraw_object_type, savings_withdraw_object >
-   {
-      savings_withdraw_object() = delete;
-
-      public:
-         template< typename Constructor, typename Allocator >
-         savings_withdraw_object( Constructor&& c, allocator< Allocator > a )
-            :memo( a )
-         {
-            c( *this );
-         }
-
-         id_type           id;
-
-         account_name_type from;
-         account_name_type to;
-         shared_string     memo;
-         uint32_t          request_id = 0;
-         asset             amount;
-         time_point_sec    complete;
-   };
-
-
    /**
     *  If last_update is greater than 1 week, then volume gets reset to 0
     *
@@ -100,7 +53,7 @@ namespace smoke { namespace chain {
     *  When a user is a taker, their volume decreases
     *
     *  Every 1000 blocks, the account that has the highest volume_weight() is paid the maximum of
-    *  1000 STEEM or 1000 * virtual_supply / (100*blocks_per_year) aka 10 * virtual_supply / blocks_per_year
+    *  1000 SMOKE or 1000 * virtual_supply / (100*blocks_per_year) aka 10 * virtual_supply / blocks_per_year
     *
     *  After being paid volume gets reset to 0
     */
@@ -145,69 +98,6 @@ namespace smoke { namespace chain {
             return ( steem_volume > 0 && sbd_volume > 0 ) ? 1 : 0;
          }
    };
-
-
-   /**
-    *  This object gets updated once per hour, on the hour
-    */
-   class feed_history_object  : public object< feed_history_object_type, feed_history_object >
-   {
-      feed_history_object() = delete;
-
-      public:
-         template< typename Constructor, typename Allocator >
-         feed_history_object( Constructor&& c, allocator< Allocator > a )
-            :price_history( a.get_segment_manager() )
-         {
-            c( *this );
-         }
-
-         id_type                                   id;
-
-         price                                     current_median_history; ///< the current median of the price history, used as the base for convert operations
-         bip::deque< price, allocator< price > >   price_history; ///< tracks this last week of median_feed one per hour
-   };
-
-
-   /**
-    *  @brief an offer to sell a amount of a asset at a specified exchange rate by a certain time
-    *  @ingroup object
-    *  @ingroup protocol
-    *  @ingroup market
-    *
-    *  This limit_order_objects are indexed by @ref expiration and is automatically deleted on the first block after expiration.
-    */
-   class limit_order_object : public object< limit_order_object_type, limit_order_object >
-   {
-      public:
-         template< typename Constructor, typename Allocator >
-         limit_order_object( Constructor&& c, allocator< Allocator > a )
-         {
-            c( *this );
-         }
-
-         limit_order_object(){}
-
-         id_type           id;
-
-         time_point_sec    created;
-         time_point_sec    expiration;
-         account_name_type seller;
-         uint32_t          orderid = 0;
-         share_type        for_sale; ///< asset id is sell_price.base.symbol
-         price             sell_price;
-
-         pair< asset_symbol_type, asset_symbol_type > get_market()const
-         {
-            return sell_price.base.symbol < sell_price.quote.symbol ?
-                std::make_pair( sell_price.base.symbol, sell_price.quote.symbol ) :
-                std::make_pair( sell_price.quote.symbol, sell_price.base.symbol );
-         }
-
-         asset amount_for_sale()const   { return asset( for_sale, sell_price.base.symbol ); }
-         asset amount_to_receive()const { return amount_for_sale() * sell_price; }
-   };
-
 
    /**
     * @breif a route to send withdrawn vesting shares.
@@ -270,7 +160,7 @@ namespace smoke { namespace chain {
 
          reward_fund_id_type     id;
          reward_fund_name_type   name;
-         asset                   reward_balance = asset( 0, STEEM_SYMBOL );
+         asset                   reward_balance = asset( 0, SMOKE_SYMBOL );
          fc::uint128_t           recent_claims = 0;
          time_point_sec          last_update;
          uint128_t               content_constant = 0;
@@ -280,56 +170,9 @@ namespace smoke { namespace chain {
          curve_id                curation_reward_curve = square_root;
    };
 
-   struct by_price;
-   struct by_expiration;
-   struct by_account;
-   typedef multi_index_container<
-      limit_order_object,
-      indexed_by<
-         ordered_unique< tag< by_id >, member< limit_order_object, limit_order_id_type, &limit_order_object::id > >,
-         ordered_non_unique< tag< by_expiration >, member< limit_order_object, time_point_sec, &limit_order_object::expiration > >,
-         ordered_unique< tag< by_price >,
-            composite_key< limit_order_object,
-               member< limit_order_object, price, &limit_order_object::sell_price >,
-               member< limit_order_object, limit_order_id_type, &limit_order_object::id >
-            >,
-            composite_key_compare< std::greater< price >, std::less< limit_order_id_type > >
-         >,
-         ordered_unique< tag< by_account >,
-            composite_key< limit_order_object,
-               member< limit_order_object, account_name_type, &limit_order_object::seller >,
-               member< limit_order_object, uint32_t, &limit_order_object::orderid >
-            >
-         >
-      >,
-      allocator< limit_order_object >
-   > limit_order_index;
-
-   struct by_owner;
-   struct by_conversion_date;
-   typedef multi_index_container<
-      convert_request_object,
-      indexed_by<
-         ordered_unique< tag< by_id >, member< convert_request_object, convert_request_id_type, &convert_request_object::id > >,
-         ordered_unique< tag< by_conversion_date >,
-            composite_key< convert_request_object,
-               member< convert_request_object, time_point_sec, &convert_request_object::conversion_date >,
-               member< convert_request_object, convert_request_id_type, &convert_request_object::id >
-            >
-         >,
-         ordered_unique< tag< by_owner >,
-            composite_key< convert_request_object,
-               member< convert_request_object, account_name_type, &convert_request_object::owner >,
-               member< convert_request_object, uint32_t, &convert_request_object::requestid >
-            >
-         >
-      >,
-      allocator< convert_request_object >
-   > convert_request_index;
 
    struct by_owner;
    struct by_volume_weight;
-
    typedef multi_index_container<
       liquidity_reward_balance_object,
       indexed_by<
@@ -346,13 +189,6 @@ namespace smoke { namespace chain {
       allocator< liquidity_reward_balance_object >
    > liquidity_reward_balance_index;
 
-   typedef multi_index_container<
-      feed_history_object,
-      indexed_by<
-         ordered_unique< tag< by_id >, member< feed_history_object, feed_history_id_type, &feed_history_object::id > >
-      >,
-      allocator< feed_history_object >
-   > feed_history_index;
 
    struct by_withdraw_route;
    struct by_destination;
@@ -423,36 +259,6 @@ namespace smoke { namespace chain {
       allocator< escrow_object >
    > escrow_index;
 
-   struct by_from_rid;
-   struct by_to_complete;
-   struct by_complete_from_rid;
-   typedef multi_index_container<
-      savings_withdraw_object,
-      indexed_by<
-         ordered_unique< tag< by_id >, member< savings_withdraw_object, savings_withdraw_id_type, &savings_withdraw_object::id > >,
-         ordered_unique< tag< by_from_rid >,
-            composite_key< savings_withdraw_object,
-               member< savings_withdraw_object, account_name_type,  &savings_withdraw_object::from >,
-               member< savings_withdraw_object, uint32_t, &savings_withdraw_object::request_id >
-            >
-         >,
-         ordered_unique< tag< by_to_complete >,
-            composite_key< savings_withdraw_object,
-               member< savings_withdraw_object, account_name_type,  &savings_withdraw_object::to >,
-               member< savings_withdraw_object, time_point_sec,  &savings_withdraw_object::complete >,
-               member< savings_withdraw_object, savings_withdraw_id_type, &savings_withdraw_object::id >
-            >
-         >,
-         ordered_unique< tag< by_complete_from_rid >,
-            composite_key< savings_withdraw_object,
-               member< savings_withdraw_object, time_point_sec,  &savings_withdraw_object::complete >,
-               member< savings_withdraw_object, account_name_type,  &savings_withdraw_object::from >,
-               member< savings_withdraw_object, uint32_t, &savings_withdraw_object::request_id >
-            >
-         >
-      >,
-      allocator< savings_withdraw_object >
-   > savings_withdraw_index;
 
    struct by_account;
    struct by_effective_date;
@@ -492,17 +298,6 @@ namespace smoke { namespace chain {
 FC_REFLECT_ENUM( smoke::chain::curve_id,
                   (quadratic)(quadratic_curation)(linear)(square_root))
 
-FC_REFLECT( smoke::chain::limit_order_object,
-             (id)(created)(expiration)(seller)(orderid)(for_sale)(sell_price) )
-CHAINBASE_SET_INDEX_TYPE( smoke::chain::limit_order_object, smoke::chain::limit_order_index )
-
-FC_REFLECT( smoke::chain::feed_history_object,
-             (id)(current_median_history)(price_history) )
-CHAINBASE_SET_INDEX_TYPE( smoke::chain::feed_history_object, smoke::chain::feed_history_index )
-
-FC_REFLECT( smoke::chain::convert_request_object,
-             (id)(owner)(requestid)(amount)(conversion_date) )
-CHAINBASE_SET_INDEX_TYPE( smoke::chain::convert_request_object, smoke::chain::convert_request_index )
 
 FC_REFLECT( smoke::chain::liquidity_reward_balance_object,
              (id)(owner)(steem_volume)(sbd_volume)(weight)(last_update) )
@@ -512,9 +307,6 @@ FC_REFLECT( smoke::chain::withdraw_vesting_route_object,
              (id)(from_account)(to_account)(percent)(auto_vest) )
 CHAINBASE_SET_INDEX_TYPE( smoke::chain::withdraw_vesting_route_object, smoke::chain::withdraw_vesting_route_index )
 
-FC_REFLECT( smoke::chain::savings_withdraw_object,
-             (id)(from)(to)(memo)(request_id)(amount)(complete) )
-CHAINBASE_SET_INDEX_TYPE( smoke::chain::savings_withdraw_object, smoke::chain::savings_withdraw_index )
 
 FC_REFLECT( smoke::chain::escrow_object,
              (id)(escrow_id)(from)(to)(agent)

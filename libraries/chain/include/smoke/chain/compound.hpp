@@ -28,22 +28,4 @@ share_type calc_percent_reward( share_type current_supply )
    return reward.to_uint64();
 }
 
-template< uint16_t percent >
-inline share_type calc_percent_reward_per_hour( share_type current_supply )
-{
-   return calc_percent_reward< percent, SMOKE_APR_PERCENT_MULTIPLY_PER_HOUR, SMOKE_APR_PERCENT_SHIFT_PER_HOUR >( current_supply );
-}
-
-template< uint16_t percent >
-inline share_type calc_percent_reward_per_block( share_type current_supply )
-{
-   return calc_percent_reward< percent, SMOKE_APR_PERCENT_MULTIPLY_PER_BLOCK, SMOKE_APR_PERCENT_SHIFT_PER_BLOCK >( current_supply );
-}
-
-template< uint16_t percent >
-inline share_type calc_percent_reward_per_round( share_type current_supply )
-{
-   return calc_percent_reward< percent, SMOKE_APR_PERCENT_MULTIPLY_PER_ROUND, SMOKE_APR_PERCENT_SHIFT_PER_ROUND >( current_supply );
-}
-
 } }

@@ -142,34 +142,6 @@ struct get_impacted_account_visitor
       _impacted.insert( op.proxy );
    }
 
-   void operator()( const feed_publish_operation& op )
-   {
-      _impacted.insert( op.publisher );
-   }
-
-   void operator()( const pow_operation& op )
-   {
-      _impacted.insert( op.worker_account );
-   }
-
-   struct pow2_impacted_visitor
-   {
-      pow2_impacted_visitor(){}
-
-      typedef const account_name_type& result_type;
-
-      template< typename WorkType >
-      result_type operator()( const WorkType& work )const
-      {
-         return work.input.worker_account;
-      }
-   };
-
-   void operator()( const pow2_operation& op )
-   {
-      _impacted.insert( op.work.visit( pow2_impacted_visitor() ) );
-   }
-
    void operator()( const request_account_recovery_operation& op )
    {
       _impacted.insert( op.account_to_recover );
@@ -184,18 +156,6 @@ struct get_impacted_account_visitor
    void operator()( const change_recovery_account_operation& op )
    {
       _impacted.insert( op.account_to_recover );
-   }
-
-   void operator()( const transfer_to_savings_operation& op )
-   {
-      _impacted.insert( op.from );
-      _impacted.insert( op.to );
-   }
-
-   void operator()( const transfer_from_savings_operation& op )
-   {
-      _impacted.insert( op.from );
-      _impacted.insert( op.to );
    }
 
    void operator()( const delegate_vesting_shares_operation& op )
@@ -222,16 +182,6 @@ struct get_impacted_account_visitor
       _impacted.insert( op.owner );
    }
 
-   void operator()( const interest_operation& op )
-   {
-      _impacted.insert( op.owner );
-   }
-
-   void operator()( const fill_convert_request_operation& op )
-   {
-      _impacted.insert( op.owner );
-   }
-
    void operator()( const fill_vesting_withdraw_operation& op )
    {
       _impacted.insert( op.from_account );
@@ -241,18 +191,6 @@ struct get_impacted_account_visitor
    void operator()( const shutdown_witness_operation& op )
    {
       _impacted.insert( op.owner );
-   }
-
-   void operator()( const fill_order_operation& op )
-   {
-      _impacted.insert( op.current_owner );
-      _impacted.insert( op.open_owner );
-   }
-
-   void operator()( const fill_transfer_from_savings_operation& op )
-   {
-      _impacted.insert( op.from );
-      _impacted.insert( op.to );
    }
 
    void operator()( const return_vesting_delegation_operation& op )

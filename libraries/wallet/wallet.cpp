@@ -295,7 +295,6 @@ public:
                                                                           time_point_sec(time_point::now()),
                                                                           " old");
       result["participation"] = (100*dynamic_props.recent_slots_filled.popcount()) / 128.0;
-      result["median_sbd_price"] = _remote_db->get_current_median_history_price();
       result["account_creation_fee"] = _remote_db->get_chain_properties().account_creation_fee;
       result["post_reward_fund"] = fc::variant(_remote_db->get_reward_fund( SMOKE_POST_REWARD_FUND_NAME )).get_object();
       return result;
@@ -765,84 +764,6 @@ public:
          }
          return ss.str();
       };
-      m["get_open_orders"] = []( variant result, const fc::variants& a ) {
-          auto orders = result.as<vector<extended_limit_order>>();
-
-          std::stringstream ss;
-
-          ss << setiosflags( ios::fixed ) << setiosflags( ios::left ) ;
-          ss << ' ' << setw( 10 ) << "Order #";
-          ss << ' ' << setw( 10 ) << "Price";
-          ss << ' ' << setw( 10 ) << "Quantity";
-          ss << ' ' << setw( 10 ) << "Type";
-          ss << "\n=====================================================================================================\n";
-          for( const auto& o : orders ) {
-             ss << ' ' << setw( 10 ) << o.orderid;
-             ss << ' ' << setw( 10 ) << o.real_price;
-             ss << ' ' << setw( 10 ) << fc::variant( asset( o.for_sale, o.sell_price.base.symbol ) ).as_string();
-             ss << ' ' << setw( 10 ) << (o.sell_price.base.symbol == STEEM_SYMBOL ? "SELL" : "BUY");
-             ss << "\n";
-          }
-          return ss.str();
-      };
-      m["get_order_book"] = []( variant result, const fc::variants& a ) {
-         auto orders = result.as< order_book >();
-         std::stringstream ss;
-         asset bid_sum = asset( 0, SBD_SYMBOL );
-         asset ask_sum = asset( 0, SBD_SYMBOL );
-         int spacing = 24;
-
-         ss << setiosflags( ios::fixed ) << setiosflags( ios::left ) ;
-
-         ss << ' ' << setw( ( spacing * 4 ) + 6 ) << "Bids" << "Asks\n"
-            << ' '
-            << setw( spacing + 3 ) << "Sum(SBD)"
-            << setw( spacing + 1) << "SBD"
-            << setw( spacing + 1 ) << "STEEM"
-            << setw( spacing + 1 ) << "Price"
-            << setw( spacing + 1 ) << "Price"
-            << setw( spacing + 1 ) << "STEEM "
-            << setw( spacing + 1 ) << "SBD " << "Sum(SBD)"
-            << "\n====================================================================================================="
-            << "|=====================================================================================================\n";
-
-         for( size_t i = 0; i < orders.bids.size() || i < orders.asks.size(); i++ )
-         {
-            if ( i < orders.bids.size() )
-            {
-               bid_sum += asset( orders.bids[i].sbd, SBD_SYMBOL );
-               ss
-                  << ' ' << setw( spacing ) << bid_sum.to_string()
-                  << ' ' << setw( spacing ) << asset( orders.bids[i].sbd, SBD_SYMBOL ).to_string()
-                  << ' ' << setw( spacing ) << asset( orders.bids[i].steem, STEEM_SYMBOL ).to_string()
-                  << ' ' << setw( spacing ) << orders.bids[i].real_price; //(~orders.bids[i].order_price).to_real();
-            }
-            else
-            {
-               ss << setw( (spacing * 4 ) + 5 ) << ' ';
-            }
-
-            ss << " |";
-
-            if ( i < orders.asks.size() )
-            {
-               ask_sum += asset( orders.asks[i].sbd, SBD_SYMBOL );
-               //ss << ' ' << setw( spacing ) << (~orders.asks[i].order_price).to_real()
-               ss << ' ' << setw( spacing ) << orders.asks[i].real_price
-                  << ' ' << setw( spacing ) << asset( orders.asks[i].steem, STEEM_SYMBOL ).to_string()
-                  << ' ' << setw( spacing ) << asset( orders.asks[i].sbd, SBD_SYMBOL ).to_string()
-                  << ' ' << setw( spacing ) << ask_sum.to_string();
-            }
-
-            ss << endl;
-         }
-
-         ss << endl
-            << "Bid Total: " << bid_sum.to_string() << endl
-            << "Ask Total: " << ask_sum.to_string() << endl;
-
-         return ss.str();
-      };
       m["get_withdraw_routes"] = []( variant result, const fc::variants& a )
       {
          auto routes = result.as< vector< withdraw_route > >();
@@ -1273,8 +1194,6 @@ pair<public_key_type,string> wallet_api::get_private_key_from_password( string a
    return std::make_pair( public_key_type( priv.get_public_key() ), key_to_wif( priv ) );
 }
 
-feed_history_api_obj wallet_api::get_feed_history()const { return my->_remote_db->get_feed_history(); }
-
 /**
  * This method is used by faucets to create new accounts for other users which must
  * provide their desired keys. The resulting account may not be controllable by this
@@ -1298,7 +1217,7 @@ annotated_signed_transaction wallet_api::create_account_with_keys( string creato
    op.posting = authority( 1, posting, 1 );
    op.memo_key = memo;
    op.json_metadata = json_meta;
-   op.fee = my->_remote_db->get_chain_properties().account_creation_fee * asset( SMOKE_CREATE_ACCOUNT_WITH_STEEM_MODIFIER, STEEM_SYMBOL );
+   op.fee = my->_remote_db->get_chain_properties().account_creation_fee * asset( SMOKE_CREATE_ACCOUNT_WITH_STEEM_MODIFIER, SMOKE_SYMBOL );
 
    signed_transaction tx;
    tx.operations.push_back(op);
@@ -1977,64 +1896,6 @@ annotated_signed_transaction wallet_api::escrow_release(
    return my->sign_transaction( tx, broadcast );
 }
 
-/**
- *  Transfers into savings happen immediately, transfers from savings take 72 hours
- */
-annotated_signed_transaction wallet_api::transfer_to_savings( string from, string to, asset amount, string memo, bool broadcast  )
-{
-   FC_ASSERT( !is_locked() );
-   check_memo( memo, get_account( from ) );
-   transfer_to_savings_operation op;
-   op.from = from;
-   op.to   = to;
-   op.memo = get_encrypted_memo( from, to, memo );
-   op.amount = amount;
-
-   signed_transaction tx;
-   tx.operations.push_back( op );
-   tx.validate();
-
-   return my->sign_transaction( tx, broadcast );
-}
-
-/**
- * @param request_id - an unique ID assigned by from account, the id is used to cancel the operation and can be reused after the transfer completes
- */
-annotated_signed_transaction wallet_api::transfer_from_savings( string from, uint32_t request_id, string to, asset amount, string memo, bool broadcast  )
-{
-   FC_ASSERT( !is_locked() );
-   check_memo( memo, get_account( from ) );
-   transfer_from_savings_operation op;
-   op.from = from;
-   op.request_id = request_id;
-   op.to = to;
-   op.amount = amount;
-   op.memo = get_encrypted_memo( from, to, memo );
-
-   signed_transaction tx;
-   tx.operations.push_back( op );
-   tx.validate();
-
-   return my->sign_transaction( tx, broadcast );
-}
-
-/**
- *  @param request_id the id used in transfer_from_savings
- *  @param from the account that initiated the transfer
- */
-annotated_signed_transaction wallet_api::cancel_transfer_from_savings( string from, uint32_t request_id, bool broadcast  )
-{
-   FC_ASSERT( !is_locked() );
-   cancel_transfer_from_savings_operation op;
-   op.from = from;
-   op.request_id = request_id;
-   signed_transaction tx;
-   tx.operations.push_back( op );
-   tx.validate();
-
-   return my->sign_transaction( tx, broadcast );
-}
-
 annotated_signed_transaction wallet_api::transfer_to_vesting(string from, string to, asset amount, bool broadcast )
 {
    FC_ASSERT( !is_locked() );
@@ -2078,40 +1939,6 @@ annotated_signed_transaction wallet_api::set_withdraw_vesting_route( string from
     tx.validate();
 
    return my->sign_transaction( tx, broadcast );
-}
-
-annotated_signed_transaction wallet_api::convert_sbd(string from, asset amount, bool broadcast )
-{
-   FC_ASSERT( !is_locked() );
-    convert_operation op;
-    op.owner = from;
-    op.requestid = fc::time_point::now().sec_since_epoch();
-    op.amount = amount;
-
-    signed_transaction tx;
-    tx.operations.push_back( op );
-    tx.validate();
-
-   return my->sign_transaction( tx, broadcast );
-}
-
-annotated_signed_transaction wallet_api::publish_feed(string witness, price exchange_rate, bool broadcast )
-{
-   FC_ASSERT( !is_locked() );
-    feed_publish_operation op;
-    op.publisher     = witness;
-    op.exchange_rate = exchange_rate;
-
-    signed_transaction tx;
-    tx.operations.push_back( op );
-    tx.validate();
-
-   return my->sign_transaction( tx, broadcast );
-}
-
-vector< convert_request_api_obj > wallet_api::get_conversion_requests( string owner_account )
-{
-   return my->_remote_db->get_conversion_requests( owner_account );
 }
 
 string wallet_api::decrypt_memo( string encrypted_memo ) {
@@ -2184,14 +2011,6 @@ map<uint32_t,applied_operation> wallet_api::get_account_history( string account,
             auto& top = item.second.op.get<transfer_operation>();
             top.memo = decrypt_memo( top.memo );
          }
-         else if( item.second.op.which() == operation::tag<transfer_from_savings_operation>::value ) {
-            auto& top = item.second.op.get<transfer_from_savings_operation>();
-            top.memo = decrypt_memo( top.memo );
-         }
-         else if( item.second.op.which() == operation::tag<transfer_to_savings_operation>::value ) {
-            auto& top = item.second.op.get<transfer_to_savings_operation>();
-            top.memo = decrypt_memo( top.memo );
-         }
       }
    }
    return result;
@@ -2204,47 +2023,6 @@ app::state wallet_api::get_state( string url ) {
 vector< withdraw_route > wallet_api::get_withdraw_routes( string account, withdraw_route_type type )const
 {
    return my->_remote_db->get_withdraw_routes( account, type );
-}
-
-order_book wallet_api::get_order_book( uint32_t limit )
-{
-   FC_ASSERT( limit <= 1000 );
-   return my->_remote_db->get_order_book( limit );
-}
-vector<extended_limit_order> wallet_api::get_open_orders( string owner )
-{
-   return my->_remote_db->get_open_orders( owner );
-}
-
-annotated_signed_transaction wallet_api::create_order(  string owner, uint32_t order_id, asset amount_to_sell, asset min_to_receive, bool fill_or_kill, uint32_t expiration_sec, bool broadcast )
-{
-   FC_ASSERT( !is_locked() );
-   limit_order_create_operation op;
-   op.owner = owner;
-   op.orderid = order_id;
-   op.amount_to_sell = amount_to_sell;
-   op.min_to_receive = min_to_receive;
-   op.fill_or_kill = fill_or_kill;
-   op.expiration = expiration_sec ? (fc::time_point::now() + fc::seconds(expiration_sec)) : fc::time_point::maximum();
-
-   signed_transaction tx;
-   tx.operations.push_back( op );
-   tx.validate();
-
-   return my->sign_transaction( tx, broadcast );
-}
-
-annotated_signed_transaction wallet_api::cancel_order( string owner, uint32_t orderid, bool broadcast ) {
-   FC_ASSERT( !is_locked() );
-   limit_order_cancel_operation op;
-   op.owner = owner;
-   op.orderid = orderid;
-
-   signed_transaction tx;
-   tx.operations.push_back( op );
-   tx.validate();
-
-   return my->sign_transaction( tx, broadcast );
 }
 
 annotated_signed_transaction wallet_api::post_comment( string author, string permlink, string parent_author, string parent_permlink, string title, string body, string json, bool broadcast )
