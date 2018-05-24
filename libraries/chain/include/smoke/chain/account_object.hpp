@@ -215,7 +215,6 @@ namespace smoke { namespace chain {
    struct by_next_vesting_withdrawal;
    struct by_steem_balance;
    struct by_smp_balance;
-   struct by_smd_balance;
    struct by_post_count;
    struct by_vote_count;
 
@@ -258,13 +257,6 @@ namespace smoke { namespace chain {
          ordered_unique< tag< by_smp_balance >,
             composite_key< account_object,
                member< account_object, asset, &account_object::vesting_shares >,
-               member< account_object, account_id_type, &account_object::id >
-            >,
-            composite_key_compare< std::greater< asset >, std::less< account_id_type > >
-         >,
-         ordered_unique< tag< by_smd_balance >,
-            composite_key< account_object,
-               member< account_object, asset, &account_object::sbd_balance >,
                member< account_object, account_id_type, &account_object::id >
             >,
             composite_key_compare< std::greater< asset >, std::less< account_id_type > >
