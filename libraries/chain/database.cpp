@@ -1116,12 +1116,6 @@ void database::clear_null_account_balance()
       adjust_balance( null_account, -null_account.balance );
    }
 
-   if( null_account.sbd_balance.amount > 0 )
-   {
-      total_sbd += null_account.sbd_balance;
-      adjust_balance( null_account, -null_account.sbd_balance );
-   }
-
    if( null_account.vesting_shares.amount > 0 )
    {
       const auto& gpo = get_dynamic_global_properties();
@@ -2038,7 +2032,6 @@ void database::init_genesis( uint64_t init_supply )
             a.name = SMOKE_INIT_MINER_NAME + ( i ? fc::to_string( i ) : std::string() );
             a.memo_key = init_public_key;
             a.balance  = asset( i ? 0 : init_supply, SMOKE_SYMBOL );
-            a.sbd_balance = asset( 0, SBD_SYMBOL );
          } );
 
          create< account_authority_object >( [&]( account_authority_object& auth )
@@ -3024,8 +3017,6 @@ asset database::get_balance( const account_object& a, asset_symbol_type symbol )
    {
       case SMOKE_SYMBOL:
          return a.balance;
-      case SBD_SYMBOL:
-         return a.sbd_balance;
       default:
          FC_ASSERT( false, "invalid symbol" );
    }
@@ -3142,7 +3133,6 @@ void database::validate_invariants()const
      {
         total_supply += itr->balance;
         total_supply += itr->reward_steem_balance;
-        total_sbd += itr->sbd_balance;
         total_sbd += itr->reward_sbd_balance;
         total_vesting += itr->vesting_shares;
         total_vesting += itr->reward_vesting_balance;
@@ -3159,7 +3149,6 @@ void database::validate_invariants()const
      for( auto itr = escrow_idx.begin(); itr != escrow_idx.end(); ++itr )
      {
         total_supply += itr->steem_balance;
-        total_sbd += itr->sbd_balance;
 
         if( itr->pending_fee.symbol == SMOKE_SYMBOL )
            total_supply += itr->pending_fee;

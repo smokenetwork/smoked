@@ -113,7 +113,6 @@ BOOST_AUTO_TEST_CASE( account_create_apply )
       BOOST_REQUIRE( acct.proxy == "" );
       BOOST_REQUIRE( acct.created == db.head_block_time() );
       BOOST_REQUIRE( acct.balance.amount.value == ASSET( "0.000 TESTS" ).amount.value );
-      BOOST_REQUIRE( acct.sbd_balance.amount.value == ASSET( "0.000 TBD" ).amount.value );
       BOOST_REQUIRE( acct.id._id == acct_auth.id._id );
 
       /// because init_witness has created vesting shares and blocks have been produced, 100 SMOKE is worth less than 100 vesting shares due to rounding
@@ -133,7 +132,6 @@ BOOST_AUTO_TEST_CASE( account_create_apply )
       BOOST_REQUIRE( acct.proxy == "" );
       BOOST_REQUIRE( acct.created == db.head_block_time() );
       BOOST_REQUIRE( acct.balance.amount.value == ASSET( "0.000 SMOKE " ).amount.value );
-      BOOST_REQUIRE( acct.sbd_balance.amount.value == ASSET( "0.000 TBD" ).amount.value );
       BOOST_REQUIRE( acct.vesting_shares.amount.value == ( op.fee * ( vest_shares / vests ) ).amount.value );
       BOOST_REQUIRE( acct.vesting_withdraw_rate.amount.value == ASSET( "0.000000 VESTS" ).amount.value );
       BOOST_REQUIRE( acct.proxied_vsf_votes_total().value == 0 );
@@ -2710,11 +2708,8 @@ BOOST_AUTO_TEST_CASE( escrow_transfer_apply )
       tx.sign( alice_private_key, db.get_chain_id() );
 
       auto alice_steem_balance = alice.balance - op.steem_amount - op.fee;
-      auto alice_sbd_balance = alice.sbd_balance - op.sbd_amount;
       auto bob_steem_balance = bob.balance;
-      auto bob_sbd_balance = bob.sbd_balance;
       auto sam_steem_balance = sam.balance;
-      auto sam_sbd_balance = sam.sbd_balance;
 
       db.push_transaction( tx, 0 );
 
@@ -2726,18 +2721,14 @@ BOOST_AUTO_TEST_CASE( escrow_transfer_apply )
       BOOST_REQUIRE( escrow.agent == op.agent );
       BOOST_REQUIRE( escrow.ratification_deadline == op.ratification_deadline );
       BOOST_REQUIRE( escrow.escrow_expiration == op.escrow_expiration );
-      BOOST_REQUIRE( escrow.sbd_balance == op.sbd_amount );
       BOOST_REQUIRE( escrow.steem_balance == op.steem_amount );
       BOOST_REQUIRE( escrow.pending_fee == op.fee );
       BOOST_REQUIRE( !escrow.to_approved );
       BOOST_REQUIRE( !escrow.agent_approved );
       BOOST_REQUIRE( !escrow.disputed );
       BOOST_REQUIRE( alice.balance == alice_steem_balance );
-      BOOST_REQUIRE( alice.sbd_balance == alice_sbd_balance );
       BOOST_REQUIRE( bob.balance == bob_steem_balance );
-      BOOST_REQUIRE( bob.sbd_balance == bob_sbd_balance );
       BOOST_REQUIRE( sam.balance == sam_steem_balance );
-      BOOST_REQUIRE( sam.sbd_balance == sam_sbd_balance );
 
       validate_database();
    }
@@ -2881,7 +2872,6 @@ BOOST_AUTO_TEST_CASE( escrow_approve_apply )
       BOOST_REQUIRE( escrow.agent == "sam" );
       BOOST_REQUIRE( escrow.ratification_deadline == et_op.ratification_deadline );
       BOOST_REQUIRE( escrow.escrow_expiration == et_op.escrow_expiration );
-      BOOST_REQUIRE( escrow.sbd_balance == ASSET( "0.000 TBD" ) );
       BOOST_REQUIRE( escrow.steem_balance == ASSET( "1.000 TESTS" ) );
       BOOST_REQUIRE( escrow.pending_fee == ASSET( "0.100 TESTS" ) );
       BOOST_REQUIRE( escrow.to_approved );
@@ -2900,7 +2890,6 @@ BOOST_AUTO_TEST_CASE( escrow_approve_apply )
       BOOST_REQUIRE( escrow.agent == "sam" );
       BOOST_REQUIRE( escrow.ratification_deadline == et_op.ratification_deadline );
       BOOST_REQUIRE( escrow.escrow_expiration == et_op.escrow_expiration );
-      BOOST_REQUIRE( escrow.sbd_balance == ASSET( "0.000 TBD" ) );
       BOOST_REQUIRE( escrow.steem_balance == ASSET( "1.000 TESTS" ) );
       BOOST_REQUIRE( escrow.pending_fee == ASSET( "0.100 TESTS" ) );
       BOOST_REQUIRE( escrow.to_approved );
@@ -2922,7 +2911,6 @@ BOOST_AUTO_TEST_CASE( escrow_approve_apply )
       BOOST_REQUIRE( escrow.agent == "sam" );
       BOOST_REQUIRE( escrow.ratification_deadline == et_op.ratification_deadline );
       BOOST_REQUIRE( escrow.escrow_expiration == et_op.escrow_expiration );
-      BOOST_REQUIRE( escrow.sbd_balance == ASSET( "0.000 TBD" ) );
       BOOST_REQUIRE( escrow.steem_balance == ASSET( "1.000 TESTS" ) );
       BOOST_REQUIRE( escrow.pending_fee == ASSET( "0.100 TESTS" ) );
       BOOST_REQUIRE( escrow.to_approved );
@@ -3038,7 +3026,6 @@ BOOST_AUTO_TEST_CASE( escrow_approve_apply )
          BOOST_REQUIRE( escrow.agent == "sam" );
          BOOST_REQUIRE( escrow.ratification_deadline == et_op.ratification_deadline );
          BOOST_REQUIRE( escrow.escrow_expiration == et_op.escrow_expiration );
-         BOOST_REQUIRE( escrow.sbd_balance == ASSET( "0.000 TBD" ) );
          BOOST_REQUIRE( escrow.steem_balance == ASSET( "1.000 TESTS" ) );
          BOOST_REQUIRE( escrow.pending_fee == ASSET( "0.000 TESTS" ) );
          BOOST_REQUIRE( escrow.to_approved );
@@ -3059,7 +3046,6 @@ BOOST_AUTO_TEST_CASE( escrow_approve_apply )
          BOOST_REQUIRE( escrow.agent == "sam" );
          BOOST_REQUIRE( escrow.ratification_deadline == et_op.ratification_deadline );
          BOOST_REQUIRE( escrow.escrow_expiration == et_op.escrow_expiration );
-         BOOST_REQUIRE( escrow.sbd_balance == ASSET( "0.000 TBD" ) );
          BOOST_REQUIRE( escrow.steem_balance == ASSET( "1.000 TESTS" ) );
          BOOST_REQUIRE( escrow.pending_fee == ASSET( "0.000 TESTS" ) );
          BOOST_REQUIRE( escrow.to_approved );
@@ -3183,7 +3169,6 @@ BOOST_AUTO_TEST_CASE( escrow_dispute_apply )
       BOOST_REQUIRE( escrow.agent == "sam" );
       BOOST_REQUIRE( escrow.ratification_deadline == et_op.ratification_deadline );
       BOOST_REQUIRE( escrow.escrow_expiration == et_op.escrow_expiration );
-      BOOST_REQUIRE( escrow.sbd_balance == et_op.sbd_amount );
       BOOST_REQUIRE( escrow.steem_balance == et_op.steem_amount );
       BOOST_REQUIRE( escrow.pending_fee == et_op.fee );
       BOOST_REQUIRE( escrow.to_approved );
@@ -3217,7 +3202,6 @@ BOOST_AUTO_TEST_CASE( escrow_dispute_apply )
       BOOST_REQUIRE( escrow.agent == "sam" );
       BOOST_REQUIRE( escrow.ratification_deadline == et_op.ratification_deadline );
       BOOST_REQUIRE( escrow.escrow_expiration == et_op.escrow_expiration );
-      BOOST_REQUIRE( escrow.sbd_balance == et_op.sbd_amount );
       BOOST_REQUIRE( escrow.steem_balance == et_op.steem_amount );
       BOOST_REQUIRE( escrow.pending_fee == ASSET( "0.000 TESTS" ) );
       BOOST_REQUIRE( escrow.to_approved );
@@ -3239,7 +3223,6 @@ BOOST_AUTO_TEST_CASE( escrow_dispute_apply )
       BOOST_REQUIRE( escrow.agent == "sam" );
       BOOST_REQUIRE( escrow.ratification_deadline == et_op.ratification_deadline );
       BOOST_REQUIRE( escrow.escrow_expiration == et_op.escrow_expiration );
-      BOOST_REQUIRE( escrow.sbd_balance == et_op.sbd_amount );
       BOOST_REQUIRE( escrow.steem_balance == et_op.steem_amount );
       BOOST_REQUIRE( escrow.pending_fee == ASSET( "0.000 TESTS" ) );
       BOOST_REQUIRE( escrow.to_approved );
@@ -3264,7 +3247,6 @@ BOOST_AUTO_TEST_CASE( escrow_dispute_apply )
          BOOST_REQUIRE( escrow.agent == "sam" );
          BOOST_REQUIRE( escrow.ratification_deadline == et_op.ratification_deadline );
          BOOST_REQUIRE( escrow.escrow_expiration == et_op.escrow_expiration );
-         BOOST_REQUIRE( escrow.sbd_balance == et_op.sbd_amount );
          BOOST_REQUIRE( escrow.steem_balance == et_op.steem_amount );
          BOOST_REQUIRE( escrow.pending_fee == ASSET( "0.000 TESTS" ) );
          BOOST_REQUIRE( escrow.to_approved );
@@ -3303,7 +3285,6 @@ BOOST_AUTO_TEST_CASE( escrow_dispute_apply )
          BOOST_REQUIRE( escrow.agent == "sam" );
          BOOST_REQUIRE( escrow.ratification_deadline == et_op.ratification_deadline );
          BOOST_REQUIRE( escrow.escrow_expiration == et_op.escrow_expiration );
-         BOOST_REQUIRE( escrow.sbd_balance == et_op.sbd_amount );
          BOOST_REQUIRE( escrow.steem_balance == et_op.steem_amount );
          BOOST_REQUIRE( escrow.pending_fee == ASSET( "0.000 TESTS" ) );
          BOOST_REQUIRE( escrow.to_approved );
@@ -3326,7 +3307,6 @@ BOOST_AUTO_TEST_CASE( escrow_dispute_apply )
          BOOST_REQUIRE( escrow.agent == "sam" );
          BOOST_REQUIRE( escrow.ratification_deadline == et_op.ratification_deadline );
          BOOST_REQUIRE( escrow.escrow_expiration == et_op.escrow_expiration );
-         BOOST_REQUIRE( escrow.sbd_balance == et_op.sbd_amount );
          BOOST_REQUIRE( escrow.steem_balance == et_op.steem_amount );
          BOOST_REQUIRE( escrow.pending_fee == ASSET( "0.000 TESTS" ) );
          BOOST_REQUIRE( escrow.to_approved );
@@ -4409,7 +4389,6 @@ BOOST_AUTO_TEST_CASE( claim_reward_balance_apply )
       validate_database();
 
       auto alice_steem = db.get_account( "alice" ).balance;
-      auto alice_sbd = db.get_account( "alice" ).sbd_balance;
       auto alice_vests = db.get_account( "alice" ).vesting_shares;
 
 
@@ -4440,7 +4419,6 @@ BOOST_AUTO_TEST_CASE( claim_reward_balance_apply )
 
       BOOST_REQUIRE( db.get_account( "alice" ).balance == alice_steem + op.reward_steem );
       BOOST_REQUIRE( db.get_account( "alice" ).reward_steem_balance == ASSET( "10.000 TESTS" ) );
-      BOOST_REQUIRE( db.get_account( "alice" ).sbd_balance == alice_sbd + op.reward_sbd );
       BOOST_REQUIRE( db.get_account( "alice" ).reward_sbd_balance == ASSET( "10.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( "alice" ).vesting_shares == alice_vests + op.reward_vests );
       BOOST_REQUIRE( db.get_account( "alice" ).reward_vesting_balance == ASSET( "5.000000 VESTS" ) );
@@ -4461,7 +4439,6 @@ BOOST_AUTO_TEST_CASE( claim_reward_balance_apply )
 
       BOOST_REQUIRE( db.get_account( "alice" ).balance == alice_steem + op.reward_steem );
       BOOST_REQUIRE( db.get_account( "alice" ).reward_steem_balance == ASSET( "0.000 TESTS" ) );
-      BOOST_REQUIRE( db.get_account( "alice" ).sbd_balance == alice_sbd + op.reward_sbd );
       BOOST_REQUIRE( db.get_account( "alice" ).reward_sbd_balance == ASSET( "0.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( "alice" ).vesting_shares == alice_vests + op.reward_vests );
       BOOST_REQUIRE( db.get_account( "alice" ).reward_vesting_balance == ASSET( "0.000000 VESTS" ) );

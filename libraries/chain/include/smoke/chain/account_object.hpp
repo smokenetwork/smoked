@@ -56,24 +56,6 @@ namespace smoke { namespace chain {
 
          asset             balance = asset( 0, SMOKE_SYMBOL );  ///< total liquid shares held by this account
 
-         /**
-          *  SBD Deposits pay interest based upon the interest rate set by witnesses. The purpose of these
-          *  fields is to track the total (time * sbd_balance) that it is held. Then at the appointed time
-          *  interest can be paid using the following equation:
-          *
-          *  interest = interest_rate * sbd_seconds / seconds_per_year
-          *
-          *  Every time the sbd_balance is updated the sbd_seconds is also updated. If at least
-          *  SMOKE_MIN_COMPOUNDING_INTERVAL_SECONDS has past since sbd_last_interest_payment then
-          *  interest is added to sbd_balance.
-          *
-          *  @defgroup sbd_data sbd Balance Data
-          */
-         ///@{
-         asset             sbd_balance = asset( 0, SBD_SYMBOL ); /// total sbd balance
-
-         ///@}
-
          asset             reward_sbd_balance = asset( 0, SBD_SYMBOL );
          asset             reward_steem_balance = asset( 0, SMOKE_SYMBOL );
          asset             reward_vesting_balance = asset( 0, VESTS_SYMBOL );
@@ -452,7 +434,6 @@ FC_REFLECT( smoke::chain::account_object,
              (owner_challenged)(active_challenged)(last_owner_proved)(last_active_proved)(recovery_account)(last_account_recovery)(reset_account)
              (comment_count)(lifetime_vote_count)(post_count)(can_vote)(voting_power)(last_vote_time)
              (balance)
-             (sbd_balance)
              (reward_steem_balance)(reward_sbd_balance)(reward_vesting_balance)(reward_vesting_steem)
              (vesting_shares)(delegated_vesting_shares)(received_vesting_shares)
              (vesting_withdraw_rate)(next_vesting_withdrawal)(withdrawn)(to_withdraw)(withdraw_routes)

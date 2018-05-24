@@ -461,7 +461,6 @@ BOOST_AUTO_TEST_CASE( recent_claims_decay )
       auto total_rshares2 = db.get_dynamic_global_properties().total_reward_shares2;
       auto bob_comment_rshares = db.get_comment( "bob", string( "test" ) ).net_rshares;
       auto bob_vest_shares = db.get_account( "bob" ).vesting_shares;
-      auto bob_sbd_balance = db.get_account( "bob" ).sbd_balance;
 
       auto bob_comment_payout = asset( ( ( uint128_t( bob_comment_rshares.value ) * bob_comment_rshares.value * reward_steem.amount.value ) / total_rshares2 ).to_uint64(), SMOKE_SYMBOL );
       auto bob_comment_discussion_rewards = asset( bob_comment_payout.amount / 4, SMOKE_SYMBOL );
@@ -525,7 +524,6 @@ BOOST_AUTO_TEST_CASE( recent_claims_decay )
       db.push_transaction( tx, 0 );
 
       bob_vest_shares = db.get_account( "bob" ).vesting_shares;
-      bob_sbd_balance = db.get_account( "bob" ).sbd_balance;
 
       validate_database();
 
@@ -668,7 +666,6 @@ BOOST_AUTO_TEST_CASE( comment_payout )
       auto total_rshares2 = db.get_dynamic_global_properties().total_reward_shares2;
       auto bob_comment_vote_total = db.get_comment( "bob", string( "test" ) ).total_vote_weight;
       auto bob_comment_rshares = db.get_comment( "bob", string( "test" ) ).net_rshares;
-      auto bob_sbd_balance = db.get_account( "bob" ).sbd_balance;
       auto alice_vest_shares = db.get_account( "alice" ).vesting_shares;
       auto bob_vest_shares = db.get_account( "bob" ).vesting_shares;
       auto sam_vest_shares = db.get_account( "sam" ).vesting_shares;
@@ -737,7 +734,6 @@ BOOST_AUTO_TEST_CASE( comment_payout )
       total_rshares2 = db.get_dynamic_global_properties().total_reward_shares2;
       auto alice_comment_vote_total = db.get_comment( "alice", string( "test" ) ).total_vote_weight;
       auto alice_comment_rshares = db.get_comment( "alice", string( "test" ) ).net_rshares;
-      auto alice_sbd_balance = db.get_account( "alice" ).sbd_balance;
       alice_vest_shares = db.get_account( "alice" ).vesting_shares;
       bob_vest_shares = db.get_account( "bob" ).vesting_shares;
       sam_vest_shares = db.get_account( "sam" ).vesting_shares;
@@ -770,7 +766,6 @@ BOOST_AUTO_TEST_CASE( comment_payout )
 
       BOOST_REQUIRE( ( db.get_dynamic_global_properties().total_reward_fund_steem + alice_comment_payout + alice_comment_vote_rewards - unclaimed_payments ).amount.value == reward_steem.amount.value );
       BOOST_REQUIRE( db.get_comment( "alice", string( "test" ) ).total_payout_value.amount.value == ( ( alice_comment_vesting_reward * db.get_dynamic_global_properties().get_vesting_share_price() ) + ( alice_comment_sbd_reward * exchange_rate ) ).amount.value );
-      BOOST_REQUIRE( db.get_account( "alice" ).sbd_balance.amount.value == ( alice_sbd_balance + alice_comment_sbd_reward ).amount.value );
       BOOST_REQUIRE( db.get_comment( "alice", string( "test" ) ).net_rshares.value == 0 );
       BOOST_REQUIRE( db.get_comment( "alice", string( "test" ) ).net_rshares.value == 0 );
       BOOST_REQUIRE( db.get_account( "alice" ).vesting_shares.amount.value == ( alice_vest_shares + alice_vote_vesting + alice_comment_vesting_reward ).amount.value );
@@ -837,7 +832,6 @@ BOOST_AUTO_TEST_CASE( comment_payout )
       db.push_transaction( tx, 0 );
 
       bob_vest_shares = db.get_account( "bob" ).vesting_shares;
-      auto bob_sbd = db.get_account( "bob" ).sbd_balance;
 
       BOOST_REQUIRE( vote_idx.find( std::make_tuple( db.get_comment( "bob", string( "test" ).id, db.get_account( "dave" ) ).id ) ) != vote_idx.end() );
       validate_database();
@@ -846,7 +840,6 @@ BOOST_AUTO_TEST_CASE( comment_payout )
 
       BOOST_REQUIRE( vote_idx.find( std::make_tuple( db.get_comment( "bob", string( "test" ).id, db.get_account( "dave" ) ).id ) ) == vote_idx.end() );
       BOOST_REQUIRE( bob_vest_shares.amount.value == db.get_account( "bob" ).vesting_shares.amount.value );
-      BOOST_REQUIRE( bob_sbd.amount.value == db.get_account( "bob" ).sbd_balance.amount.value );
       validate_database();
    }
    FC_LOG_AND_RETHROW()
@@ -1022,13 +1015,9 @@ BOOST_AUTO_TEST_CASE( nested_comments )
       auto dave_comment_total_payout = db.to_sbd( asset( dave_pays_dave_sbd + dave_pays_dave_vest, SMOKE_SYMBOL ) );
 
       auto alice_starting_vesting = db.get_account( "alice" ).vesting_shares;
-      auto alice_starting_sbd = db.get_account( "alice" ).sbd_balance;
       auto bob_starting_vesting = db.get_account( "bob" ).vesting_shares;
-      auto bob_starting_sbd = db.get_account( "bob" ).sbd_balance;
       auto sam_starting_vesting = db.get_account( "sam" ).vesting_shares;
-      auto sam_starting_sbd = db.get_account( "sam" ).sbd_balance;
       auto dave_starting_vesting = db.get_account( "dave" ).vesting_shares;
-      auto dave_starting_sbd = db.get_account( "dave" ).sbd_balance;
 
       generate_block();
 
@@ -1150,22 +1139,18 @@ BOOST_AUTO_TEST_CASE( nested_comments )
 
       auto alice_total_sbd = alice_starting_sbd + asset( alice_pays_alice_sbd + bob_pays_alice_sbd + dave_pays_alice_sbd, SMOKE_SYMBOL ) * exchange_rate;
       auto alice_total_vesting = alice_starting_vesting + asset( alice_pays_alice_vest + bob_pays_alice_vest + dave_pays_alice_vest + alice_vote_alice_reward.amount + alice_vote_bob_reward.amount, SMOKE_SYMBOL ) * gpo.get_vesting_share_price();
-      BOOST_REQUIRE( db.get_account( "alice" ).sbd_balance.amount.value == alice_total_sbd.amount.value );
       BOOST_REQUIRE( db.get_account( "alice" ).vesting_shares.amount.value == alice_total_vesting.amount.value );
 
       auto bob_total_sbd = bob_starting_sbd + asset( bob_pays_bob_sbd + dave_pays_bob_sbd, SMOKE_SYMBOL ) * exchange_rate;
       auto bob_total_vesting = bob_starting_vesting + asset( bob_pays_bob_vest + dave_pays_bob_vest + bob_vote_alice_reward.amount + bob_vote_bob_reward.amount + bob_vote_dave_reward.amount, SMOKE_SYMBOL ) * gpo.get_vesting_share_price();
-      BOOST_REQUIRE( db.get_account( "bob" ).sbd_balance.amount.value == bob_total_sbd.amount.value );
       BOOST_REQUIRE( db.get_account( "bob" ).vesting_shares.amount.value == bob_total_vesting.amount.value );
 
       auto sam_total_sbd = sam_starting_sbd + asset( dave_pays_sam_sbd, SMOKE_SYMBOL ) * exchange_rate;
       auto sam_total_vesting = bob_starting_vesting + asset( dave_pays_sam_vest + sam_vote_bob_reward.amount, SMOKE_SYMBOL ) * gpo.get_vesting_share_price();
-      BOOST_REQUIRE( db.get_account( "sam" ).sbd_balance.amount.value == sam_total_sbd.amount.value );
       BOOST_REQUIRE( db.get_account( "sam" ).vesting_shares.amount.value == sam_total_vesting.amount.value );
 
       auto dave_total_sbd = dave_starting_sbd + asset( dave_pays_dave_sbd, SMOKE_SYMBOL ) * exchange_rate;
       auto dave_total_vesting = dave_starting_vesting + asset( dave_pays_dave_vest, SMOKE_SYMBOL ) * gpo.get_vesting_share_price();
-      BOOST_REQUIRE( db.get_account( "dave" ).sbd_balance.amount.value == dave_total_sbd.amount.value );
       BOOST_REQUIRE( db.get_account( "dave" ).vesting_shares.amount.value == dave_total_vesting.amount.value );
    }
    FC_LOG_AND_RETHROW()
@@ -1616,7 +1601,6 @@ BOOST_AUTO_TEST_CASE( liquidity_rewards )
       signed_transaction tx;
 
       fund( "alice", ASSET( "25.522 TBD" ) );
-      asset alice_sbd = db.get_account( "alice" ).sbd_balance;
 
       generate_block();
 
@@ -2377,28 +2361,24 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
       validate_database();
 
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).balance == ASSET( "1.000 TESTS" ) );
-      BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).sbd_balance == ASSET( "2.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).vesting_shares > ASSET( "0.000000 VESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_sbd_balance == ASSET( "1.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_steem_balance == ASSET( "1.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_balance == ASSET( "1.000000 VESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_steem == ASSET( "1.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( "alice" ).balance == ASSET( "2.000 TESTS" ) );
-      BOOST_REQUIRE( db.get_account( "alice" ).sbd_balance == ASSET( "3.000 TBD" ) );
 
       BOOST_TEST_MESSAGE( "--- Generating block to clear balances" );
       generate_block();
       validate_database();
 
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).balance == ASSET( "0.000 TESTS" ) );
-      BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).sbd_balance == ASSET( "0.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).vesting_shares == ASSET( "0.000000 VESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_sbd_balance == ASSET( "0.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_steem_balance == ASSET( "0.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_balance == ASSET( "0.000000 VESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_steem == ASSET( "0.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( "alice" ).balance == ASSET( "2.000 TESTS" ) );
-      BOOST_REQUIRE( db.get_account( "alice" ).sbd_balance == ASSET( "3.000 TBD" ) );
    }
    FC_LOG_AND_RETHROW()
 }

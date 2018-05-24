@@ -332,10 +332,6 @@ void database_fixture::fund(
          {
             if( amount.symbol == SMOKE_SYMBOL )
                a.balance += amount;
-            else if( amount.symbol == SBD_SYMBOL )
-            {
-               a.sbd_balance += amount;
-            }
          });
 
          db.modify( db.get_dynamic_global_properties(), [&]( dynamic_global_property_object& gpo )

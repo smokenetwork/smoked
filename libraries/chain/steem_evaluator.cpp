@@ -618,7 +618,6 @@ void escrow_transfer_evaluator::do_apply( const escrow_transfer_operation& o )
          sbd_spent += o.fee;
 
       FC_ASSERT( from_account.balance >= steem_spent, "Account cannot cover SMOKE costs of escrow. Required: ${r} Available: ${a}", ("r",steem_spent)("a",from_account.balance) );
-      FC_ASSERT( from_account.sbd_balance >= sbd_spent, "Account cannot cover SBD costs of escrow. Required: ${r} Available: ${a}", ("r",sbd_spent)("a",from_account.sbd_balance) );
 
       _db.adjust_balance( from_account, -steem_spent );
       _db.adjust_balance( from_account, -sbd_spent );
@@ -631,7 +630,6 @@ void escrow_transfer_evaluator::do_apply( const escrow_transfer_operation& o )
          esc.agent                  = o.agent;
          esc.ratification_deadline  = o.ratification_deadline;
          esc.escrow_expiration      = o.escrow_expiration;
-         esc.sbd_balance            = o.sbd_amount;
          esc.steem_balance          = o.steem_amount;
          esc.pending_fee            = o.fee;
       });
@@ -681,7 +679,6 @@ void escrow_approve_evaluator::do_apply( const escrow_approve_operation& o )
       {
          const auto& from_account = _db.get_account( o.from );
          _db.adjust_balance( from_account, escrow.steem_balance );
-         _db.adjust_balance( from_account, escrow.sbd_balance );
          _db.adjust_balance( from_account, escrow.pending_fee );
 
          _db.remove( escrow );
@@ -730,7 +727,6 @@ void escrow_release_evaluator::do_apply( const escrow_release_operation& o )
 
       const auto& e = _db.get_escrow( o.from, o.escrow_id );
       FC_ASSERT( e.steem_balance >= o.steem_amount, "Release amount exceeds escrow balance. Amount: ${a}, Balance: ${b}", ("a", o.steem_amount)("b", e.steem_balance) );
-      FC_ASSERT( e.sbd_balance >= o.sbd_amount, "Release amount exceeds escrow balance. Amount: ${a}, Balance: ${b}", ("a", o.sbd_amount)("b", e.sbd_balance) );
       FC_ASSERT( e.to == o.to, "Operation 'to' (${o}) does not match escrow 'to' (${e}).", ("o", o.to)("e", e.to) );
       FC_ASSERT( e.agent == o.agent, "Operation 'agent' (${a}) does not match escrow 'agent' (${e}).", ("o", o.agent)("e", e.agent) );
       FC_ASSERT( o.receiver == e.from || o.receiver == e.to, "Funds must be released to 'from' (${f}) or 'to' (${t})", ("f", e.from)("t", e.to) );
@@ -766,10 +762,9 @@ void escrow_release_evaluator::do_apply( const escrow_release_operation& o )
       _db.modify( e, [&]( escrow_object& esc )
       {
          esc.steem_balance -= o.steem_amount;
-         esc.sbd_balance -= o.sbd_amount;
       });
 
-      if( e.steem_balance.amount == 0 && e.sbd_balance.amount == 0 )
+      if( e.steem_balance.amount == 0 )
       {
          _db.remove( e );
       }
