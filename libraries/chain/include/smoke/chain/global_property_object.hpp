@@ -70,13 +70,6 @@ namespace smoke { namespace chain {
          }
 
          /**
-          *  This property defines the interest rate that SBD deposits receive.
-          */
-         uint16_t sbd_interest_rate = 0;
-
-         uint16_t sbd_print_rate = SMOKE_100_PERCENT;
-
-         /**
           *  Maximum block size is decided by the set of active witnesses which change every round.
           *  Each witness posts what they think the maximum size should be as part of their witness
           *  properties, the median size is chosen to be the maximum block size for the round.
@@ -138,8 +131,6 @@ FC_REFLECT( smoke::chain::dynamic_global_property_object,
              (total_reward_shares2)
              (pending_rewarded_vesting_shares)
              (pending_rewarded_vesting_steem)
-             (sbd_interest_rate)
-             (sbd_print_rate)
              (maximum_block_size)
              (current_aslot)
              (recent_slots_filled)

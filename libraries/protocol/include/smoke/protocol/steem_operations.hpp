@@ -389,14 +389,11 @@ namespace smoke { namespace protocol {
        *  to tune rate limiting and capacity
        */
       uint32_t          maximum_block_size = SMOKE_MIN_BLOCK_SIZE_LIMIT * 2;
-      uint16_t          sbd_interest_rate  = SMOKE_DEFAULT_SBD_INTEREST_RATE;
 
       void validate()const
       {
          FC_ASSERT( account_creation_fee.amount >= SMOKE_MIN_ACCOUNT_CREATION_FEE);
          FC_ASSERT( maximum_block_size >= SMOKE_MIN_BLOCK_SIZE_LIMIT);
-         FC_ASSERT( sbd_interest_rate >= 0 );
-         FC_ASSERT( sbd_interest_rate <= SMOKE_100_PERCENT );
       }
    };
 
@@ -687,7 +684,7 @@ namespace smoke { namespace protocol {
 } } // smoke::protocol
 
 FC_REFLECT( smoke::protocol::convert_operation, (owner)(requestid)(amount) )
-FC_REFLECT( smoke::protocol::chain_properties, (account_creation_fee)(maximum_block_size)(sbd_interest_rate) );
+FC_REFLECT( smoke::protocol::chain_properties, (account_creation_fee)(maximum_block_size) );
 
 FC_REFLECT( smoke::protocol::account_create_operation,
             (fee)
