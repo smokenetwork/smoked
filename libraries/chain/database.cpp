@@ -929,56 +929,6 @@ uint32_t database::get_slot_at_time(fc::time_point_sec when)const
 }
 
 /**
- *  Converts SMOKE into sbd and adds it to to_account while reducing the SMOKE supply
- *  by SMOKE and increasing the sbd supply by the specified amount.
- */
-std::pair< asset, asset > database::create_sbd( const account_object& to_account, asset steem, bool to_reward_balance )
-{
-   std::pair< asset, asset > assets( asset( 0, SBD_SYMBOL ), asset( 0, SMOKE_SYMBOL ) );
-
-   try
-   {
-      if( steem.amount == 0 )
-         return assets;
-
-      const auto& median_price = get_feed_history().current_median_history;
-      const auto& gpo = get_dynamic_global_properties();
-
-      if( !median_price.is_null() )
-      {
-         auto to_sbd = ( gpo.sbd_print_rate * steem.amount ) / SMOKE_100_PERCENT;
-         auto to_steem = steem.amount - to_sbd;
-
-         auto sbd = asset( to_sbd, SMOKE_SYMBOL ) * median_price;
-
-         if( to_reward_balance )
-         {
-            adjust_reward_balance( to_account, sbd );
-            adjust_reward_balance( to_account, asset( to_steem, SMOKE_SYMBOL ) );
-         }
-         else
-         {
-            adjust_balance( to_account, sbd );
-            adjust_balance( to_account, asset( to_steem, SMOKE_SYMBOL ) );
-         }
-
-         adjust_supply( asset( -to_sbd, SMOKE_SYMBOL ) );
-         adjust_supply( sbd );
-         assets.first = sbd;
-         assets.second = to_steem;
-      }
-      else
-      {
-         adjust_balance( to_account, steem );
-         assets.second = steem;
-      }
-   }
-   FC_CAPTURE_LOG_AND_RETHROW( (to_account.name)(steem) )
-
-   return assets;
-}
-
-/**
  * @param to_account - the account to receive the new vesting shares
  * @param SMOKE - SMOKE to be converted to vesting shares
  */
@@ -1506,11 +1456,11 @@ share_type database::cashout_comment_helper( util::comment_reward_context& ctx, 
 
            const auto& author = get_account( comment.author );
            auto vest_created = create_vesting( author, vesting_steem, true );
-           auto sbd_payout = create_sbd( author, sbd_steem, true );
+//           auto sbd_payout = create_sbd( author, sbd_steem, true );
 
-           adjust_total_payout( comment, sbd_payout.second + asset( vesting_steem, SMOKE_SYMBOL ), asset( curation_tokens, SMOKE_SYMBOL ), asset( total_beneficiary, SMOKE_SYMBOL ) );
+           adjust_total_payout( comment, asset( sbd_steem, SMOKE_SYMBOL ) + asset( vesting_steem, SMOKE_SYMBOL ), asset( curation_tokens, SMOKE_SYMBOL ), asset( total_beneficiary, SMOKE_SYMBOL ) );
 
-           push_virtual_operation( author_reward_operation( comment.author, to_string( comment.permlink ), sbd_payout.first, sbd_payout.second, vest_created ) );
+           push_virtual_operation( author_reward_operation( comment.author, to_string( comment.permlink ), asset( 0, SBD_SYMBOL ), asset( sbd_steem, SMOKE_SYMBOL ), vest_created ) );
            push_virtual_operation( comment_reward_operation( comment.author, to_string( comment.permlink ), asset( claimed_reward, SMOKE_SYMBOL ) ) );
 
 #ifndef IS_LOW_MEM
@@ -2938,7 +2888,6 @@ void database::update_virtual_supply()
      modify( get_dynamic_global_properties(), [&]( dynamic_global_property_object& dgp )
      {
          dgp.virtual_supply = dgp.current_supply;
-         dgp.sbd_print_rate = 0;
      });
   } FC_CAPTURE_AND_RETHROW() }
 

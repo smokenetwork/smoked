@@ -53,7 +53,6 @@ namespace smoke { namespace protocol {
             curation_reward_operation,
             comment_reward_operation,
             liquidity_reward_operation,
-            interest_operation,
             fill_vesting_withdraw_operation,
             shutdown_witness_operation,
             hardfork_operation,
