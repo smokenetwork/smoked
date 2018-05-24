@@ -1749,7 +1749,6 @@ state database_api::get_state( string path )const
       state _state;
       _state.props         = get_dynamic_global_properties();
       _state.current_route = path;
-      _state.feed_price    = get_current_median_history_price();
 
       try {
       if( path.size() && path[0] == '/' )
