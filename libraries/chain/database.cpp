@@ -2550,7 +2550,6 @@ void database::_apply_block( const signed_block& next_block )
    clear_expired_delegations();
    update_witness_schedule(*this);
 
-   update_median_feed();
    update_virtual_supply();
 
    clear_null_account_balance();
@@ -2570,9 +2569,7 @@ void database::_apply_block( const signed_block& next_block )
    notify_applied_block( next_block );
 
    notify_changed_objects();
-} //FC_CAPTURE_AND_RETHROW( (next_block.block_num()) )  }
-FC_CAPTURE_LOG_AND_RETHROW( (next_block.block_num()) )
-}
+} FC_CAPTURE_LOG_AND_RETHROW( (next_block.block_num()) ) }
 
 void database::process_header_extensions( const signed_block& next_block )
 {
