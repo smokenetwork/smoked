@@ -2315,52 +2315,6 @@ BOOST_AUTO_TEST_CASE( comment_freeze )
    FC_LOG_AND_RETHROW()
 }
 
-BOOST_AUTO_TEST_CASE( sbd_price_feed_limit )
-{
-   try
-   {
-      ACTORS( (alice) );
-      generate_block();
-      vest( "alice", ASSET( "10.000 TESTS" ) );
-
-//      price exchange_rate( ASSET( "1.000 TBD" ), ASSET( "1.000 TESTS" ) );
-//      set_price_feed( exchange_rate );
-
-      comment_operation comment;
-      comment.author = "alice";
-      comment.permlink = "test";
-      comment.parent_permlink = "test";
-      comment.title = "test";
-      comment.body = "test";
-
-      vote_operation vote;
-      vote.voter = "alice";
-      vote.author = "alice";
-      vote.permlink = "test";
-      vote.weight = SMOKE_100_PERCENT;
-
-      signed_transaction tx;
-      tx.operations.push_back( comment );
-      tx.operations.push_back( vote );
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.sign( alice_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      generate_blocks( db.get_comment( "alice", string( "test" ) ).cashout_time, true );
-
-      BOOST_TEST_MESSAGE( "Setting SBD percent to greater than 10% market cap." );
-
-      db.skip_price_feed_limit_check = false;
-      const auto& gpo = db.get_dynamic_global_properties();
-//      auto new_exchange_rate = price( gpo.current_sbd_supply, asset( ( SMOKE_100_PERCENT ) * gpo.current_supply.amount ) );
-//      set_price_feed( new_exchange_rate );
-//      set_price_feed( new_exchange_rate );
-
-      BOOST_REQUIRE( db.get_feed_history().current_median_history > new_exchange_rate && db.get_feed_history().current_median_history < exchange_rate );
-   }
-   FC_LOG_AND_RETHROW()
-}
-
 BOOST_AUTO_TEST_CASE( clear_null_account )
 {
    try

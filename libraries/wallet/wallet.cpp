@@ -1195,8 +1195,6 @@ pair<public_key_type,string> wallet_api::get_private_key_from_password( string a
    return std::make_pair( public_key_type( priv.get_public_key() ), key_to_wif( priv ) );
 }
 
-feed_history_api_obj wallet_api::get_feed_history()const { return my->_remote_db->get_feed_history(); }
-
 /**
  * This method is used by faucets to create new accounts for other users which must
  * provide their desired keys. The resulting account may not be controllable by this

@@ -265,22 +265,6 @@ chain_properties database_api::get_chain_properties()const
    });
 }
 
-feed_history_api_obj database_api::get_feed_history()const
-{
-   return my->_db.with_read_lock( [&]()
-   {
-      return feed_history_api_obj( my->_db.get_feed_history() );
-   });
-}
-
-price database_api::get_current_median_history_price()const
-{
-   return my->_db.with_read_lock( [&]()
-   {
-      return my->_db.get_feed_history().current_median_history;
-   });
-}
-
 dynamic_global_property_api_obj database_api_impl::get_dynamic_global_properties()const
 {
    return dynamic_global_property_api_obj( _db.get( dynamic_global_property_id_type() ), _db );

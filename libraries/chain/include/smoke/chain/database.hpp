@@ -133,7 +133,6 @@ namespace smoke { namespace chain {
 
          const dynamic_global_property_object&  get_dynamic_global_properties()const;
          const node_property_object&            get_node_properties()const;
-         const feed_history_object&             get_feed_history()const;
          const witness_schedule_object&         get_witness_schedule_object()const;
          const hardfork_property_object&        get_hardfork_property_object()const;
 
@@ -324,13 +323,6 @@ namespace smoke { namespace chain {
          share_type pay_reward_funds( share_type reward );
 
          void  pay_liquidity_reward();
-
-         /**
-          * Helper method to return the current sbd value of a given amount of
-          * SMOKE.  Return 0 SBD if there isn't a current_median_history
-          */
-         asset to_sbd( const asset& steem )const;
-         asset to_steem( const asset& sbd )const;
 
          time_point_sec   head_block_time()const;
          uint32_t         head_block_num()const;

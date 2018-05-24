@@ -145,9 +145,6 @@
 #define SMOKE_SOFT_MAX_BLOCK_SIZE             (2*1024*1024)
 #define SMOKE_MIN_BLOCK_SIZE                  115
 #define SMOKE_BLOCKS_PER_HOUR                 (60*60/SMOKE_BLOCK_INTERVAL)
-#define SMOKE_FEED_HISTORY_WINDOW             (12*7) // 3.5 days
-#define SMOKE_CONVERSION_DELAY                (fc::hours(SMOKE_FEED_HISTORY_WINDOW)) //3.5 day conversion
-
 #define SMOKE_MIN_UNDO_HISTORY                10
 #define SMOKE_MAX_UNDO_HISTORY                10000
 

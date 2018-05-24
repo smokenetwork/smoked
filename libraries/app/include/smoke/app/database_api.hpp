@@ -174,7 +174,6 @@ class database_api
       dynamic_global_property_api_obj  get_dynamic_global_properties()const;
       chain_properties                 get_chain_properties()const;
       price                            get_current_median_history_price()const;
-      feed_history_api_obj             get_feed_history()const;
       witness_schedule_api_obj         get_witness_schedule()const;
       hardfork_version                 get_hardfork_version()const;
       scheduled_hardfork               get_next_scheduled_hardfork()const;
@@ -467,7 +466,6 @@ FC_API(smoke::app::database_api,
    (get_config)
    (get_dynamic_global_properties)
    (get_chain_properties)
-   (get_feed_history)
    (get_current_median_history_price)
    (get_witness_schedule)
    (get_hardfork_version)

@@ -409,11 +409,6 @@ const node_property_object& database::get_node_properties() const
    return _node_property_object;
 }
 
-const feed_history_object& database::get_feed_history()const
-{ try {
-   return get< feed_history_object >();
-} FC_CAPTURE_AND_RETHROW() }
-
 const witness_schedule_object& database::get_witness_schedule_object()const
 { try {
    return get< witness_schedule_object >();
@@ -1519,7 +1514,7 @@ void database::process_comment_cashout()
 {
 //   const auto& gpo = get_dynamic_global_properties();
    util::comment_reward_context ctx;
-   ctx.current_steem_price = get_feed_history().current_median_history;
+//   ctx.current_steem_price = get_feed_history().current_median_history;
 
    vector< reward_fund_context > funds;
    vector< share_type > steem_awarded;
@@ -1732,16 +1727,6 @@ share_type database::pay_reward_funds( share_type reward )
    return used_rewards;
 }
 
-asset database::to_sbd( const asset& steem )const
-{
-   return util::to_sbd( get_feed_history().current_median_history, steem );
-}
-
-asset database::to_steem( const asset& sbd )const
-{
-   return util::to_steem( get_feed_history().current_median_history, sbd );
-}
-
 void database::account_recovery_processing()
 {
    // Clear expired recovery requests
@@ -1913,7 +1898,6 @@ void database::initialize_indexes()
    add_core_index< comment_index                           >(*this);
    add_core_index< comment_vote_index                      >(*this);
    add_core_index< witness_vote_index                      >(*this);
-   add_core_index< feed_history_index                      >(*this);
    add_core_index< liquidity_reward_balance_index          >(*this);
    add_core_index< operation_index                         >(*this);
    add_core_index< account_history_index                   >(*this);
@@ -2087,8 +2071,7 @@ void database::init_genesis( uint64_t init_supply )
          p.maximum_block_size = SMOKE_MAX_BLOCK_SIZE;
       } );
 
-      // Nothing to do
-      create< feed_history_object >( [&]( feed_history_object& o ) {});
+
       for( int i = 0; i < 0x10000; i++ )
          create< block_summary_object >( [&]( block_summary_object& ) {});
       create< hardfork_property_object >( [&](hardfork_property_object& hpo )
@@ -2216,13 +2199,6 @@ void database::init_genesis( uint64_t init_supply )
       // SMOKE_HARDFORK_0_15
 
       // SMOKE_HARDFORK_0_16
-      {
-         modify( get_feed_history(), [&]( feed_history_object& fho )
-         {
-             while( fho.price_history.size() > SMOKE_FEED_HISTORY_WINDOW )
-                fho.price_history.pop_front();
-         });
-      }
 
       // SMOKE_HARDFORK_0_17
       {
@@ -2646,15 +2622,6 @@ void database::process_header_extensions( const signed_block& next_block )
    }
 }
 
-void database::update_median_feed() {
-  try {
-     modify(get_feed_history(), [&](feed_history_object &fho) {
-         if (fho.price_history.size() > 0) {
-            fho.price_history.clear();
-         }
-     });
-  } FC_CAPTURE_AND_RETHROW() }
-
 void database::apply_transaction(const signed_transaction& trx, uint32_t skip)
 {
    detail::with_skip_flags( *this, skip, [&]() { _apply_transaction(trx); });
@@ -3060,9 +3027,9 @@ void database::adjust_supply( const asset& delta, bool adjust_vesting )
             break;
          }
          case SBD_SYMBOL:
-            props.current_sbd_supply += delta;
-            props.virtual_supply = props.current_sbd_supply * get_feed_history().current_median_history + props.current_supply;
-            assert( props.current_sbd_supply.amount.value >= 0 );
+//            props.current_sbd_supply += delta;
+//            props.virtual_supply = props.current_sbd_supply * get_feed_history().current_median_history + props.current_supply;
+//            assert( props.current_sbd_supply.amount.value >= 0 );
             break;
          default:
             FC_ASSERT( false, "invalid symbol" );

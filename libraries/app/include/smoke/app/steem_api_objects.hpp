@@ -19,7 +19,6 @@ using namespace smoke::chain;
 typedef chain::change_recovery_account_request_object  change_recovery_account_request_api_obj;
 typedef chain::block_summary_object                    block_summary_api_obj;
 typedef chain::comment_vote_object                     comment_vote_api_obj;
-typedef chain::convert_request_object                  convert_request_api_obj;
 typedef chain::escrow_object                           escrow_api_obj;
 typedef chain::liquidity_reward_balance_object         liquidity_reward_balance_api_obj;
 typedef chain::withdraw_vesting_route_object           withdraw_vesting_route_api_obj;
@@ -328,21 +327,6 @@ struct account_history_api_obj
 
 };
 
-struct feed_history_api_obj
-{
-   feed_history_api_obj( const chain::feed_history_object& f ) :
-      id( f.id ),
-      current_median_history( f.current_median_history ),
-      price_history( f.price_history.begin(), f.price_history.end() )
-   {}
-
-   feed_history_api_obj() {}
-
-   feed_history_id_type id;
-   price                current_median_history;
-   deque< price >       price_history;
-};
-
 struct witness_api_obj
 {
    witness_api_obj( const chain::witness_object& w ) :
@@ -480,12 +464,6 @@ FC_REFLECT( smoke::app::account_recovery_request_api_obj,
              (account_to_recover)
              (new_owner_authority)
              (expires)
-          )
-
-FC_REFLECT( smoke::app::feed_history_api_obj,
-             (id)
-             (current_median_history)
-             (price_history)
           )
 
 FC_REFLECT( smoke::app::tag_api_obj,
