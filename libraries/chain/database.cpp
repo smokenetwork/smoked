@@ -2065,7 +2065,6 @@ void database::init_genesis( uint64_t init_supply )
          p.recent_slots_filled = fc::uint128::max_value();
          p.participation_count = 128;
          p.current_supply = asset( init_supply, SMOKE_SYMBOL );
-         p.current_sbd_supply = asset( 0, SBD_SYMBOL );
          p.maximum_block_size = SMOKE_MAX_BLOCK_SIZE;
       } );
 
@@ -3011,8 +3010,6 @@ void database::adjust_supply( const asset& delta, bool adjust_vesting )
             break;
          }
          case SBD_SYMBOL:
-//            props.current_sbd_supply += delta;
-//            assert( props.current_sbd_supply.amount.value >= 0 );
             break;
          default:
             FC_ASSERT( false, "invalid symbol" );
@@ -3195,7 +3192,6 @@ void database::validate_invariants()const
      total_supply += gpo.total_vesting_fund_steem + gpo.total_reward_fund_steem + gpo.pending_rewarded_vesting_steem;
 
      FC_ASSERT( gpo.current_supply == total_supply, "", ("gpo.current_supply",gpo.current_supply)("total_supply",total_supply) );
-     FC_ASSERT( gpo.current_sbd_supply == total_sbd, "", ("gpo.current_sbd_supply",gpo.current_sbd_supply)("total_sbd",total_sbd) );
      FC_ASSERT( gpo.total_vesting_shares + gpo.pending_rewarded_vesting_shares == total_vesting, "", ("gpo.total_vesting_shares",gpo.total_vesting_shares)("total_vesting",total_vesting) );
      FC_ASSERT( gpo.total_vesting_shares.amount == total_vsf_votes, "", ("total_vesting_shares",gpo.total_vesting_shares)("total_vsf_votes",total_vsf_votes) );
      FC_ASSERT( gpo.pending_rewarded_vesting_steem == pending_vesting_steem, "", ("pending_rewarded_vesting_steem",gpo.pending_rewarded_vesting_steem)("pending_vesting_steem", pending_vesting_steem));

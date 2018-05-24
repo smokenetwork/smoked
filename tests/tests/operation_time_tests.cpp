@@ -2369,7 +2369,6 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
          db.modify( db.get_dynamic_global_properties(), [&]( dynamic_global_property_object& gpo )
          {
             gpo.current_supply += ASSET( "2.000 TESTS" );
-            gpo.current_sbd_supply += ASSET( "1.000 TBD" );
             gpo.pending_rewarded_vesting_shares += ASSET( "1.000000 VESTS" );
             gpo.pending_rewarded_vesting_steem += ASSET( "1.000 TESTS" );
          });

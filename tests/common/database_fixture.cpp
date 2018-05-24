@@ -342,8 +342,6 @@ void database_fixture::fund(
          {
             if( amount.symbol == SMOKE_SYMBOL )
                gpo.current_supply += amount;
-            else if( amount.symbol == SBD_SYMBOL )
-               gpo.current_sbd_supply += amount;
          });
 
       }, default_skip );
