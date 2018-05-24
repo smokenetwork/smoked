@@ -295,7 +295,6 @@ public:
                                                                           time_point_sec(time_point::now()),
                                                                           " old");
       result["participation"] = (100*dynamic_props.recent_slots_filled.popcount()) / 128.0;
-      result["median_sbd_price"] = _remote_db->get_current_median_history_price();
       result["account_creation_fee"] = _remote_db->get_chain_properties().account_creation_fee;
       result["post_reward_fund"] = fc::variant(_remote_db->get_reward_fund( SMOKE_POST_REWARD_FUND_NAME )).get_object();
       return result;
@@ -1194,8 +1193,6 @@ pair<public_key_type,string> wallet_api::get_private_key_from_password( string a
    auto priv = fc::ecc::private_key::regenerate( secret );
    return std::make_pair( public_key_type( priv.get_public_key() ), key_to_wif( priv ) );
 }
-
-feed_history_api_obj wallet_api::get_feed_history()const { return my->_remote_db->get_feed_history(); }
 
 /**
  * This method is used by faucets to create new accounts for other users which must
