@@ -962,12 +962,6 @@ u256 to256( const fc::uint128& t )
 
 void database_api::set_pending_payout( discussion& d )const
 {
-   const auto& cidx = my->_db.get_index<tags::tag_index>().indices().get<tags::by_comment>();
-   auto itr = cidx.lower_bound( d.id );
-   if( itr != cidx.end() && itr->comment == d.id )  {
-//      d.promoted = asset( itr->promoted_balance, SBD_SYMBOL );
-   }
-
 //   const auto& props = my->_db.get_dynamic_global_properties();
 
    asset pot;
@@ -1212,7 +1206,6 @@ vector<discussion> database_api::get_discussions( const discussion_query& query,
       try
       {
          result.push_back( get_discussion( tidx_itr->comment, truncate_body ) );
-//         result.back().promoted = asset(tidx_itr->promoted_balance, SBD_SYMBOL );
 
          if( filter( result.back() ) )
          {

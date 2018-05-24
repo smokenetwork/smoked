@@ -176,8 +176,6 @@ struct operation_visitor
              obj.net_votes         = comment.net_votes;
              obj.hot               = hot;
              obj.trending          = trending;
-             if( obj.cashout == fc::time_point_sec() )
-               obj.promoted_balance = 0;
          });
          add_stats( current, stats );
        } else {
@@ -391,37 +389,7 @@ struct operation_visitor
 
    void operator()( const transfer_operation& op )const
    {
-      if( op.to == SMOKE_NULL_ACCOUNT && op.amount.symbol == SBD_SYMBOL )
-      {
-         vector<string> part; part.reserve(4);
-         auto path = op.memo;
-         boost::split( part, path, boost::is_any_of("/") );
-         if( part.size() > 1 && part[0].size() && part[0][0] == '@' )
-         {
-            auto acnt = part[0].substr(1);
-            auto perm = part[1];
 
-            auto c = _db.find_comment( acnt, perm );
-            if( c && c->parent_author.size() == 0 )
-            {
-               const auto& comment_idx = _db.get_index<tag_index>().indices().get<by_comment>();
-               auto citr = comment_idx.lower_bound( c->id );
-               while( citr != comment_idx.end() && citr->comment == c->id )
-               {
-                  _db.modify( *citr, [&]( tag_object& t )
-                  {
-                      if( t.cashout != fc::time_point_sec::maximum() )
-                          t.promoted_balance += op.amount.amount;
-                  });
-                  ++citr;
-               }
-            }
-            else
-            {
-               ilog( "unable to find body" );
-            }
-         }
-      }
    }
 
    void operator()( const vote_operation& op )const
