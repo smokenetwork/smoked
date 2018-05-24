@@ -216,31 +216,6 @@ namespace smoke { namespace chain {
          curve_id                curation_reward_curve = square_root;
    };
 
-   struct by_price;
-   struct by_expiration;
-   struct by_account;
-
-   struct by_owner;
-   struct by_conversion_date;
-   typedef multi_index_container<
-      convert_request_object,
-      indexed_by<
-         ordered_unique< tag< by_id >, member< convert_request_object, convert_request_id_type, &convert_request_object::id > >,
-         ordered_unique< tag< by_conversion_date >,
-            composite_key< convert_request_object,
-               member< convert_request_object, time_point_sec, &convert_request_object::conversion_date >,
-               member< convert_request_object, convert_request_id_type, &convert_request_object::id >
-            >
-         >,
-         ordered_unique< tag< by_owner >,
-            composite_key< convert_request_object,
-               member< convert_request_object, account_name_type, &convert_request_object::owner >,
-               member< convert_request_object, uint32_t, &convert_request_object::requestid >
-            >
-         >
-      >,
-      allocator< convert_request_object >
-   > convert_request_index;
 
    struct by_owner;
    struct by_volume_weight;
@@ -380,10 +355,6 @@ FC_REFLECT_ENUM( smoke::chain::curve_id,
 FC_REFLECT( smoke::chain::feed_history_object,
              (id)(current_median_history)(price_history) )
 CHAINBASE_SET_INDEX_TYPE( smoke::chain::feed_history_object, smoke::chain::feed_history_index )
-
-FC_REFLECT( smoke::chain::convert_request_object,
-             (id)(owner)(requestid)(amount)(conversion_date) )
-CHAINBASE_SET_INDEX_TYPE( smoke::chain::convert_request_object, smoke::chain::convert_request_index )
 
 FC_REFLECT( smoke::chain::liquidity_reward_balance_object,
              (id)(owner)(steem_volume)(sbd_volume)(weight)(last_update) )

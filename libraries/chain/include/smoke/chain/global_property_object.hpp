@@ -47,7 +47,6 @@ namespace smoke { namespace chain {
          asset       current_supply             = asset( 0, SMOKE_SYMBOL );
          asset       confidential_supply        = asset( 0, SMOKE_SYMBOL ); ///< total asset held in confidential balances
          asset       current_sbd_supply         = asset( 0, SBD_SYMBOL );
-         asset       confidential_sbd_supply    = asset( 0, SBD_SYMBOL ); ///< total asset held in confidential balances
          asset       total_vesting_fund_steem   = asset( 0, SMOKE_SYMBOL );
          asset       total_vesting_shares       = asset( 0, VESTS_SYMBOL );
          asset       total_reward_fund_steem    = asset( 0, SMOKE_SYMBOL );
@@ -124,7 +123,6 @@ FC_REFLECT( smoke::chain::dynamic_global_property_object,
              (current_supply)
              (confidential_supply)
              (current_sbd_supply)
-             (confidential_sbd_supply)
              (total_vesting_fund_steem)
              (total_vesting_shares)
              (total_reward_fund_steem)

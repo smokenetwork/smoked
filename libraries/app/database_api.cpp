@@ -890,21 +890,6 @@ bool database_api_impl::verify_account_authority( const string& name, const flat
    return verify_authority( trx );
 }
 
-vector<convert_request_api_obj> database_api::get_conversion_requests( const string& account )const
-{
-   return my->_db.with_read_lock( [&]()
-   {
-      const auto& idx = my->_db.get_index< convert_request_index >().indices().get< by_owner >();
-      vector< convert_request_api_obj > result;
-      auto itr = idx.lower_bound(account);
-      while( itr != idx.end() && itr->owner == account ) {
-         result.push_back(*itr);
-         ++itr;
-      }
-      return result;
-   });
-}
-
 discussion database_api::get_content( string author, string permlink )const
 {
    return my->_db.with_read_lock( [&]()
@@ -1830,7 +1815,6 @@ state database_api::get_state( string path )const
                   case operation::tag<escrow_approve_operation>::value:
                   case operation::tag<escrow_dispute_operation>::value:
                   case operation::tag<escrow_release_operation>::value:
-                  case operation::tag<fill_convert_request_operation>::value:
                   case operation::tag<claim_reward_balance_operation>::value:
                      eacnt.transfer_history[item.first] =  item.second;
                      break;

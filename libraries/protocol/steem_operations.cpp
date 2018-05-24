@@ -229,15 +229,6 @@ namespace smoke { namespace protocol {
       for( const auto& a : required_auths ) a.validate();
    }
 
-   void convert_operation::validate()const
-   {
-      validate_account_name( owner );
-      /// only allow conversion from SBD to SMOKE, allowing the opposite can enable traders to abuse
-      /// market fluxuations through converting large quantities without moving the price.
-      FC_ASSERT( is_asset_type( amount, SBD_SYMBOL ), "Can only convert SBD to SMOKE" );
-      FC_ASSERT( amount.amount > 0, "Must convert some SBD" );
-   }
-
    void escrow_transfer_operation::validate()const
    {
       validate_account_name( from );

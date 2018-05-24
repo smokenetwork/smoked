@@ -1410,66 +1410,6 @@ BOOST_AUTO_TEST_CASE( vesting_withdraw_route )
    FC_LOG_AND_RETHROW()
 }
 
-BOOST_AUTO_TEST_CASE( convert_delay )
-{
-   try
-   {
-      ACTORS( (alice) )
-      generate_block();
-      vest( "alice", ASSET( "10.000 TESTS" ) );
-      fund( "alice", ASSET( "25.000 TBD" ) );
-
-//      set_price_feed( price( asset::from_string( "1.250 TESTS" ), asset::from_string( "1.000 TBD" ) ) );
-
-      convert_operation op;
-      signed_transaction tx;
-
-      auto start_balance = ASSET( "25.000 TBD" );
-
-      BOOST_TEST_MESSAGE( "Setup conversion to TESTS" );
-      tx.operations.clear();
-      tx.signatures.clear();
-      op.owner = "alice";
-      op.amount = asset( 2000, SBD_SYMBOL );
-      op.requestid = 2;
-      tx.operations.push_back( op );
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.sign( alice_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      BOOST_TEST_MESSAGE( "Generating Blocks up to conversion block" );
-      generate_blocks( db.head_block_time() + SMOKE_CONVERSION_DELAY - fc::seconds( SMOKE_BLOCK_INTERVAL / 2 ), true );
-
-      BOOST_TEST_MESSAGE( "Verify conversion is not applied" );
-      const auto& alice_2 = db.get_account( "alice" );
-      const auto& convert_request_idx = db.get_index< convert_request_index >().indices().get< by_owner >();
-      auto convert_request = convert_request_idx.find( std::make_tuple( "alice", 2 ) );
-
-      BOOST_REQUIRE( convert_request != convert_request_idx.end() );
-      BOOST_REQUIRE( alice_2.balance.amount.value == 0 );
-      BOOST_REQUIRE( alice_2.sbd_balance.amount.value == ( start_balance - op.amount ).amount.value );
-      validate_database();
-
-      BOOST_TEST_MESSAGE( "Generate one more block" );
-      generate_block();
-
-      BOOST_TEST_MESSAGE( "Verify conversion applied" );
-      const auto& alice_3 = db.get_account( "alice" );
-      auto vop = get_last_operations( 1 )[0].get< fill_convert_request_operation >();
-
-      convert_request = convert_request_idx.find( std::make_tuple( "alice", 2 ) );
-      BOOST_REQUIRE( convert_request == convert_request_idx.end() );
-      BOOST_REQUIRE( alice_3.balance.amount.value == 2500 );
-      BOOST_REQUIRE( alice_3.sbd_balance.amount.value == ( start_balance - op.amount ).amount.value );
-      BOOST_REQUIRE( vop.owner == "alice" );
-      BOOST_REQUIRE( vop.requestid == 2 );
-      BOOST_REQUIRE( vop.amount_in.amount.value == ASSET( "2.000 TBD" ).amount.value );
-      BOOST_REQUIRE( vop.amount_out.amount.value == ASSET( "2.500 TESTS" ).amount.value );
-      validate_database();
-   }
-   FC_LOG_AND_RETHROW();
-}
-
 BOOST_AUTO_TEST_CASE( steem_inflation )
 {
    try

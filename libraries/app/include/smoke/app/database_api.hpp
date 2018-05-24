@@ -245,8 +245,6 @@ class database_api
        */
       vector<optional<witness_api_obj>> get_witnesses(const vector<witness_id_type>& witness_ids)const;
 
-      vector<convert_request_api_obj> get_conversion_requests( const string& account_name )const;
-
       /**
        * @brief Get the witness owned by a given account
        * @param account The name of the account whose witness should be retrieved
@@ -485,7 +483,6 @@ FC_API(smoke::app::database_api,
    (lookup_account_names)
    (lookup_accounts)
    (get_account_count)
-   (get_conversion_requests)
    (get_account_history)
    (get_owner_history)
    (get_recovery_request)

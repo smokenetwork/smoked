@@ -312,7 +312,6 @@ namespace smoke { namespace chain {
          share_type cashout_comment_helper( util::comment_reward_context& ctx, const comment_object& comment );
          void process_comment_cashout();
          void process_funds();
-         void process_conversions();
          void account_recovery_processing();
          void expire_escrow_ratification();
          void process_decline_voting_rights();
