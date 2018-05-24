@@ -132,22 +132,18 @@ BOOST_AUTO_TEST_CASE( comment_payout_equalize )
       for( const auto& author : authors )
       {
          const account_object& a = db.get_account(author.name);
-         ilog( "${n} : ${steem} ${sbd}", ("n", author.name)("steem", a.reward_steem_balance)("sbd", a.reward_sbd_balance) );
+         ilog( "${n} : ${steem}", ("n", author.name)("steem", a.reward_steem_balance) );
       }
       for( const auto& voter : voters )
       {
          const account_object& a = db.get_account(voter.name);
-         ilog( "${n} : ${steem} ${sbd}", ("n", voter.name)("steem", a.reward_steem_balance)("sbd", a.reward_sbd_balance) );
+         ilog( "${n} : ${steem}", ("n", voter.name)("steem", a.reward_steem_balance));
       }
       */
 
       const account_object& alice_account = db.get_account("alice");
       const account_object& bob_account   = db.get_account("bob");
       const account_object& dave_account  = db.get_account("dave");
-
-      BOOST_CHECK( alice_account.reward_sbd_balance == ASSET( "14288.000 TBD" ) );
-      BOOST_CHECK( bob_account.reward_sbd_balance == ASSET( "0.000 TBD" ) );
-      BOOST_CHECK( dave_account.reward_sbd_balance == alice_account.reward_sbd_balance );
    }
    FC_LOG_AND_RETHROW()
 }
@@ -266,8 +262,6 @@ BOOST_AUTO_TEST_CASE( reward_funds )
 
          BOOST_REQUIRE( post_rf.reward_balance.amount == 0 );
          BOOST_REQUIRE( comment_rf.reward_balance.amount > 0 );
-         BOOST_REQUIRE( db.get_account( "alice" ).reward_sbd_balance.amount > 0 );
-         BOOST_REQUIRE( db.get_account( "bob" ).reward_sbd_balance.amount == 0 );
          validate_database();
       }
 
@@ -279,8 +273,6 @@ BOOST_AUTO_TEST_CASE( reward_funds )
 
          BOOST_REQUIRE( post_rf.reward_balance.amount > 0 );
          BOOST_REQUIRE( comment_rf.reward_balance.amount == 0 );
-         BOOST_REQUIRE( db.get_account( "alice" ).reward_sbd_balance.amount > 0 );
-         BOOST_REQUIRE( db.get_account( "bob" ).reward_sbd_balance.amount > 0 );
          validate_database();
       }
    }
@@ -2345,7 +2337,6 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
          db.modify( db.get_account( SMOKE_NULL_ACCOUNT ), [&]( account_object& a )
          {
             a.reward_steem_balance = ASSET( "1.000 TESTS" );
-            a.reward_sbd_balance = ASSET( "1.000 TBD" );
             a.reward_vesting_balance = ASSET( "1.000000 VESTS" );
             a.reward_vesting_steem = ASSET( "1.000 TESTS" );
          });
@@ -2362,7 +2353,6 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
 
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).balance == ASSET( "1.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).vesting_shares > ASSET( "0.000000 VESTS" ) );
-      BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_sbd_balance == ASSET( "1.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_steem_balance == ASSET( "1.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_balance == ASSET( "1.000000 VESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_steem == ASSET( "1.000 TESTS" ) );
@@ -2374,7 +2364,6 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
 
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).balance == ASSET( "0.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).vesting_shares == ASSET( "0.000000 VESTS" ) );
-      BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_sbd_balance == ASSET( "0.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_steem_balance == ASSET( "0.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_balance == ASSET( "0.000000 VESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_steem == ASSET( "0.000 TESTS" ) );

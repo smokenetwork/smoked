@@ -56,7 +56,6 @@ namespace smoke { namespace chain {
 
          asset             balance = asset( 0, SMOKE_SYMBOL );  ///< total liquid shares held by this account
 
-         asset             reward_sbd_balance = asset( 0, SBD_SYMBOL );
          asset             reward_steem_balance = asset( 0, SMOKE_SYMBOL );
          asset             reward_vesting_balance = asset( 0, VESTS_SYMBOL );
          asset             reward_vesting_steem = asset( 0, SMOKE_SYMBOL );
@@ -426,7 +425,7 @@ FC_REFLECT( smoke::chain::account_object,
              (owner_challenged)(active_challenged)(last_owner_proved)(last_active_proved)(recovery_account)(last_account_recovery)(reset_account)
              (comment_count)(lifetime_vote_count)(post_count)(can_vote)(voting_power)(last_vote_time)
              (balance)
-             (reward_steem_balance)(reward_sbd_balance)(reward_vesting_balance)(reward_vesting_steem)
+             (reward_steem_balance)(reward_vesting_balance)(reward_vesting_steem)
              (vesting_shares)(delegated_vesting_shares)(received_vesting_shares)
              (vesting_withdraw_rate)(next_vesting_withdrawal)(withdrawn)(to_withdraw)(withdraw_routes)
              (curation_rewards)

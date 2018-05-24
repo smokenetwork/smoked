@@ -1141,12 +1141,6 @@ void database::clear_null_account_balance()
       adjust_reward_balance( null_account, -null_account.reward_steem_balance );
    }
 
-   if( null_account.reward_sbd_balance.amount > 0 )
-   {
-      total_sbd += null_account.reward_sbd_balance;
-      adjust_reward_balance( null_account, -null_account.reward_sbd_balance );
-   }
-
    if( null_account.reward_vesting_balance.amount > 0 )
    {
       const auto& gpo = get_dynamic_global_properties();
@@ -2973,9 +2967,6 @@ void database::adjust_reward_balance( const account_object& a, const asset& delt
          case SMOKE_SYMBOL:
             acnt.reward_steem_balance += delta;
             break;
-         case SBD_SYMBOL:
-            acnt.reward_sbd_balance += delta;
-            break;
          default:
             FC_ASSERT( false, "invalid symbol" );
       }
@@ -3133,7 +3124,6 @@ void database::validate_invariants()const
      {
         total_supply += itr->balance;
         total_supply += itr->reward_steem_balance;
-        total_sbd += itr->reward_sbd_balance;
         total_vesting += itr->vesting_shares;
         total_vesting += itr->reward_vesting_balance;
         pending_vesting_steem += itr->reward_vesting_steem;
