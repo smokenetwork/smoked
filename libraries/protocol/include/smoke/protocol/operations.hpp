@@ -17,8 +17,6 @@ namespace smoke { namespace protocol {
             transfer_to_vesting_operation,
             withdraw_vesting_operation,
 
-            convert_operation,
-
             account_create_operation,
             account_update_operation,
 
@@ -48,7 +46,6 @@ namespace smoke { namespace protocol {
             account_create_with_delegation_operation,
 
             /// virtual operations below this point
-            fill_convert_request_operation,
             author_reward_operation,
             curation_reward_operation,
             comment_reward_operation,

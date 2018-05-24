@@ -168,24 +168,6 @@ struct operation_process
             b.finished_vesting_withdrawals++;
       });
    }
-
-   void operator()( const convert_operation& op )const
-   {
-      _db.modify( _bucket, [&]( bucket_object& b )
-      {
-         b.sbd_conversion_requests_created++;
-         b.sbd_to_be_converted += op.amount.amount;
-      });
-   }
-
-   void operator()( const fill_convert_request_operation& op )const
-   {
-      _db.modify( _bucket, [&]( bucket_object& b )
-      {
-         b.sbd_conversion_requests_filled++;
-         b.steem_converted += op.amount_out.amount;
-      });
-   }
 };
 
 void blockchain_statistics_plugin_impl::on_block( const signed_block& b )

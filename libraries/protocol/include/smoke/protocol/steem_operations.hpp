@@ -502,20 +502,6 @@ namespace smoke { namespace protocol {
    };
 
    /**
-    *  This operation instructs the blockchain to start a conversion between SMOKE and SBD,
-    *  The funds are deposited after SMOKE_CONVERSION_DELAY
-    */
-   struct convert_operation : public base_operation
-   {
-      account_name_type owner;
-      uint32_t          requestid = 0;
-      asset             amount;
-
-      void  validate()const;
-      void  get_required_active_authorities( flat_set<account_name_type>& a )const{ a.insert(owner); }
-   };
-
-   /**
     * All account recovery requests come from a listed recovery account. This
     * is secure based on the assumption that only a trusted account should be
     * a recovery account. It is the responsibility of the recovery account to
@@ -683,7 +669,6 @@ namespace smoke { namespace protocol {
    };
 } } // smoke::protocol
 
-FC_REFLECT( smoke::protocol::convert_operation, (owner)(requestid)(amount) )
 FC_REFLECT( smoke::protocol::chain_properties, (account_creation_fee)(maximum_block_size) );
 
 FC_REFLECT( smoke::protocol::account_create_operation,
