@@ -727,7 +727,6 @@ public:
          auto accounts = result.as<vector<account_api_obj>>();
          asset total_steem;
          asset total_vest(0, VESTS_SYMBOL );
-         asset total_sbd(0, SBD_SYMBOL );
          for( const auto& a : accounts ) {
             total_steem += a.balance;
             total_vest  += a.vesting_shares;
@@ -1788,7 +1787,6 @@ annotated_signed_transaction wallet_api::escrow_transfer(
       string to,
       string agent,
       uint32_t escrow_id,
-      asset sbd_amount,
       asset steem_amount,
       asset fee,
       time_point_sec ratification_deadline,
@@ -1803,7 +1801,6 @@ annotated_signed_transaction wallet_api::escrow_transfer(
    op.to = to;
    op.agent = agent;
    op.escrow_id = escrow_id;
-   op.sbd_amount = sbd_amount;
    op.steem_amount = steem_amount;
    op.fee = fee;
    op.ratification_deadline = ratification_deadline;
@@ -1873,7 +1870,6 @@ annotated_signed_transaction wallet_api::escrow_release(
    string who,
    string receiver,
    uint32_t escrow_id,
-   asset sbd_amount,
    asset steem_amount,
    bool broadcast
 )
@@ -1886,7 +1882,6 @@ annotated_signed_transaction wallet_api::escrow_release(
    op.who = who;
    op.receiver = receiver;
    op.escrow_id = escrow_id;
-   op.sbd_amount = sbd_amount;
    op.steem_amount = steem_amount;
 
    signed_transaction tx;

@@ -16,7 +16,6 @@ fc::variant_object get_config()
    result[ "IS_TEST_NET" ] = false;
 #endif
 
-   result["SBD_SYMBOL"] = SBD_SYMBOL;
    result["SMOKE_100_PERCENT"] = SMOKE_100_PERCENT;
    result["SMOKE_1_PERCENT"] = SMOKE_1_PERCENT;
    result["SMOKE_1_TENTH_PERCENT"] = SMOKE_1_TENTH_PERCENT;

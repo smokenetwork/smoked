@@ -1108,7 +1108,6 @@ void database::clear_null_account_balance()
 {
    const auto& null_account = get_account( SMOKE_NULL_ACCOUNT );
    asset total_steem( 0, SMOKE_SYMBOL );
-   asset total_sbd( 0, SBD_SYMBOL );
 
    if( null_account.balance.amount > 0 )
    {
@@ -1162,9 +1161,6 @@ void database::clear_null_account_balance()
 
    if( total_steem.amount > 0 )
       adjust_supply( -total_steem );
-
-   if( total_sbd.amount > 0 )
-      adjust_supply( -total_sbd );
 }
 
 /**
@@ -1443,7 +1439,7 @@ share_type database::cashout_comment_helper( util::comment_reward_context& ctx, 
 
            adjust_total_payout( comment, asset( sbd_steem, SMOKE_SYMBOL ) + asset( vesting_steem, SMOKE_SYMBOL ), asset( curation_tokens, SMOKE_SYMBOL ), asset( total_beneficiary, SMOKE_SYMBOL ) );
 
-           push_virtual_operation( author_reward_operation( comment.author, to_string( comment.permlink ), asset( 0, SBD_SYMBOL ), asset( sbd_steem, SMOKE_SYMBOL ), vest_created ) );
+           push_virtual_operation( author_reward_operation( comment.author, to_string( comment.permlink ), asset( sbd_steem, SMOKE_SYMBOL ), vest_created ) );
            push_virtual_operation( comment_reward_operation( comment.author, to_string( comment.permlink ), asset( claimed_reward, SMOKE_SYMBOL ) ) );
 
 #ifndef IS_LOW_MEM
@@ -2950,8 +2946,6 @@ void database::adjust_balance( const account_object& a, const asset& delta )
          case SMOKE_SYMBOL:
             acnt.balance += delta;
             break;
-         case SBD_SYMBOL:
-            break;
          default:
             FC_ASSERT( false, "invalid symbol" );
       }
@@ -2993,8 +2987,6 @@ void database::adjust_supply( const asset& delta, bool adjust_vesting )
             assert( props.current_supply.amount.value >= 0 );
             break;
          }
-         case SBD_SYMBOL:
-            break;
          default:
             FC_ASSERT( false, "invalid symbol" );
       }
@@ -3108,7 +3100,6 @@ void database::validate_invariants()const
   {
      const auto& account_idx = get_index<account_index>().indices().get<by_name>();
      asset total_supply = asset( 0, SMOKE_SYMBOL );
-     asset total_sbd = asset( 0, SBD_SYMBOL );
      asset total_vesting = asset( 0, VESTS_SYMBOL );
      asset pending_vesting_steem = asset( 0, SMOKE_SYMBOL );
      share_type total_vsf_votes = share_type( 0 );
@@ -3142,8 +3133,6 @@ void database::validate_invariants()const
 
         if( itr->pending_fee.symbol == SMOKE_SYMBOL )
            total_supply += itr->pending_fee;
-        else if( itr->pending_fee.symbol == SBD_SYMBOL )
-           total_sbd += itr->pending_fee;
         else
            FC_ASSERT( false, "found escrow pending fee that is not SBD or SMOKE" );
      }

@@ -9,12 +9,11 @@ namespace smoke { namespace protocol {
 
    struct author_reward_operation : public virtual_operation {
       author_reward_operation(){}
-      author_reward_operation( const account_name_type& a, const string& p, const asset& s, const asset& st, const asset& v )
-         :author(a), permlink(p), sbd_payout(s), steem_payout(st), vesting_payout(v){}
+      author_reward_operation( const account_name_type& a, const string& p, const asset& st, const asset& v )
+         :author(a), permlink(p), steem_payout(st), vesting_payout(v){}
 
       account_name_type author;
       string            permlink;
-      asset             sbd_payout;
       asset             steem_payout;
       asset             vesting_payout;
    };
@@ -125,7 +124,7 @@ namespace smoke { namespace protocol {
 
 } } //smoke::protocol
 
-FC_REFLECT( smoke::protocol::author_reward_operation, (author)(permlink)(sbd_payout)(steem_payout)(vesting_payout) )
+FC_REFLECT( smoke::protocol::author_reward_operation, (author)(permlink)(steem_payout)(vesting_payout) )
 FC_REFLECT( smoke::protocol::curation_reward_operation, (curator)(reward)(comment_author)(comment_permlink) )
 FC_REFLECT( smoke::protocol::comment_reward_operation, (author)(permlink)(payout) )
 FC_REFLECT( smoke::protocol::liquidity_reward_operation, (owner)(payout) )

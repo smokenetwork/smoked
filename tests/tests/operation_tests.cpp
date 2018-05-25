@@ -2550,7 +2550,6 @@ BOOST_AUTO_TEST_CASE( escrow_transfer_validate )
       escrow_transfer_operation op;
       op.from = "alice";
       op.to = "bob";
-      op.sbd_amount = ASSET( "1.000 TBD" );
       op.steem_amount = ASSET( "1.000 TESTS" );
       op.escrow_id = 0;
       op.agent = "sam";
@@ -2559,33 +2558,19 @@ BOOST_AUTO_TEST_CASE( escrow_transfer_validate )
       op.ratification_deadline = db.head_block_time() + 100;
       op.escrow_expiration = db.head_block_time() + 200;
 
-      BOOST_TEST_MESSAGE( "--- failure when sbd symbol != SBD" );
-      op.sbd_amount.symbol = SMOKE_SYMBOL;
       SMOKE_REQUIRE_THROW( op.validate(), fc::exception );
 
-      BOOST_TEST_MESSAGE( "--- failure when steem symbol != SMOKE" );
-      op.sbd_amount.symbol = SBD_SYMBOL;
-      op.steem_amount.symbol = SBD_SYMBOL;
-      SMOKE_REQUIRE_THROW( op.validate(), fc::exception );
-
-      BOOST_TEST_MESSAGE( "--- failure when fee symbol != SBD and fee symbol != SMOKE" );
+      BOOST_TEST_MESSAGE( "--- failure when fee symbol != SMOKE" );
       op.steem_amount.symbol = SMOKE_SYMBOL;
       op.fee.symbol = VESTS_SYMBOL;
       SMOKE_REQUIRE_THROW( op.validate(), fc::exception );
 
-      BOOST_TEST_MESSAGE( "--- failure when sbd == 0 and steem == 0" );
+      BOOST_TEST_MESSAGE( "--- failure when steem == 0" );
       op.fee.symbol = SMOKE_SYMBOL;
-      op.sbd_amount.amount = 0;
       op.steem_amount.amount = 0;
       SMOKE_REQUIRE_THROW( op.validate(), fc::exception );
 
-      BOOST_TEST_MESSAGE( "--- failure when sbd < 0" );
-      op.sbd_amount.amount = -100;
-      op.steem_amount.amount = 1000;
-      SMOKE_REQUIRE_THROW( op.validate(), fc::exception );
-
       BOOST_TEST_MESSAGE( "--- failure when steem < 0" );
-      op.sbd_amount.amount = 1000;
       op.steem_amount.amount = -100;
       SMOKE_REQUIRE_THROW( op.validate(), fc::exception );
 
@@ -2619,7 +2604,6 @@ BOOST_AUTO_TEST_CASE( escrow_transfer_authorities )
       escrow_transfer_operation op;
       op.from = "alice";
       op.to = "bob";
-      op.sbd_amount = ASSET( "1.000 TBD" );
       op.steem_amount = ASSET( "1.000 TESTS" );
       op.escrow_id = 0;
       op.agent = "sam";
@@ -2657,7 +2641,6 @@ BOOST_AUTO_TEST_CASE( escrow_transfer_apply )
       escrow_transfer_operation op;
       op.from = "alice";
       op.to = "bob";
-      op.sbd_amount = ASSET( "1.000 TBD" );
       op.steem_amount = ASSET( "1.000 TESTS" );
       op.escrow_id = 0;
       op.agent = "sam";
@@ -2674,7 +2657,6 @@ BOOST_AUTO_TEST_CASE( escrow_transfer_apply )
       SMOKE_REQUIRE_THROW( db.push_transaction( tx, 0 ), fc::exception );
 
       BOOST_TEST_MESSAGE( "--- falure when from cannot cover amount + fee" );
-      op.sbd_amount.amount = 0;
       op.steem_amount.amount = 10000;
       tx.operations.clear();
       tx.signatures.clear();
@@ -3329,30 +3311,14 @@ BOOST_AUTO_TEST_CASE( escrow_release_validate )
       op.agent = "sam";
       op.receiver = "bob";
 
-
       BOOST_TEST_MESSAGE( "--- failure when steem < 0" );
       op.steem_amount.amount = -1;
       SMOKE_REQUIRE_THROW( op.validate(), fc::exception );
 
-
-      BOOST_TEST_MESSAGE( "--- failure when sbd < 0" );
-      op.steem_amount.amount = 0;
-      op.sbd_amount.amount = -1;
+      BOOST_TEST_MESSAGE( "--- failure when steem == 0 " );
       SMOKE_REQUIRE_THROW( op.validate(), fc::exception );
-
-
-      BOOST_TEST_MESSAGE( "--- failure when steem == 0 and sbd == 0" );
-      op.sbd_amount.amount = 0;
-      SMOKE_REQUIRE_THROW( op.validate(), fc::exception );
-
-
-      BOOST_TEST_MESSAGE( "--- failure when sbd is not sbd symbol" );
-      op.sbd_amount = ASSET( "1.000 TESTS" );
-      SMOKE_REQUIRE_THROW( op.validate(), fc::exception );
-
 
       BOOST_TEST_MESSAGE( "--- failure when steem is not steem symbol" );
-      op.sbd_amount.symbol = SBD_SYMBOL;
       op.steem_amount = ASSET( "1.000 TBD" );
       SMOKE_REQUIRE_THROW( op.validate(), fc::exception );
 
@@ -3608,7 +3574,6 @@ BOOST_AUTO_TEST_CASE( escrow_release_apply )
 
       BOOST_TEST_MESSAGE( "--- failure when releasing less steem than available" );
       op.steem_amount = ASSET( "0.000 TESTS" );
-      op.sbd_amount = ASSET( "1.000 TBD" );
 
       tx.clear();
       tx.operations.push_back( op );
@@ -3633,7 +3598,6 @@ BOOST_AUTO_TEST_CASE( escrow_release_apply )
       op.receiver = et_op.from;
       op.who = et_op.to;
       op.steem_amount = ASSET( "0.100 TESTS" );
-      op.sbd_amount = ASSET( "0.000 TBD" );
       tx.operations.push_back( op );
       tx.sign( bob_private_key, db.get_chain_id() );
       SMOKE_REQUIRE_THROW( db.push_transaction( tx, 0 ), fc::exception );
