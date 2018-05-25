@@ -727,21 +727,19 @@ public:
          auto accounts = result.as<vector<account_api_obj>>();
          asset total_steem;
          asset total_vest(0, VESTS_SYMBOL );
-         asset total_sbd(0, SBD_SYMBOL );
          for( const auto& a : accounts ) {
             total_steem += a.balance;
             total_vest  += a.vesting_shares;
-            total_sbd  += a.sbd_balance;
             out << std::left << std::setw( 17 ) << std::string(a.name)
                 << std::right << std::setw(18) << fc::variant(a.balance).as_string() <<" "
                 << std::right << std::setw(26) << fc::variant(a.vesting_shares).as_string() <<" "
-                << std::right << std::setw(16) << fc::variant(a.sbd_balance).as_string() <<"\n";
+                << std::right << std::setw(16) <<"\n";
          }
          out << "-------------------------------------------------------------------------\n";
             out << std::left << std::setw( 17 ) << "TOTAL"
                 << std::right << std::setw(18) << fc::variant(total_steem).as_string() <<" "
                 << std::right << std::setw(26) << fc::variant(total_vest).as_string() <<" "
-                << std::right << std::setw(16) << fc::variant(total_sbd).as_string() <<"\n";
+                << std::right << std::setw(16) <<"\n";
          return out.str();
       };
       m["get_account_history"] = []( variant result, const fc::variants& a ) {
@@ -1789,7 +1787,6 @@ annotated_signed_transaction wallet_api::escrow_transfer(
       string to,
       string agent,
       uint32_t escrow_id,
-      asset sbd_amount,
       asset steem_amount,
       asset fee,
       time_point_sec ratification_deadline,
@@ -1804,7 +1801,6 @@ annotated_signed_transaction wallet_api::escrow_transfer(
    op.to = to;
    op.agent = agent;
    op.escrow_id = escrow_id;
-   op.sbd_amount = sbd_amount;
    op.steem_amount = steem_amount;
    op.fee = fee;
    op.ratification_deadline = ratification_deadline;
@@ -1874,7 +1870,6 @@ annotated_signed_transaction wallet_api::escrow_release(
    string who,
    string receiver,
    uint32_t escrow_id,
-   asset sbd_amount,
    asset steem_amount,
    bool broadcast
 )
@@ -1887,7 +1882,6 @@ annotated_signed_transaction wallet_api::escrow_release(
    op.who = who;
    op.receiver = receiver;
    op.escrow_id = escrow_id;
-   op.sbd_amount = sbd_amount;
    op.steem_amount = steem_amount;
 
    signed_transaction tx;

@@ -26,7 +26,6 @@ namespace smoke { namespace app {
       vector< string > maturing;    /// about to be paid out
       vector< string > best;        /// total lifetime payout
       vector< string > hot;         /// total lifetime payout
-      vector< string > promoted;    /// pending lifetime payout
    };
 
    struct tag_index
@@ -64,7 +63,6 @@ namespace smoke { namespace app {
       vector<vote_state>          active_votes;
       vector<string>              replies; ///< author/slug mapping
       share_type                  author_reputation = 0;
-      asset                       promoted = asset(0, SBD_SYMBOL);
       uint32_t                    body_length = 0;
       vector<account_name_type>   reblogged_by;
       optional<account_name_type> first_reblogged_by;
@@ -139,8 +137,8 @@ FC_REFLECT_DERIVED( smoke::app::extended_account,
 FC_REFLECT( smoke::app::vote_state, (voter)(weight)(rshares)(percent)(reputation)(time) );
 FC_REFLECT( smoke::app::account_vote, (authorperm)(weight)(rshares)(percent)(time) );
 
-FC_REFLECT( smoke::app::discussion_index, (category)(trending)(payout)(payout_comments)(trending30)(updated)(created)(responses)(active)(votes)(maturing)(best)(hot)(promoted)(cashout) )
+FC_REFLECT( smoke::app::discussion_index, (category)(trending)(payout)(payout_comments)(trending30)(updated)(created)(responses)(active)(votes)(maturing)(best)(hot)(cashout) )
 FC_REFLECT( smoke::app::tag_index, (trending) )
-FC_REFLECT_DERIVED( smoke::app::discussion, (smoke::app::comment_api_obj), (url)(root_title)(pending_payout_value)(total_pending_payout_value)(active_votes)(replies)(author_reputation)(promoted)(body_length)(reblogged_by)(first_reblogged_by)(first_reblogged_on) )
+FC_REFLECT_DERIVED( smoke::app::discussion, (smoke::app::comment_api_obj), (url)(root_title)(pending_payout_value)(total_pending_payout_value)(active_votes)(replies)(author_reputation)(body_length)(reblogged_by)(first_reblogged_by)(first_reblogged_on) )
 
 FC_REFLECT( smoke::app::state, (current_route)(props)(tag_idx)(tags)(content)(accounts)(pow_queue)(witnesses)(discussion_idx)(witness_schedule)(error) )

@@ -962,12 +962,6 @@ u256 to256( const fc::uint128& t )
 
 void database_api::set_pending_payout( discussion& d )const
 {
-   const auto& cidx = my->_db.get_index<tags::tag_index>().indices().get<tags::by_comment>();
-   auto itr = cidx.lower_bound( d.id );
-   if( itr != cidx.end() && itr->comment == d.id )  {
-      d.promoted = asset( itr->promoted_balance, SBD_SYMBOL );
-   }
-
 //   const auto& props = my->_db.get_dynamic_global_properties();
 
    asset pot;
@@ -1212,7 +1206,6 @@ vector<discussion> database_api::get_discussions( const discussion_query& query,
       try
       {
          result.push_back( get_discussion( tidx_itr->comment, truncate_body ) );
-         result.back().promoted = asset(tidx_itr->promoted_balance, SBD_SYMBOL );
 
          if( filter( result.back() ) )
          {
@@ -1291,21 +1284,6 @@ vector<discussion> database_api::get_comment_discussions_by_payout( const discus
       auto tidx_itr = tidx.lower_bound( boost::make_tuple( tag, false ) );
 
       return get_discussions( query, tag, parent, tidx, tidx_itr, query.truncate_body, []( const comment_api_obj& c ){ return c.net_rshares <= 0; }, exit_default, tag_exit_default, true );
-   });
-}
-
-vector<discussion> database_api::get_discussions_by_promoted( const discussion_query& query )const
-{
-   return my->_db.with_read_lock( [&]()
-   {
-      query.validate();
-      auto tag = fc::to_lower( query.tag );
-      auto parent = get_parent( query );
-
-      const auto& tidx = my->_db.get_index<tags::tag_index>().indices().get<tags::by_parent_promoted>();
-      auto tidx_itr = tidx.lower_bound( boost::make_tuple( tag, parent, share_type(SMOKE_MAX_SHARE_SUPPLY) )  );
-
-      return get_discussions( query, tag, parent, tidx, tidx_itr, query.truncate_body, filter_default, exit_default, []( const tags::tag_object& t ){ return t.promoted_balance == 0; }  );
    });
 }
 
@@ -1965,23 +1943,6 @@ state database_api::get_state( string path )const
             _state.content[key] = std::move(d);
          }
       }
-      else if( part[0] == "promoted" )
-      {
-         discussion_query q;
-         q.tag = tag;
-         q.limit = 20;
-         q.truncate_body = 1024;
-         auto trending_disc = get_discussions_by_promoted( q );
-
-         auto& didx = _state.discussion_idx[tag];
-         for( const auto& d : trending_disc )
-         {
-            auto key = d.author + "/" + d.permlink;
-            didx.promoted.push_back( key );
-            if( d.author.size() ) accounts.insert(d.author);
-            _state.content[key] = std::move(d);
-         }
-      }
       else if( part[0] == "responses"  ) {
          discussion_query q;
          q.tag = tag;
@@ -2008,21 +1969,6 @@ state database_api::get_state( string path )const
          for( const auto& d : trending_disc ) {
             auto key = d.author +"/" + d.permlink;
             didx.hot.push_back( key );
-            if( d.author.size() ) accounts.insert(d.author);
-            _state.content[key] = std::move(d);
-         }
-      }
-      else if( !part[0].size() || part[0] == "promoted" ) {
-         discussion_query q;
-         q.tag = tag;
-         q.limit = 20;
-         q.truncate_body = 1024;
-         auto trending_disc = get_discussions_by_promoted( q );
-
-         auto& didx = _state.discussion_idx[tag];
-         for( const auto& d : trending_disc ) {
-            auto key = d.author +"/" + d.permlink;
-            didx.promoted.push_back( key );
             if( d.author.size() ) accounts.insert(d.author);
             _state.content[key] = std::move(d);
          }

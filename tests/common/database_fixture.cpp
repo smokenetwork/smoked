@@ -332,21 +332,14 @@ void database_fixture::fund(
          {
             if( amount.symbol == SMOKE_SYMBOL )
                a.balance += amount;
-            else if( amount.symbol == SBD_SYMBOL )
-            {
-               a.sbd_balance += amount;
-            }
          });
 
          db.modify( db.get_dynamic_global_properties(), [&]( dynamic_global_property_object& gpo )
          {
             if( amount.symbol == SMOKE_SYMBOL )
                gpo.current_supply += amount;
-            else if( amount.symbol == SBD_SYMBOL )
-               gpo.current_sbd_supply += amount;
          });
 
-         db.update_virtual_supply();
       }, default_skip );
    }
    FC_CAPTURE_AND_RETHROW( (account_name)(amount) )
@@ -403,7 +396,6 @@ void database_fixture::vest( const string& account, const asset& amount )
 
       db.create_vesting( db.get_account( account ), amount );
 
-      db.update_virtual_supply();
    }, default_skip );
 }
 

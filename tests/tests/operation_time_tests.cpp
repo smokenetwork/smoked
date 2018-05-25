@@ -132,22 +132,18 @@ BOOST_AUTO_TEST_CASE( comment_payout_equalize )
       for( const auto& author : authors )
       {
          const account_object& a = db.get_account(author.name);
-         ilog( "${n} : ${steem} ${sbd}", ("n", author.name)("steem", a.reward_steem_balance)("sbd", a.reward_sbd_balance) );
+         ilog( "${n} : ${steem}", ("n", author.name)("steem", a.reward_steem_balance) );
       }
       for( const auto& voter : voters )
       {
          const account_object& a = db.get_account(voter.name);
-         ilog( "${n} : ${steem} ${sbd}", ("n", voter.name)("steem", a.reward_steem_balance)("sbd", a.reward_sbd_balance) );
+         ilog( "${n} : ${steem}", ("n", voter.name)("steem", a.reward_steem_balance));
       }
       */
 
       const account_object& alice_account = db.get_account("alice");
       const account_object& bob_account   = db.get_account("bob");
       const account_object& dave_account  = db.get_account("dave");
-
-      BOOST_CHECK( alice_account.reward_sbd_balance == ASSET( "14288.000 TBD" ) );
-      BOOST_CHECK( bob_account.reward_sbd_balance == ASSET( "0.000 TBD" ) );
-      BOOST_CHECK( dave_account.reward_sbd_balance == alice_account.reward_sbd_balance );
    }
    FC_LOG_AND_RETHROW()
 }
@@ -266,8 +262,6 @@ BOOST_AUTO_TEST_CASE( reward_funds )
 
          BOOST_REQUIRE( post_rf.reward_balance.amount == 0 );
          BOOST_REQUIRE( comment_rf.reward_balance.amount > 0 );
-         BOOST_REQUIRE( db.get_account( "alice" ).reward_sbd_balance.amount > 0 );
-         BOOST_REQUIRE( db.get_account( "bob" ).reward_sbd_balance.amount == 0 );
          validate_database();
       }
 
@@ -279,8 +273,6 @@ BOOST_AUTO_TEST_CASE( reward_funds )
 
          BOOST_REQUIRE( post_rf.reward_balance.amount > 0 );
          BOOST_REQUIRE( comment_rf.reward_balance.amount == 0 );
-         BOOST_REQUIRE( db.get_account( "alice" ).reward_sbd_balance.amount > 0 );
-         BOOST_REQUIRE( db.get_account( "bob" ).reward_sbd_balance.amount > 0 );
          validate_database();
       }
    }
@@ -461,7 +453,6 @@ BOOST_AUTO_TEST_CASE( recent_claims_decay )
       auto total_rshares2 = db.get_dynamic_global_properties().total_reward_shares2;
       auto bob_comment_rshares = db.get_comment( "bob", string( "test" ) ).net_rshares;
       auto bob_vest_shares = db.get_account( "bob" ).vesting_shares;
-      auto bob_sbd_balance = db.get_account( "bob" ).sbd_balance;
 
       auto bob_comment_payout = asset( ( ( uint128_t( bob_comment_rshares.value ) * bob_comment_rshares.value * reward_steem.amount.value ) / total_rshares2 ).to_uint64(), SMOKE_SYMBOL );
       auto bob_comment_discussion_rewards = asset( bob_comment_payout.amount / 4, SMOKE_SYMBOL );
@@ -525,7 +516,6 @@ BOOST_AUTO_TEST_CASE( recent_claims_decay )
       db.push_transaction( tx, 0 );
 
       bob_vest_shares = db.get_account( "bob" ).vesting_shares;
-      bob_sbd_balance = db.get_account( "bob" ).sbd_balance;
 
       validate_database();
 
@@ -668,7 +658,6 @@ BOOST_AUTO_TEST_CASE( comment_payout )
       auto total_rshares2 = db.get_dynamic_global_properties().total_reward_shares2;
       auto bob_comment_vote_total = db.get_comment( "bob", string( "test" ) ).total_vote_weight;
       auto bob_comment_rshares = db.get_comment( "bob", string( "test" ) ).net_rshares;
-      auto bob_sbd_balance = db.get_account( "bob" ).sbd_balance;
       auto alice_vest_shares = db.get_account( "alice" ).vesting_shares;
       auto bob_vest_shares = db.get_account( "bob" ).vesting_shares;
       auto sam_vest_shares = db.get_account( "sam" ).vesting_shares;
@@ -737,7 +726,6 @@ BOOST_AUTO_TEST_CASE( comment_payout )
       total_rshares2 = db.get_dynamic_global_properties().total_reward_shares2;
       auto alice_comment_vote_total = db.get_comment( "alice", string( "test" ) ).total_vote_weight;
       auto alice_comment_rshares = db.get_comment( "alice", string( "test" ) ).net_rshares;
-      auto alice_sbd_balance = db.get_account( "alice" ).sbd_balance;
       alice_vest_shares = db.get_account( "alice" ).vesting_shares;
       bob_vest_shares = db.get_account( "bob" ).vesting_shares;
       sam_vest_shares = db.get_account( "sam" ).vesting_shares;
@@ -770,7 +758,6 @@ BOOST_AUTO_TEST_CASE( comment_payout )
 
       BOOST_REQUIRE( ( db.get_dynamic_global_properties().total_reward_fund_steem + alice_comment_payout + alice_comment_vote_rewards - unclaimed_payments ).amount.value == reward_steem.amount.value );
       BOOST_REQUIRE( db.get_comment( "alice", string( "test" ) ).total_payout_value.amount.value == ( ( alice_comment_vesting_reward * db.get_dynamic_global_properties().get_vesting_share_price() ) + ( alice_comment_sbd_reward * exchange_rate ) ).amount.value );
-      BOOST_REQUIRE( db.get_account( "alice" ).sbd_balance.amount.value == ( alice_sbd_balance + alice_comment_sbd_reward ).amount.value );
       BOOST_REQUIRE( db.get_comment( "alice", string( "test" ) ).net_rshares.value == 0 );
       BOOST_REQUIRE( db.get_comment( "alice", string( "test" ) ).net_rshares.value == 0 );
       BOOST_REQUIRE( db.get_account( "alice" ).vesting_shares.amount.value == ( alice_vest_shares + alice_vote_vesting + alice_comment_vesting_reward ).amount.value );
@@ -837,7 +824,6 @@ BOOST_AUTO_TEST_CASE( comment_payout )
       db.push_transaction( tx, 0 );
 
       bob_vest_shares = db.get_account( "bob" ).vesting_shares;
-      auto bob_sbd = db.get_account( "bob" ).sbd_balance;
 
       BOOST_REQUIRE( vote_idx.find( std::make_tuple( db.get_comment( "bob", string( "test" ).id, db.get_account( "dave" ) ).id ) ) != vote_idx.end() );
       validate_database();
@@ -846,7 +832,6 @@ BOOST_AUTO_TEST_CASE( comment_payout )
 
       BOOST_REQUIRE( vote_idx.find( std::make_tuple( db.get_comment( "bob", string( "test" ).id, db.get_account( "dave" ) ).id ) ) == vote_idx.end() );
       BOOST_REQUIRE( bob_vest_shares.amount.value == db.get_account( "bob" ).vesting_shares.amount.value );
-      BOOST_REQUIRE( bob_sbd.amount.value == db.get_account( "bob" ).sbd_balance.amount.value );
       validate_database();
    }
    FC_LOG_AND_RETHROW()
@@ -1022,13 +1007,9 @@ BOOST_AUTO_TEST_CASE( nested_comments )
       auto dave_comment_total_payout = db.to_sbd( asset( dave_pays_dave_sbd + dave_pays_dave_vest, SMOKE_SYMBOL ) );
 
       auto alice_starting_vesting = db.get_account( "alice" ).vesting_shares;
-      auto alice_starting_sbd = db.get_account( "alice" ).sbd_balance;
       auto bob_starting_vesting = db.get_account( "bob" ).vesting_shares;
-      auto bob_starting_sbd = db.get_account( "bob" ).sbd_balance;
       auto sam_starting_vesting = db.get_account( "sam" ).vesting_shares;
-      auto sam_starting_sbd = db.get_account( "sam" ).sbd_balance;
       auto dave_starting_vesting = db.get_account( "dave" ).vesting_shares;
-      auto dave_starting_sbd = db.get_account( "dave" ).sbd_balance;
 
       generate_block();
 
@@ -1150,22 +1131,18 @@ BOOST_AUTO_TEST_CASE( nested_comments )
 
       auto alice_total_sbd = alice_starting_sbd + asset( alice_pays_alice_sbd + bob_pays_alice_sbd + dave_pays_alice_sbd, SMOKE_SYMBOL ) * exchange_rate;
       auto alice_total_vesting = alice_starting_vesting + asset( alice_pays_alice_vest + bob_pays_alice_vest + dave_pays_alice_vest + alice_vote_alice_reward.amount + alice_vote_bob_reward.amount, SMOKE_SYMBOL ) * gpo.get_vesting_share_price();
-      BOOST_REQUIRE( db.get_account( "alice" ).sbd_balance.amount.value == alice_total_sbd.amount.value );
       BOOST_REQUIRE( db.get_account( "alice" ).vesting_shares.amount.value == alice_total_vesting.amount.value );
 
       auto bob_total_sbd = bob_starting_sbd + asset( bob_pays_bob_sbd + dave_pays_bob_sbd, SMOKE_SYMBOL ) * exchange_rate;
       auto bob_total_vesting = bob_starting_vesting + asset( bob_pays_bob_vest + dave_pays_bob_vest + bob_vote_alice_reward.amount + bob_vote_bob_reward.amount + bob_vote_dave_reward.amount, SMOKE_SYMBOL ) * gpo.get_vesting_share_price();
-      BOOST_REQUIRE( db.get_account( "bob" ).sbd_balance.amount.value == bob_total_sbd.amount.value );
       BOOST_REQUIRE( db.get_account( "bob" ).vesting_shares.amount.value == bob_total_vesting.amount.value );
 
       auto sam_total_sbd = sam_starting_sbd + asset( dave_pays_sam_sbd, SMOKE_SYMBOL ) * exchange_rate;
       auto sam_total_vesting = bob_starting_vesting + asset( dave_pays_sam_vest + sam_vote_bob_reward.amount, SMOKE_SYMBOL ) * gpo.get_vesting_share_price();
-      BOOST_REQUIRE( db.get_account( "sam" ).sbd_balance.amount.value == sam_total_sbd.amount.value );
       BOOST_REQUIRE( db.get_account( "sam" ).vesting_shares.amount.value == sam_total_vesting.amount.value );
 
       auto dave_total_sbd = dave_starting_sbd + asset( dave_pays_dave_sbd, SMOKE_SYMBOL ) * exchange_rate;
       auto dave_total_vesting = dave_starting_vesting + asset( dave_pays_dave_vest, SMOKE_SYMBOL ) * gpo.get_vesting_share_price();
-      BOOST_REQUIRE( db.get_account( "dave" ).sbd_balance.amount.value == dave_total_sbd.amount.value );
       BOOST_REQUIRE( db.get_account( "dave" ).vesting_shares.amount.value == dave_total_vesting.amount.value );
    }
    FC_LOG_AND_RETHROW()
@@ -1418,7 +1395,6 @@ BOOST_AUTO_TEST_CASE( steem_inflation )
       BOOST_TEST_MESSAGE( "Testing SMOKE Inflation until the vesting start block" );
 
       auto gpo = db.get_dynamic_global_properties();
-      auto virtual_supply = gpo.virtual_supply;
       auto witness_name = db.get_scheduled_witness(1);
       auto old_witness_balance = db.get_account( witness_name ).balance;
       auto old_witness_shares = db.get_account( witness_name ).vesting_shares;
@@ -1594,527 +1570,519 @@ BOOST_AUTO_TEST_CASE( steem_inflation )
    FC_LOG_AND_RETHROW();
 }
 
-BOOST_AUTO_TEST_CASE( liquidity_rewards )
-{
-   using std::abs;
-
-   try
-   {
-      db.liquidity_rewards_enabled = false;
-
-      ACTORS( (alice)(bob)(sam)(dave) )
-      generate_block();
-      vest( "alice", ASSET( "10.000 TESTS" ) );
-      vest( "bob", ASSET( "10.000 TESTS" ) );
-      vest( "sam", ASSET( "10.000 TESTS" ) );
-      vest( "dave", ASSET( "10.000 TESTS" ) );
-
-      BOOST_TEST_MESSAGE( "Rewarding Bob with TESTS" );
-
-//      auto exchange_rate = price( ASSET( "1.250 TESTS" ), ASSET( "1.000 TBD" ) );
-//      set_price_feed( exchange_rate );
-
-      signed_transaction tx;
-
-      fund( "alice", ASSET( "25.522 TBD" ) );
-      asset alice_sbd = db.get_account( "alice" ).sbd_balance;
-
-      generate_block();
-
-      fund( "alice", alice_sbd.amount );
-      fund( "bob", alice_sbd.amount );
-      fund( "sam", alice_sbd.amount );
-      fund( "dave", alice_sbd.amount );
-
-      int64_t alice_sbd_volume = 0;
-      int64_t alice_steem_volume = 0;
-      time_point_sec alice_reward_last_update = fc::time_point_sec::min();
-      int64_t bob_sbd_volume = 0;
-      int64_t bob_steem_volume = 0;
-      time_point_sec bob_reward_last_update = fc::time_point_sec::min();
-      int64_t sam_sbd_volume = 0;
-      int64_t sam_steem_volume = 0;
-      time_point_sec sam_reward_last_update = fc::time_point_sec::min();
-      int64_t dave_sbd_volume = 0;
-      int64_t dave_steem_volume = 0;
-      time_point_sec dave_reward_last_update = fc::time_point_sec::min();
-
-
-      alice_steem_volume += ( asset( alice_sbd.amount / 20, SBD_SYMBOL ) * exchange_rate ).amount.value;
-      alice_reward_last_update = db.head_block_time();
-      bob_steem_volume -= ( asset( alice_sbd.amount / 20, SBD_SYMBOL ) * exchange_rate ).amount.value;
-      bob_reward_last_update = db.head_block_time();
-
-      auto ops = get_last_operations( 1 );
-      const auto& liquidity_idx = db.get_index< liquidity_reward_balance_index >().indices().get< by_owner >();
-
-      auto reward = liquidity_idx.find( db.get_account( "alice" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "alice" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == alice_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == alice_steem_volume );
-      BOOST_CHECK( reward->last_update == alice_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "bob" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "bob" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == bob_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == bob_steem_volume );
-      BOOST_CHECK( reward->last_update == bob_reward_last_update );*/
-
-      BOOST_TEST_MESSAGE( "Creating Limit Order for SBD that will stay on the books for 60 minutes." );
-
-      op.owner = "sam";
-      op.amount_to_sell = asset( ( alice_sbd.amount.value / 20 ), SMOKE_SYMBOL );
-      op.min_to_receive = asset( ( alice_sbd.amount.value / 20 ), SBD_SYMBOL );
-      op.orderid = 3;
-
-      tx.signatures.clear();
-      tx.operations.clear();
-      tx.operations.push_back( op );
-      tx.sign( sam_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      BOOST_TEST_MESSAGE( "Waiting 10 minutes" );
-
-//      generate_blocks( db.head_block_time() + SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC_HF10, true );
-
-      BOOST_TEST_MESSAGE( "Creating Limit Order for SBD that will stay on the books for 30 minutes." );
-
-      op.owner = "bob";
-      op.orderid = 4;
-      op.amount_to_sell = asset( ( alice_sbd.amount.value / 10 ) * 3 - alice_sbd.amount.value / 20, SMOKE_SYMBOL );
-      op.min_to_receive = asset( ( alice_sbd.amount.value / 10 ) * 3 - alice_sbd.amount.value / 20, SBD_SYMBOL );
-
-      tx.signatures.clear();
-      tx.operations.clear();
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.operations.push_back( op );
-      tx.sign( bob_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      BOOST_TEST_MESSAGE( "Waiting 30 minutes" );
-
-//      generate_blocks( db.head_block_time() + SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC_HF10, true );
-
-      BOOST_TEST_MESSAGE( "Filling both limit orders." );
-
-      op.owner = "alice";
-      op.orderid = 5;
-      op.amount_to_sell = asset( ( alice_sbd.amount.value / 10 ) * 3, SBD_SYMBOL );
-      op.min_to_receive = asset( ( alice_sbd.amount.value / 10 ) * 3, SMOKE_SYMBOL );
-
-      tx.signatures.clear();
-      tx.operations.clear();
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.operations.push_back( op );
-      tx.sign( alice_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      alice_sbd_volume -= ( alice_sbd.amount.value / 10 ) * 3;
-      alice_reward_last_update = db.head_block_time();
-      sam_sbd_volume += alice_sbd.amount.value / 20;
-      sam_reward_last_update = db.head_block_time();
-      bob_sbd_volume += ( alice_sbd.amount.value / 10 ) * 3 - ( alice_sbd.amount.value / 20 );
-      bob_reward_last_update = db.head_block_time();
-      ops = get_last_operations( 4 );
-
-      reward = liquidity_idx.find( db.get_account( "alice" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "alice" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == alice_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == alice_steem_volume );
-      BOOST_CHECK( reward->last_update == alice_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "bob" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "bob" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == bob_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == bob_steem_volume );
-      BOOST_CHECK( reward->last_update == bob_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "sam" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == sam_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
-      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
-
-      BOOST_TEST_MESSAGE( "Testing a partial fill before minimum time and full fill after minimum time" );
-
-      op.orderid = 6;
-      op.amount_to_sell = asset( alice_sbd.amount.value / 20 * 2, SBD_SYMBOL );
-      op.min_to_receive = asset( alice_sbd.amount.value / 20 * 2, SMOKE_SYMBOL );
-
-      tx.signatures.clear();
-      tx.operations.clear();
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.operations.push_back( op );
-      tx.sign( alice_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-//      generate_blocks( db.head_block_time() + fc::seconds( SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC_HF10.to_seconds() / 2 ), true );
-
-      op.owner = "bob";
-      op.orderid = 7;
-      op.amount_to_sell = asset( alice_sbd.amount.value / 20, SMOKE_SYMBOL );
-      op.min_to_receive = asset( alice_sbd.amount.value / 20, SBD_SYMBOL );
-
-      tx.signatures.clear();
-      tx.operations.clear();
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.operations.push_back( op );
-      tx.sign( bob_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-//      generate_blocks( db.head_block_time() + fc::seconds( SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC_HF10.to_seconds() / 2 ), true );
-
-      ops = get_last_operations( 3 );
-
-      reward = liquidity_idx.find( db.get_account( "alice" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "alice" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == alice_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == alice_steem_volume );
-      BOOST_CHECK( reward->last_update == alice_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "bob" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "bob" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == bob_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == bob_steem_volume );
-      BOOST_CHECK( reward->last_update == bob_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "sam" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == sam_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
-      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
-
-//      generate_blocks( db.head_block_time() + SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC_HF10, true );
-
-      op.owner = "sam";
-      op.orderid = 8;
-
-      tx.signatures.clear();
-      tx.operations.clear();
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.operations.push_back( op );
-      tx.sign( sam_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      alice_steem_volume += alice_sbd.amount.value / 20;
-      alice_reward_last_update = db.head_block_time();
-      sam_steem_volume -= alice_sbd.amount.value / 20;
-      sam_reward_last_update = db.head_block_time();
-
-      ops = get_last_operations( 2 );
-
-      reward = liquidity_idx.find( db.get_account( "alice" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "alice" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == alice_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == alice_steem_volume );
-      BOOST_CHECK( reward->last_update == alice_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "bob" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "bob" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == bob_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == bob_steem_volume );
-      BOOST_CHECK( reward->last_update == bob_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "sam" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == sam_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
-      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
-
-      BOOST_TEST_MESSAGE( "Trading to give Alice and Bob positive volumes to receive rewards" );
-
-      transfer_operation transfer;
-      transfer.to = "dave";
-      transfer.from = "alice";
-      transfer.amount = asset( alice_sbd.amount / 2, SBD_SYMBOL );
-
-      tx.operations.clear();
-      tx.signatures.clear();
-      tx.operations.push_back( transfer );
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.sign( alice_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      op.owner = "alice";
-      op.amount_to_sell = asset( 8 * ( alice_sbd.amount.value / 20 ), SMOKE_SYMBOL );
-      op.min_to_receive = asset( op.amount_to_sell.amount, SBD_SYMBOL );
-      op.orderid = 9;
-      tx.operations.clear();
-      tx.signatures.clear();
-      tx.operations.push_back( op );
-      tx.sign( alice_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-//      generate_blocks( db.head_block_time() + SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC_HF10, true );
-
-      op.owner = "dave";
-      op.amount_to_sell = asset( 7 * ( alice_sbd.amount.value / 20 ), SBD_SYMBOL );;
-      op.min_to_receive = asset( op.amount_to_sell.amount, SMOKE_SYMBOL );
-      op.orderid = 10;
-      tx.operations.clear();
-      tx.signatures.clear();
-      tx.operations.push_back( op );
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.sign( dave_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      alice_sbd_volume += op.amount_to_sell.amount.value;
-      alice_reward_last_update = db.head_block_time();
-      dave_sbd_volume -= op.amount_to_sell.amount.value;
-      dave_reward_last_update = db.head_block_time();
-
-      ops = get_last_operations( 1 );
-
-      reward = liquidity_idx.find( db.get_account( "alice" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "alice" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == alice_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == alice_steem_volume );
-      BOOST_CHECK( reward->last_update == alice_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "bob" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "bob" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == bob_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == bob_steem_volume );
-      BOOST_CHECK( reward->last_update == bob_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "sam" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == sam_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
-      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "dave" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "dave" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == dave_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == dave_steem_volume );
-      BOOST_CHECK( reward->last_update == dave_reward_last_update );*/
-
-      op.owner = "bob";
-      op.amount_to_sell.amount = alice_sbd.amount / 20;
-      op.min_to_receive.amount = op.amount_to_sell.amount;
-      op.orderid = 11;
-      tx.operations.clear();
-      tx.signatures.clear();
-      tx.operations.push_back( op );
-      tx.sign( bob_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      alice_sbd_volume += op.amount_to_sell.amount.value;
-      alice_reward_last_update = db.head_block_time();
-      bob_sbd_volume -= op.amount_to_sell.amount.value;
-      bob_reward_last_update = db.head_block_time();
-
-      ops = get_last_operations( 1 );
-
-      reward = liquidity_idx.find( db.get_account( "alice" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "alice" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == alice_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == alice_steem_volume );
-      BOOST_CHECK( reward->last_update == alice_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "bob" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "bob" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == bob_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == bob_steem_volume );
-      BOOST_CHECK( reward->last_update == bob_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "sam" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == sam_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
-      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "dave" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "dave" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == dave_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == dave_steem_volume );
-      BOOST_CHECK( reward->last_update == dave_reward_last_update );*/
-
-      transfer.to = "bob";
-      transfer.from = "alice";
-      transfer.amount = asset( alice_sbd.amount / 5, SBD_SYMBOL );
-      tx.operations.clear();
-      tx.signatures.clear();
-      tx.operations.push_back( transfer );
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.sign( alice_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      op.owner = "bob";
-      op.orderid = 12;
-      op.amount_to_sell = asset( 3 * ( alice_sbd.amount / 40 ), SBD_SYMBOL );
-      op.min_to_receive = asset( op.amount_to_sell.amount, SMOKE_SYMBOL );
-      tx.operations.clear();
-      tx.signatures.clear();
-      tx.operations.push_back( op );
-      tx.sign( bob_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-//      generate_blocks( db.head_block_time() + SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC_HF10, true );
-
-      op.owner = "dave";
-      op.orderid = 13;
-      op.amount_to_sell = op.min_to_receive;
-      op.min_to_receive.symbol = SBD_SYMBOL;
-      tx.operations.clear();
-      tx.signatures.clear();
-      tx.operations.push_back( op );
-      tx.sign( dave_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      bob_steem_volume += op.amount_to_sell.amount.value;
-      bob_reward_last_update = db.head_block_time();
-      dave_steem_volume -= op.amount_to_sell.amount.value;
-      dave_reward_last_update = db.head_block_time();
-
-      ops = get_last_operations( 1 );
-
-      reward = liquidity_idx.find( db.get_account( "alice" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "alice" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == alice_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == alice_steem_volume );
-      BOOST_CHECK( reward->last_update == alice_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "bob" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "bob" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == bob_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == bob_steem_volume );
-      BOOST_CHECK( reward->last_update == bob_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "sam" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == sam_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
-      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
-
-      reward = liquidity_idx.find( db.get_account( "dave" ).id );
-      BOOST_REQUIRE( reward == liquidity_idx.end() );
-      /*BOOST_REQUIRE( reward->owner == db.get_account( "dave" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == dave_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == dave_steem_volume );
-      BOOST_CHECK( reward->last_update == dave_reward_last_update );*/
-
-      auto alice_balance = db.get_account( "alice" ).balance;
-      auto bob_balance = db.get_account( "bob" ).balance;
-      auto sam_balance = db.get_account( "sam" ).balance;
-      auto dave_balance = db.get_account( "dave" ).balance;
-
-      BOOST_TEST_MESSAGE( "Generating Blocks to trigger liquidity rewards" );
-
-      db.liquidity_rewards_enabled = true;
-      generate_blocks( SMOKE_LIQUIDITY_REWARD_BLOCKS - ( db.head_block_num() % SMOKE_LIQUIDITY_REWARD_BLOCKS ) - 1 );
-
-      BOOST_REQUIRE( db.head_block_num() % SMOKE_LIQUIDITY_REWARD_BLOCKS == SMOKE_LIQUIDITY_REWARD_BLOCKS - 1 );
-      BOOST_REQUIRE( db.get_account( "alice" ).balance.amount.value == alice_balance.amount.value );
-      BOOST_REQUIRE( db.get_account( "bob" ).balance.amount.value == bob_balance.amount.value );
-      BOOST_REQUIRE( db.get_account( "sam" ).balance.amount.value == sam_balance.amount.value );
-      BOOST_REQUIRE( db.get_account( "dave" ).balance.amount.value == dave_balance.amount.value );
-
-      generate_block();
-
-      //alice_balance += SMOKE_MIN_LIQUIDITY_REWARD;
-
-      BOOST_REQUIRE( db.get_account( "alice" ).balance.amount.value == alice_balance.amount.value );
-      BOOST_REQUIRE( db.get_account( "bob" ).balance.amount.value == bob_balance.amount.value );
-      BOOST_REQUIRE( db.get_account( "sam" ).balance.amount.value == sam_balance.amount.value );
-      BOOST_REQUIRE( db.get_account( "dave" ).balance.amount.value == dave_balance.amount.value );
-
-      ops = get_last_operations( 1 );
-
-      SMOKE_REQUIRE_THROW( ops[0].get< liquidity_reward_operation>(), fc::exception );
-      //BOOST_REQUIRE( ops[0].get< liquidity_reward_operation>().payout.amount.value == SMOKE_MIN_LIQUIDITY_REWARD.amount.value );
-
-      generate_blocks( SMOKE_LIQUIDITY_REWARD_BLOCKS );
-
-      //bob_balance += SMOKE_MIN_LIQUIDITY_REWARD;
-
-      BOOST_REQUIRE( db.get_account( "alice" ).balance.amount.value == alice_balance.amount.value );
-      BOOST_REQUIRE( db.get_account( "bob" ).balance.amount.value == bob_balance.amount.value );
-      BOOST_REQUIRE( db.get_account( "sam" ).balance.amount.value == sam_balance.amount.value );
-      BOOST_REQUIRE( db.get_account( "dave" ).balance.amount.value == dave_balance.amount.value );
-
-      ops = get_last_operations( 1 );
-
-      SMOKE_REQUIRE_THROW( ops[0].get< liquidity_reward_operation>(), fc::exception );
-      //BOOST_REQUIRE( ops[0].get< liquidity_reward_operation>().payout.amount.value == SMOKE_MIN_LIQUIDITY_REWARD.amount.value );
-
-      alice_steem_volume = 0;
-      alice_sbd_volume = 0;
-      bob_steem_volume = 0;
-      bob_sbd_volume = 0;
-
-      BOOST_TEST_MESSAGE( "Testing liquidity timeout" );
-
-//      generate_blocks( sam_reward_last_update + SMOKE_LIQUIDITY_TIMEOUT_SEC - fc::seconds( SMOKE_BLOCK_INTERVAL / 2 ) - SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC , true );
-
-      op.owner = "sam";
-      op.orderid = 14;
-      op.amount_to_sell = ASSET( "1.000 TESTS" );
-      op.min_to_receive = ASSET( "1.000 TBD" );
-      tx.operations.clear();
-      tx.signatures.clear();
-      tx.operations.push_back( op );
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.sign( sam_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      generate_blocks( db.head_block_time() + ( SMOKE_BLOCK_INTERVAL / 2 ) + SMOKE_LIQUIDITY_TIMEOUT_SEC, true );
-
-      reward = liquidity_idx.find( db.get_account( "sam" ).id );
-      /*BOOST_REQUIRE( reward == liquidity_idx.end() );
-      BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == sam_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
-      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
-
-      generate_block();
-
-      op.owner = "alice";
-      op.orderid = 15;
-      op.amount_to_sell.symbol = SBD_SYMBOL;
-      op.min_to_receive.symbol = SMOKE_SYMBOL;
-      tx.operations.clear();
-      tx.signatures.clear();
-      tx.operations.push_back( op );
-      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
-      tx.sign( alice_private_key, db.get_chain_id() );
-      db.push_transaction( tx, 0 );
-
-      sam_sbd_volume = ASSET( "1.000 TBD" ).amount.value;
-      sam_steem_volume = 0;
-      sam_reward_last_update = db.head_block_time();
-
-      reward = liquidity_idx.find( db.get_account( "sam" ).id );
-      /*BOOST_REQUIRE( reward == liquidity_idx.end() );
-      BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
-      BOOST_REQUIRE( reward->sbd_volume == sam_sbd_volume );
-      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
-      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
-   }
-   FC_LOG_AND_RETHROW();
-}
+//BOOST_AUTO_TEST_CASE( liquidity_rewards )
+//{
+//   using std::abs;
+//
+//   try
+//   {
+//      db.liquidity_rewards_enabled = false;
+//
+//      ACTORS( (alice)(bob)(sam)(dave) )
+//      generate_block();
+//      vest( "alice", ASSET( "10.000 TESTS" ) );
+//      vest( "bob", ASSET( "10.000 TESTS" ) );
+//      vest( "sam", ASSET( "10.000 TESTS" ) );
+//      vest( "dave", ASSET( "10.000 TESTS" ) );
+//
+//      BOOST_TEST_MESSAGE( "Rewarding Bob with TESTS" );
+//
+//      signed_transaction tx;
+//
+//      fund( "alice", ASSET( "25.522 TBD" ) );
+//
+//      generate_block();
+//
+////      fund( "alice", alice_sbd.amount );
+////      fund( "bob", alice_sbd.amount );
+////      fund( "sam", alice_sbd.amount );
+////      fund( "dave", alice_sbd.amount );
+//
+////      int64_t alice_sbd_volume = 0;
+//      int64_t alice_steem_volume = 0;
+//      time_point_sec alice_reward_last_update = fc::time_point_sec::min();
+////      int64_t bob_sbd_volume = 0;
+//      int64_t bob_steem_volume = 0;
+//      time_point_sec bob_reward_last_update = fc::time_point_sec::min();
+////      int64_t sam_sbd_volume = 0;
+//      int64_t sam_steem_volume = 0;
+//      time_point_sec sam_reward_last_update = fc::time_point_sec::min();
+////      int64_t dave_sbd_volume = 0;
+//      int64_t dave_steem_volume = 0;
+//      time_point_sec dave_reward_last_update = fc::time_point_sec::min();
+//
+//
+//      alice_steem_volume += ( asset( alice_sbd.amount / 20, SBD_SYMBOL ) * exchange_rate ).amount.value;
+//      alice_reward_last_update = db.head_block_time();
+//      bob_steem_volume -= ( asset( alice_sbd.amount / 20, SBD_SYMBOL ) * exchange_rate ).amount.value;
+//      bob_reward_last_update = db.head_block_time();
+//
+//      auto ops = get_last_operations( 1 );
+//      const auto& liquidity_idx = db.get_index< liquidity_reward_balance_index >().indices().get< by_owner >();
+//
+//      auto reward = liquidity_idx.find( db.get_account( "alice" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "alice" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == alice_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == alice_steem_volume );
+//      BOOST_CHECK( reward->last_update == alice_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "bob" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "bob" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == bob_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == bob_steem_volume );
+//      BOOST_CHECK( reward->last_update == bob_reward_last_update );*/
+//
+//      BOOST_TEST_MESSAGE( "Creating Limit Order for SBD that will stay on the books for 60 minutes." );
+//
+//      op.owner = "sam";
+//      op.amount_to_sell = asset( ( alice_sbd.amount.value / 20 ), SMOKE_SYMBOL );
+//      op.min_to_receive = asset( ( alice_sbd.amount.value / 20 ), SBD_SYMBOL );
+//      op.orderid = 3;
+//
+//      tx.signatures.clear();
+//      tx.operations.clear();
+//      tx.operations.push_back( op );
+//      tx.sign( sam_private_key, db.get_chain_id() );
+//      db.push_transaction( tx, 0 );
+//
+//      BOOST_TEST_MESSAGE( "Waiting 10 minutes" );
+//
+////      generate_blocks( db.head_block_time() + SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC_HF10, true );
+//
+//      BOOST_TEST_MESSAGE( "Creating Limit Order for SBD that will stay on the books for 30 minutes." );
+//
+//      op.owner = "bob";
+//      op.orderid = 4;
+//      op.amount_to_sell = asset( ( alice_sbd.amount.value / 10 ) * 3 - alice_sbd.amount.value / 20, SMOKE_SYMBOL );
+//      op.min_to_receive = asset( ( alice_sbd.amount.value / 10 ) * 3 - alice_sbd.amount.value / 20, SBD_SYMBOL );
+//
+//      tx.signatures.clear();
+//      tx.operations.clear();
+//      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
+//      tx.operations.push_back( op );
+//      tx.sign( bob_private_key, db.get_chain_id() );
+//      db.push_transaction( tx, 0 );
+//
+//      BOOST_TEST_MESSAGE( "Waiting 30 minutes" );
+//
+////      generate_blocks( db.head_block_time() + SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC_HF10, true );
+//
+//      BOOST_TEST_MESSAGE( "Filling both limit orders." );
+//
+//      op.owner = "alice";
+//      op.orderid = 5;
+//      op.amount_to_sell = asset( ( alice_sbd.amount.value / 10 ) * 3, SBD_SYMBOL );
+//      op.min_to_receive = asset( ( alice_sbd.amount.value / 10 ) * 3, SMOKE_SYMBOL );
+//
+//      tx.signatures.clear();
+//      tx.operations.clear();
+//      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
+//      tx.operations.push_back( op );
+//      tx.sign( alice_private_key, db.get_chain_id() );
+//      db.push_transaction( tx, 0 );
+//
+//      alice_sbd_volume -= ( alice_sbd.amount.value / 10 ) * 3;
+//      alice_reward_last_update = db.head_block_time();
+//      sam_sbd_volume += alice_sbd.amount.value / 20;
+//      sam_reward_last_update = db.head_block_time();
+//      bob_sbd_volume += ( alice_sbd.amount.value / 10 ) * 3 - ( alice_sbd.amount.value / 20 );
+//      bob_reward_last_update = db.head_block_time();
+//      ops = get_last_operations( 4 );
+//
+//      reward = liquidity_idx.find( db.get_account( "alice" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "alice" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == alice_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == alice_steem_volume );
+//      BOOST_CHECK( reward->last_update == alice_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "bob" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "bob" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == bob_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == bob_steem_volume );
+//      BOOST_CHECK( reward->last_update == bob_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "sam" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == sam_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
+//      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
+//
+//      BOOST_TEST_MESSAGE( "Testing a partial fill before minimum time and full fill after minimum time" );
+//
+//      op.orderid = 6;
+//      op.amount_to_sell = asset( alice_sbd.amount.value / 20 * 2, SBD_SYMBOL );
+//      op.min_to_receive = asset( alice_sbd.amount.value / 20 * 2, SMOKE_SYMBOL );
+//
+//      tx.signatures.clear();
+//      tx.operations.clear();
+//      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
+//      tx.operations.push_back( op );
+//      tx.sign( alice_private_key, db.get_chain_id() );
+//      db.push_transaction( tx, 0 );
+//
+////      generate_blocks( db.head_block_time() + fc::seconds( SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC_HF10.to_seconds() / 2 ), true );
+//
+//      op.owner = "bob";
+//      op.orderid = 7;
+//      op.amount_to_sell = asset( alice_sbd.amount.value / 20, SMOKE_SYMBOL );
+//      op.min_to_receive = asset( alice_sbd.amount.value / 20, SBD_SYMBOL );
+//
+//      tx.signatures.clear();
+//      tx.operations.clear();
+//      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
+//      tx.operations.push_back( op );
+//      tx.sign( bob_private_key, db.get_chain_id() );
+//      db.push_transaction( tx, 0 );
+//
+////      generate_blocks( db.head_block_time() + fc::seconds( SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC_HF10.to_seconds() / 2 ), true );
+//
+//      ops = get_last_operations( 3 );
+//
+//      reward = liquidity_idx.find( db.get_account( "alice" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "alice" ).id );
+//      BOOST_REQUIRE( reward->steem_volume == alice_steem_volume );
+//      BOOST_CHECK( reward->last_update == alice_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "bob" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "bob" ).id );
+//      BOOST_REQUIRE( reward->steem_volume == bob_steem_volume );
+//      BOOST_CHECK( reward->last_update == bob_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "sam" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
+//      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
+//      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
+//
+////      generate_blocks( db.head_block_time() + SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC_HF10, true );
+//
+//      op.owner = "sam";
+//      op.orderid = 8;
+//
+//      tx.signatures.clear();
+//      tx.operations.clear();
+//      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
+//      tx.operations.push_back( op );
+//      tx.sign( sam_private_key, db.get_chain_id() );
+//      db.push_transaction( tx, 0 );
+//
+//      alice_steem_volume += alice_sbd.amount.value / 20;
+//      alice_reward_last_update = db.head_block_time();
+//      sam_steem_volume -= alice_sbd.amount.value / 20;
+//      sam_reward_last_update = db.head_block_time();
+//
+//      ops = get_last_operations( 2 );
+//
+//      reward = liquidity_idx.find( db.get_account( "alice" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "alice" ).id );
+//      BOOST_REQUIRE( reward->steem_volume == alice_steem_volume );
+//      BOOST_CHECK( reward->last_update == alice_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "bob" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "bob" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == bob_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == bob_steem_volume );
+//      BOOST_CHECK( reward->last_update == bob_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "sam" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == sam_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
+//      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
+//
+//      BOOST_TEST_MESSAGE( "Trading to give Alice and Bob positive volumes to receive rewards" );
+//
+//      transfer_operation transfer;
+//      transfer.to = "dave";
+//      transfer.from = "alice";
+//      transfer.amount = asset( alice_sbd.amount / 2, SBD_SYMBOL );
+//
+//      tx.operations.clear();
+//      tx.signatures.clear();
+//      tx.operations.push_back( transfer );
+//      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
+//      tx.sign( alice_private_key, db.get_chain_id() );
+//      db.push_transaction( tx, 0 );
+//
+//      op.owner = "alice";
+//      op.amount_to_sell = asset( 8 * ( alice_sbd.amount.value / 20 ), SMOKE_SYMBOL );
+//      op.min_to_receive = asset( op.amount_to_sell.amount, SBD_SYMBOL );
+//      op.orderid = 9;
+//      tx.operations.clear();
+//      tx.signatures.clear();
+//      tx.operations.push_back( op );
+//      tx.sign( alice_private_key, db.get_chain_id() );
+//      db.push_transaction( tx, 0 );
+//
+////      generate_blocks( db.head_block_time() + SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC_HF10, true );
+//
+//      op.owner = "dave";
+//      op.amount_to_sell = asset( 7 * ( alice_sbd.amount.value / 20 ), SBD_SYMBOL );;
+//      op.min_to_receive = asset( op.amount_to_sell.amount, SMOKE_SYMBOL );
+//      op.orderid = 10;
+//      tx.operations.clear();
+//      tx.signatures.clear();
+//      tx.operations.push_back( op );
+//      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
+//      tx.sign( dave_private_key, db.get_chain_id() );
+//      db.push_transaction( tx, 0 );
+//
+//      alice_sbd_volume += op.amount_to_sell.amount.value;
+//      alice_reward_last_update = db.head_block_time();
+//      dave_sbd_volume -= op.amount_to_sell.amount.value;
+//      dave_reward_last_update = db.head_block_time();
+//
+//      ops = get_last_operations( 1 );
+//
+//      reward = liquidity_idx.find( db.get_account( "alice" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "alice" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == alice_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == alice_steem_volume );
+//      BOOST_CHECK( reward->last_update == alice_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "bob" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "bob" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == bob_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == bob_steem_volume );
+//      BOOST_CHECK( reward->last_update == bob_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "sam" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == sam_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
+//      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "dave" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "dave" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == dave_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == dave_steem_volume );
+//      BOOST_CHECK( reward->last_update == dave_reward_last_update );*/
+//
+//      op.owner = "bob";
+//      op.amount_to_sell.amount = alice_sbd.amount / 20;
+//      op.min_to_receive.amount = op.amount_to_sell.amount;
+//      op.orderid = 11;
+//      tx.operations.clear();
+//      tx.signatures.clear();
+//      tx.operations.push_back( op );
+//      tx.sign( bob_private_key, db.get_chain_id() );
+//      db.push_transaction( tx, 0 );
+//
+//      alice_sbd_volume += op.amount_to_sell.amount.value;
+//      alice_reward_last_update = db.head_block_time();
+//      bob_sbd_volume -= op.amount_to_sell.amount.value;
+//      bob_reward_last_update = db.head_block_time();
+//
+//      ops = get_last_operations( 1 );
+//
+//      reward = liquidity_idx.find( db.get_account( "alice" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "alice" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == alice_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == alice_steem_volume );
+//      BOOST_CHECK( reward->last_update == alice_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "bob" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "bob" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == bob_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == bob_steem_volume );
+//      BOOST_CHECK( reward->last_update == bob_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "sam" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == sam_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
+//      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "dave" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "dave" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == dave_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == dave_steem_volume );
+//      BOOST_CHECK( reward->last_update == dave_reward_last_update );*/
+//
+//      transfer.to = "bob";
+//      transfer.from = "alice";
+//      transfer.amount = asset( alice_sbd.amount / 5, SBD_SYMBOL );
+//      tx.operations.clear();
+//      tx.signatures.clear();
+//      tx.operations.push_back( transfer );
+//      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
+//      tx.sign( alice_private_key, db.get_chain_id() );
+//      db.push_transaction( tx, 0 );
+//
+//      op.owner = "bob";
+//      op.orderid = 12;
+//      op.amount_to_sell = asset( 3 * ( alice_sbd.amount / 40 ), SBD_SYMBOL );
+//      op.min_to_receive = asset( op.amount_to_sell.amount, SMOKE_SYMBOL );
+//      tx.operations.clear();
+//      tx.signatures.clear();
+//      tx.operations.push_back( op );
+//      tx.sign( bob_private_key, db.get_chain_id() );
+//      db.push_transaction( tx, 0 );
+//
+////      generate_blocks( db.head_block_time() + SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC_HF10, true );
+//
+//      op.owner = "dave";
+//      op.orderid = 13;
+//      op.amount_to_sell = op.min_to_receive;
+//      op.min_to_receive.symbol = SBD_SYMBOL;
+//      tx.operations.clear();
+//      tx.signatures.clear();
+//      tx.operations.push_back( op );
+//      tx.sign( dave_private_key, db.get_chain_id() );
+//      db.push_transaction( tx, 0 );
+//
+//      bob_steem_volume += op.amount_to_sell.amount.value;
+//      bob_reward_last_update = db.head_block_time();
+//      dave_steem_volume -= op.amount_to_sell.amount.value;
+//      dave_reward_last_update = db.head_block_time();
+//
+//      ops = get_last_operations( 1 );
+//
+//      reward = liquidity_idx.find( db.get_account( "alice" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "alice" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == alice_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == alice_steem_volume );
+//      BOOST_CHECK( reward->last_update == alice_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "bob" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "bob" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == bob_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == bob_steem_volume );
+//      BOOST_CHECK( reward->last_update == bob_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "sam" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == sam_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
+//      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
+//
+//      reward = liquidity_idx.find( db.get_account( "dave" ).id );
+//      BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      /*BOOST_REQUIRE( reward->owner == db.get_account( "dave" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == dave_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == dave_steem_volume );
+//      BOOST_CHECK( reward->last_update == dave_reward_last_update );*/
+//
+//      auto alice_balance = db.get_account( "alice" ).balance;
+//      auto bob_balance = db.get_account( "bob" ).balance;
+//      auto sam_balance = db.get_account( "sam" ).balance;
+//      auto dave_balance = db.get_account( "dave" ).balance;
+//
+//      BOOST_TEST_MESSAGE( "Generating Blocks to trigger liquidity rewards" );
+//
+//      db.liquidity_rewards_enabled = true;
+//      generate_blocks( SMOKE_LIQUIDITY_REWARD_BLOCKS - ( db.head_block_num() % SMOKE_LIQUIDITY_REWARD_BLOCKS ) - 1 );
+//
+//      BOOST_REQUIRE( db.head_block_num() % SMOKE_LIQUIDITY_REWARD_BLOCKS == SMOKE_LIQUIDITY_REWARD_BLOCKS - 1 );
+//      BOOST_REQUIRE( db.get_account( "alice" ).balance.amount.value == alice_balance.amount.value );
+//      BOOST_REQUIRE( db.get_account( "bob" ).balance.amount.value == bob_balance.amount.value );
+//      BOOST_REQUIRE( db.get_account( "sam" ).balance.amount.value == sam_balance.amount.value );
+//      BOOST_REQUIRE( db.get_account( "dave" ).balance.amount.value == dave_balance.amount.value );
+//
+//      generate_block();
+//
+//      //alice_balance += SMOKE_MIN_LIQUIDITY_REWARD;
+//
+//      BOOST_REQUIRE( db.get_account( "alice" ).balance.amount.value == alice_balance.amount.value );
+//      BOOST_REQUIRE( db.get_account( "bob" ).balance.amount.value == bob_balance.amount.value );
+//      BOOST_REQUIRE( db.get_account( "sam" ).balance.amount.value == sam_balance.amount.value );
+//      BOOST_REQUIRE( db.get_account( "dave" ).balance.amount.value == dave_balance.amount.value );
+//
+//      ops = get_last_operations( 1 );
+//
+//      SMOKE_REQUIRE_THROW( ops[0].get< liquidity_reward_operation>(), fc::exception );
+//      //BOOST_REQUIRE( ops[0].get< liquidity_reward_operation>().payout.amount.value == SMOKE_MIN_LIQUIDITY_REWARD.amount.value );
+//
+//      generate_blocks( SMOKE_LIQUIDITY_REWARD_BLOCKS );
+//
+//      //bob_balance += SMOKE_MIN_LIQUIDITY_REWARD;
+//
+//      BOOST_REQUIRE( db.get_account( "alice" ).balance.amount.value == alice_balance.amount.value );
+//      BOOST_REQUIRE( db.get_account( "bob" ).balance.amount.value == bob_balance.amount.value );
+//      BOOST_REQUIRE( db.get_account( "sam" ).balance.amount.value == sam_balance.amount.value );
+//      BOOST_REQUIRE( db.get_account( "dave" ).balance.amount.value == dave_balance.amount.value );
+//
+//      ops = get_last_operations( 1 );
+//
+//      SMOKE_REQUIRE_THROW( ops[0].get< liquidity_reward_operation>(), fc::exception );
+//      //BOOST_REQUIRE( ops[0].get< liquidity_reward_operation>().payout.amount.value == SMOKE_MIN_LIQUIDITY_REWARD.amount.value );
+//
+//      alice_steem_volume = 0;
+//      alice_sbd_volume = 0;
+//      bob_steem_volume = 0;
+//      bob_sbd_volume = 0;
+//
+//      BOOST_TEST_MESSAGE( "Testing liquidity timeout" );
+//
+////      generate_blocks( sam_reward_last_update + SMOKE_LIQUIDITY_TIMEOUT_SEC - fc::seconds( SMOKE_BLOCK_INTERVAL / 2 ) - SMOKE_MIN_LIQUIDITY_REWARD_PERIOD_SEC , true );
+//
+//      op.owner = "sam";
+//      op.orderid = 14;
+//      op.amount_to_sell = ASSET( "1.000 TESTS" );
+//      op.min_to_receive = ASSET( "1.000 TBD" );
+//      tx.operations.clear();
+//      tx.signatures.clear();
+//      tx.operations.push_back( op );
+//      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
+//      tx.sign( sam_private_key, db.get_chain_id() );
+//      db.push_transaction( tx, 0 );
+//
+//      generate_blocks( db.head_block_time() + ( SMOKE_BLOCK_INTERVAL / 2 ) + SMOKE_LIQUIDITY_TIMEOUT_SEC, true );
+//
+//      reward = liquidity_idx.find( db.get_account( "sam" ).id );
+//      /*BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == sam_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
+//      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
+//
+//      generate_block();
+//
+//      op.owner = "alice";
+//      op.orderid = 15;
+//      op.amount_to_sell.symbol = SBD_SYMBOL;
+//      op.min_to_receive.symbol = SMOKE_SYMBOL;
+//      tx.operations.clear();
+//      tx.signatures.clear();
+//      tx.operations.push_back( op );
+//      tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
+//      tx.sign( alice_private_key, db.get_chain_id() );
+//      db.push_transaction( tx, 0 );
+//
+//      sam_sbd_volume = ASSET( "1.000 TBD" ).amount.value;
+//      sam_steem_volume = 0;
+//      sam_reward_last_update = db.head_block_time();
+//
+//      reward = liquidity_idx.find( db.get_account( "sam" ).id );
+//      /*BOOST_REQUIRE( reward == liquidity_idx.end() );
+//      BOOST_REQUIRE( reward->owner == db.get_account( "sam" ).id );
+//      BOOST_REQUIRE( reward->sbd_volume == sam_sbd_volume );
+//      BOOST_REQUIRE( reward->steem_volume == sam_steem_volume );
+//      BOOST_CHECK( reward->last_update == sam_reward_last_update );*/
+//   }
+//   FC_LOG_AND_RETHROW();
+//}
 
 BOOST_AUTO_TEST_CASE( post_rate_limit )
 {
@@ -2362,7 +2330,6 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
          db.modify( db.get_account( SMOKE_NULL_ACCOUNT ), [&]( account_object& a )
          {
             a.reward_steem_balance = ASSET( "1.000 TESTS" );
-            a.reward_sbd_balance = ASSET( "1.000 TBD" );
             a.reward_vesting_balance = ASSET( "1.000000 VESTS" );
             a.reward_vesting_steem = ASSET( "1.000 TESTS" );
          });
@@ -2370,8 +2337,6 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
          db.modify( db.get_dynamic_global_properties(), [&]( dynamic_global_property_object& gpo )
          {
             gpo.current_supply += ASSET( "2.000 TESTS" );
-            gpo.virtual_supply += ASSET( "3.000 TESTS" );
-            gpo.current_sbd_supply += ASSET( "1.000 TBD" );
             gpo.pending_rewarded_vesting_shares += ASSET( "1.000000 VESTS" );
             gpo.pending_rewarded_vesting_steem += ASSET( "1.000 TESTS" );
          });
@@ -2380,28 +2345,22 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
       validate_database();
 
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).balance == ASSET( "1.000 TESTS" ) );
-      BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).sbd_balance == ASSET( "2.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).vesting_shares > ASSET( "0.000000 VESTS" ) );
-      BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_sbd_balance == ASSET( "1.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_steem_balance == ASSET( "1.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_balance == ASSET( "1.000000 VESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_steem == ASSET( "1.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( "alice" ).balance == ASSET( "2.000 TESTS" ) );
-      BOOST_REQUIRE( db.get_account( "alice" ).sbd_balance == ASSET( "3.000 TBD" ) );
 
       BOOST_TEST_MESSAGE( "--- Generating block to clear balances" );
       generate_block();
       validate_database();
 
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).balance == ASSET( "0.000 TESTS" ) );
-      BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).sbd_balance == ASSET( "0.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).vesting_shares == ASSET( "0.000000 VESTS" ) );
-      BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_sbd_balance == ASSET( "0.000 TBD" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_steem_balance == ASSET( "0.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_balance == ASSET( "0.000000 VESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_steem == ASSET( "0.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( "alice" ).balance == ASSET( "2.000 TESTS" ) );
-      BOOST_REQUIRE( db.get_account( "alice" ).sbd_balance == ASSET( "3.000 TBD" ) );
    }
    FC_LOG_AND_RETHROW()
 }

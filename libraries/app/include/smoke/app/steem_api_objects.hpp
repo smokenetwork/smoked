@@ -166,8 +166,6 @@ struct account_api_obj
       voting_power( a.voting_power ),
       last_vote_time( a.last_vote_time ),
       balance( a.balance ),
-      sbd_balance( a.sbd_balance ),
-      reward_sbd_balance( a.reward_sbd_balance ),
       reward_steem_balance( a.reward_steem_balance ),
       reward_vesting_balance( a.reward_vesting_balance ),
       reward_vesting_steem( a.reward_vesting_steem ),
@@ -252,9 +250,7 @@ struct account_api_obj
    time_point_sec    last_vote_time;
 
    asset             balance;
-   asset             sbd_balance;
 
-   asset             reward_sbd_balance;
    asset             reward_steem_balance;
    asset             reward_vesting_balance;
    asset             reward_vesting_steem;
@@ -441,8 +437,7 @@ FC_REFLECT( smoke::app::account_api_obj,
              (owner_challenged)(active_challenged)(last_owner_proved)(last_active_proved)(recovery_account)(last_account_recovery)(reset_account)
              (comment_count)(lifetime_vote_count)(post_count)(can_vote)(voting_power)(last_vote_time)
              (balance)
-             (sbd_balance)
-             (reward_sbd_balance)(reward_steem_balance)(reward_vesting_balance)(reward_vesting_steem)
+             (reward_steem_balance)(reward_vesting_balance)(reward_vesting_steem)
              (vesting_shares)(delegated_vesting_shares)(received_vesting_shares)(vesting_withdraw_rate)(next_vesting_withdrawal)(withdrawn)(to_withdraw)(withdraw_routes)
              (curation_rewards)
              (posting_rewards)

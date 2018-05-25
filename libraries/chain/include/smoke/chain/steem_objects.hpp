@@ -36,7 +36,6 @@ namespace smoke { namespace chain {
          account_name_type agent;
          time_point_sec    ratification_deadline;
          time_point_sec    escrow_expiration;
-         asset             sbd_balance;
          asset             steem_balance;
          asset             pending_fee;
          bool              to_approved = false;
@@ -217,7 +216,6 @@ namespace smoke { namespace chain {
    struct by_to;
    struct by_agent;
    struct by_ratification_deadline;
-   struct by_sbd_balance;
    typedef multi_index_container<
       escrow_object,
       indexed_by<
@@ -247,13 +245,6 @@ namespace smoke { namespace chain {
                member< escrow_object, escrow_id_type, &escrow_object::id >
             >,
             composite_key_compare< std::less< bool >, std::less< time_point_sec >, std::less< escrow_id_type > >
-         >,
-         ordered_unique< tag< by_sbd_balance >,
-            composite_key< escrow_object,
-               member< escrow_object, asset, &escrow_object::sbd_balance >,
-               member< escrow_object, escrow_id_type, &escrow_object::id >
-            >,
-            composite_key_compare< std::greater< asset >, std::less< escrow_id_type > >
          >
       >,
       allocator< escrow_object >
@@ -311,7 +302,7 @@ CHAINBASE_SET_INDEX_TYPE( smoke::chain::withdraw_vesting_route_object, smoke::ch
 FC_REFLECT( smoke::chain::escrow_object,
              (id)(escrow_id)(from)(to)(agent)
              (ratification_deadline)(escrow_expiration)
-             (sbd_balance)(steem_balance)(pending_fee)
+             (steem_balance)(pending_fee)
              (to_approved)(agent_approved)(disputed) )
 CHAINBASE_SET_INDEX_TYPE( smoke::chain::escrow_object, smoke::chain::escrow_index )
 

@@ -85,7 +85,6 @@ class tag_object : public object< tag_object_type, tag_object >
       int32_t           children    = 0;
       double            hot         = 0;
       double            trending    = 0;
-      share_type        promoted_balance = 0;
 
       account_id_type   author;
       comment_id_type   parent;
@@ -101,7 +100,6 @@ struct by_cashout; /// all posts regardless of depth
 struct by_net_rshares; /// all comments regardless of depth
 struct by_parent_created;
 struct by_parent_active;
-struct by_parent_promoted;
 struct by_parent_net_rshares; /// all top level posts by direct pending payout
 struct by_parent_net_votes; /// all top level posts by direct votes
 struct by_parent_trending;
@@ -150,15 +148,6 @@ typedef multi_index_container<
                member< tag_object, tag_id_type, &tag_object::id >
             >,
             composite_key_compare< std::less<tag_name_type>, std::less<comment_id_type>, std::greater< time_point_sec >, std::less< tag_id_type > >
-      >,
-      ordered_unique< tag< by_parent_promoted >,
-            composite_key< tag_object,
-               member< tag_object, tag_name_type, &tag_object::tag >,
-               member< tag_object, comment_id_type, &tag_object::parent >,
-               member< tag_object, share_type, &tag_object::promoted_balance >,
-               member< tag_object, tag_id_type, &tag_object::id >
-            >,
-            composite_key_compare< std::less<tag_name_type>, std::less<comment_id_type>, std::greater< share_type >, std::less< tag_id_type > >
       >,
       ordered_unique< tag< by_parent_net_rshares >,
             composite_key< tag_object,
@@ -401,7 +390,7 @@ class author_tag_stats_object : public object< author_tag_stats_object_type, aut
       id_type         id;
       account_id_type author;
       tag_name_type   tag;
-      asset           total_rewards = asset( 0, SBD_SYMBOL );
+      asset           total_rewards = asset( 0, SMOKE_SYMBOL );
       uint32_t        total_posts = 0;
 };
 typedef oid< author_tag_stats_object > author_tag_stats_id_type;
@@ -504,7 +493,7 @@ class tag_api : public std::enable_shared_from_this<tag_api> {
 FC_API( smoke::tags::tag_api, (get_tags) );
 
 FC_REFLECT( smoke::tags::tag_object,
-   (id)(tag)(created)(active)(cashout)(net_rshares)(net_votes)(hot)(trending)(promoted_balance)(children)(author)(parent)(comment) )
+   (id)(tag)(created)(active)(cashout)(net_rshares)(net_votes)(hot)(trending)(children)(author)(parent)(comment) )
 CHAINBASE_SET_INDEX_TYPE( smoke::tags::tag_object, smoke::tags::tag_index )
 
 FC_REFLECT( smoke::tags::tag_stats_object,

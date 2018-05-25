@@ -1108,18 +1108,11 @@ void database::clear_null_account_balance()
 {
    const auto& null_account = get_account( SMOKE_NULL_ACCOUNT );
    asset total_steem( 0, SMOKE_SYMBOL );
-   asset total_sbd( 0, SBD_SYMBOL );
 
    if( null_account.balance.amount > 0 )
    {
       total_steem += null_account.balance;
       adjust_balance( null_account, -null_account.balance );
-   }
-
-   if( null_account.sbd_balance.amount > 0 )
-   {
-      total_sbd += null_account.sbd_balance;
-      adjust_balance( null_account, -null_account.sbd_balance );
    }
 
    if( null_account.vesting_shares.amount > 0 )
@@ -1147,12 +1140,6 @@ void database::clear_null_account_balance()
       adjust_reward_balance( null_account, -null_account.reward_steem_balance );
    }
 
-   if( null_account.reward_sbd_balance.amount > 0 )
-   {
-      total_sbd += null_account.reward_sbd_balance;
-      adjust_reward_balance( null_account, -null_account.reward_sbd_balance );
-   }
-
    if( null_account.reward_vesting_balance.amount > 0 )
    {
       const auto& gpo = get_dynamic_global_properties();
@@ -1174,9 +1161,6 @@ void database::clear_null_account_balance()
 
    if( total_steem.amount > 0 )
       adjust_supply( -total_steem );
-
-   if( total_sbd.amount > 0 )
-      adjust_supply( -total_sbd );
 }
 
 /**
@@ -1455,7 +1439,7 @@ share_type database::cashout_comment_helper( util::comment_reward_context& ctx, 
 
            adjust_total_payout( comment, asset( sbd_steem, SMOKE_SYMBOL ) + asset( vesting_steem, SMOKE_SYMBOL ), asset( curation_tokens, SMOKE_SYMBOL ), asset( total_beneficiary, SMOKE_SYMBOL ) );
 
-           push_virtual_operation( author_reward_operation( comment.author, to_string( comment.permlink ), asset( 0, SBD_SYMBOL ), asset( sbd_steem, SMOKE_SYMBOL ), vest_created ) );
+           push_virtual_operation( author_reward_operation( comment.author, to_string( comment.permlink ), asset( sbd_steem, SMOKE_SYMBOL ), vest_created ) );
            push_virtual_operation( comment_reward_operation( comment.author, to_string( comment.permlink ), asset( claimed_reward, SMOKE_SYMBOL ) ) );
 
 #ifndef IS_LOW_MEM
@@ -1652,7 +1636,6 @@ void database::process_funds()
   {
       p.total_vesting_fund_steem += asset( vesting_reward, SMOKE_SYMBOL );
       p.current_supply           += asset( new_steem, SMOKE_SYMBOL );
-      p.virtual_supply           += asset( new_steem, SMOKE_SYMBOL );
   });
 
   const auto& producer_reward = create_vesting( get_account( cwit.owner ), asset( witness_reward, SMOKE_SYMBOL ) );
@@ -1777,7 +1760,7 @@ void database::expire_escrow_ratification()
 
       const auto& from_account = get_account( old_escrow.from );
       adjust_balance( from_account, old_escrow.steem_balance );
-      adjust_balance( from_account, old_escrow.sbd_balance );
+//      adjust_balance( from_account, old_escrow.sbd_balance );
       adjust_balance( from_account, old_escrow.pending_fee );
 
       remove( old_escrow );
@@ -2039,7 +2022,6 @@ void database::init_genesis( uint64_t init_supply )
             a.name = SMOKE_INIT_MINER_NAME + ( i ? fc::to_string( i ) : std::string() );
             a.memo_key = init_public_key;
             a.balance  = asset( i ? 0 : init_supply, SMOKE_SYMBOL );
-            a.sbd_balance = asset( 0, SBD_SYMBOL );
          } );
 
          create< account_authority_object >( [&]( account_authority_object& auth )
@@ -2066,8 +2048,6 @@ void database::init_genesis( uint64_t init_supply )
          p.recent_slots_filled = fc::uint128::max_value();
          p.participation_count = 128;
          p.current_supply = asset( init_supply, SMOKE_SYMBOL );
-         p.current_sbd_supply = asset( 0, SBD_SYMBOL );
-         p.virtual_supply = p.current_supply;
          p.maximum_block_size = SMOKE_MAX_BLOCK_SIZE;
       } );
 
@@ -2550,14 +2530,11 @@ void database::_apply_block( const signed_block& next_block )
    clear_expired_delegations();
    update_witness_schedule(*this);
 
-   update_virtual_supply();
-
    clear_null_account_balance();
    process_funds();
    process_comment_cashout();
    process_vesting_withdrawals();
    pay_liquidity_reward();
-   update_virtual_supply();
 
    account_recovery_processing();
    expire_escrow_ratification();
@@ -2800,13 +2777,6 @@ void database::update_global_dynamic_data( const signed_block& b )
    }
 } FC_CAPTURE_AND_RETHROW() }
 
-void database::update_virtual_supply()
-{ try {
-     modify( get_dynamic_global_properties(), [&]( dynamic_global_property_object& dgp )
-     {
-         dgp.virtual_supply = dgp.current_supply;
-     });
-  } FC_CAPTURE_AND_RETHROW() }
 
 void database::update_signing_witness(const witness_object& signing_witness, const signed_block& new_block)
 { try {
@@ -2976,8 +2946,6 @@ void database::adjust_balance( const account_object& a, const asset& delta )
          case SMOKE_SYMBOL:
             acnt.balance += delta;
             break;
-         case SBD_SYMBOL:
-            break;
          default:
             FC_ASSERT( false, "invalid symbol" );
       }
@@ -2992,9 +2960,6 @@ void database::adjust_reward_balance( const account_object& a, const asset& delt
       {
          case SMOKE_SYMBOL:
             acnt.reward_steem_balance += delta;
-            break;
-         case SBD_SYMBOL:
-            acnt.reward_sbd_balance += delta;
             break;
          default:
             FC_ASSERT( false, "invalid symbol" );
@@ -3018,16 +2983,10 @@ void database::adjust_supply( const asset& delta, bool adjust_vesting )
          {
             asset new_vesting( (adjust_vesting && delta.amount > 0) ? delta.amount * 9 : 0, SMOKE_SYMBOL );
             props.current_supply += delta + new_vesting;
-            props.virtual_supply += delta + new_vesting;
             props.total_vesting_fund_steem += new_vesting;
             assert( props.current_supply.amount.value >= 0 );
             break;
          }
-         case SBD_SYMBOL:
-//            props.current_sbd_supply += delta;
-//            props.virtual_supply = props.current_sbd_supply * get_feed_history().current_median_history + props.current_supply;
-//            assert( props.current_sbd_supply.amount.value >= 0 );
-            break;
          default:
             FC_ASSERT( false, "invalid symbol" );
       }
@@ -3041,8 +3000,6 @@ asset database::get_balance( const account_object& a, asset_symbol_type symbol )
    {
       case SMOKE_SYMBOL:
          return a.balance;
-      case SBD_SYMBOL:
-         return a.sbd_balance;
       default:
          FC_ASSERT( false, "invalid symbol" );
    }
@@ -3143,7 +3100,6 @@ void database::validate_invariants()const
   {
      const auto& account_idx = get_index<account_index>().indices().get<by_name>();
      asset total_supply = asset( 0, SMOKE_SYMBOL );
-     asset total_sbd = asset( 0, SBD_SYMBOL );
      asset total_vesting = asset( 0, VESTS_SYMBOL );
      asset pending_vesting_steem = asset( 0, SMOKE_SYMBOL );
      share_type total_vsf_votes = share_type( 0 );
@@ -3159,8 +3115,6 @@ void database::validate_invariants()const
      {
         total_supply += itr->balance;
         total_supply += itr->reward_steem_balance;
-        total_sbd += itr->sbd_balance;
-        total_sbd += itr->reward_sbd_balance;
         total_vesting += itr->vesting_shares;
         total_vesting += itr->reward_vesting_balance;
         pending_vesting_steem += itr->reward_vesting_steem;
@@ -3176,12 +3130,9 @@ void database::validate_invariants()const
      for( auto itr = escrow_idx.begin(); itr != escrow_idx.end(); ++itr )
      {
         total_supply += itr->steem_balance;
-        total_sbd += itr->sbd_balance;
 
         if( itr->pending_fee.symbol == SMOKE_SYMBOL )
            total_supply += itr->pending_fee;
-        else if( itr->pending_fee.symbol == SBD_SYMBOL )
-           total_sbd += itr->pending_fee;
         else
            FC_ASSERT( false, "found escrow pending fee that is not SBD or SMOKE" );
      }
@@ -3209,11 +3160,9 @@ void database::validate_invariants()const
      total_supply += gpo.total_vesting_fund_steem + gpo.total_reward_fund_steem + gpo.pending_rewarded_vesting_steem;
 
      FC_ASSERT( gpo.current_supply == total_supply, "", ("gpo.current_supply",gpo.current_supply)("total_supply",total_supply) );
-     FC_ASSERT( gpo.current_sbd_supply == total_sbd, "", ("gpo.current_sbd_supply",gpo.current_sbd_supply)("total_sbd",total_sbd) );
      FC_ASSERT( gpo.total_vesting_shares + gpo.pending_rewarded_vesting_shares == total_vesting, "", ("gpo.total_vesting_shares",gpo.total_vesting_shares)("total_vesting",total_vesting) );
      FC_ASSERT( gpo.total_vesting_shares.amount == total_vsf_votes, "", ("total_vesting_shares",gpo.total_vesting_shares)("total_vsf_votes",total_vsf_votes) );
      FC_ASSERT( gpo.pending_rewarded_vesting_steem == pending_vesting_steem, "", ("pending_rewarded_vesting_steem",gpo.pending_rewarded_vesting_steem)("pending_vesting_steem", pending_vesting_steem));
-     FC_ASSERT( gpo.virtual_supply >= gpo.current_supply );
   }
   FC_CAPTURE_LOG_AND_RETHROW( (head_block_num()) );
 }

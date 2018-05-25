@@ -77,7 +77,6 @@ struct bucket_object : public object< bucket_object_type, bucket_object >
    uint32_t             transactions = 0;                            ///< Transactions processed
    uint32_t             transfers = 0;                               ///< Account to account transfers
    share_type           steem_transferred = 0;                       ///< SMOKE transferred from account to account
-   share_type           sbd_transferred = 0;                         ///< SBD transferred from account to account
    share_type           sbd_paid_as_interest = 0;                    ///< SBD paid as interest
    uint32_t             paid_accounts_created = 0;                   ///< Accounts created with fee
    uint32_t             mined_accounts_created = 0;                  ///< Accounts mined for free
@@ -92,7 +91,7 @@ struct bucket_object : public object< bucket_object_type, bucket_object >
    uint32_t             new_reply_votes = 0;                         ///< New votes on replies
    uint32_t             changed_reply_votes = 0;                     ///< Changed votes on replies
    uint32_t             payouts = 0;                                 ///< Number of comment payouts
-   share_type           sbd_paid_to_authors = 0;                     ///< Ammount of SBD paid to authors
+   share_type           steem_paid_to_authors = 0;                   ///< Ammount of SMOKE paid to authors
    share_type           vests_paid_to_authors = 0;                   ///< Ammount of VESS paid to authors
    share_type           vests_paid_to_curators = 0;                  ///< Ammount of VESTS paid to curators
    share_type           liquidity_rewards_paid = 0;                  ///< Ammount of SMOKE paid to market makers
@@ -141,7 +140,6 @@ FC_REFLECT( smoke::blockchain_statistics::bucket_object,
    (transactions)
    (transfers)
    (steem_transferred)
-   (sbd_transferred)
    (sbd_paid_as_interest)
    (paid_accounts_created)
    (mined_accounts_created)
@@ -156,7 +154,7 @@ FC_REFLECT( smoke::blockchain_statistics::bucket_object,
    (new_reply_votes)
    (changed_reply_votes)
    (payouts)
-   (sbd_paid_to_authors)
+   (steem_paid_to_authors)
    (vests_paid_to_authors)
    (vests_paid_to_curators)
    (liquidity_rewards_paid)

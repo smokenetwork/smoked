@@ -357,7 +357,6 @@ namespace smoke { namespace chain {
          void retally_witness_votes();
          void retally_witness_vote_counts( bool force = false );
          void retally_liquidity_weight();
-         void update_virtual_supply();
 
          bool has_hardfork( uint32_t hardfork )const;
 

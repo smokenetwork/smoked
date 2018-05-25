@@ -56,25 +56,6 @@ namespace smoke { namespace chain {
 
          asset             balance = asset( 0, SMOKE_SYMBOL );  ///< total liquid shares held by this account
 
-         /**
-          *  SBD Deposits pay interest based upon the interest rate set by witnesses. The purpose of these
-          *  fields is to track the total (time * sbd_balance) that it is held. Then at the appointed time
-          *  interest can be paid using the following equation:
-          *
-          *  interest = interest_rate * sbd_seconds / seconds_per_year
-          *
-          *  Every time the sbd_balance is updated the sbd_seconds is also updated. If at least
-          *  SMOKE_MIN_COMPOUNDING_INTERVAL_SECONDS has past since sbd_last_interest_payment then
-          *  interest is added to sbd_balance.
-          *
-          *  @defgroup sbd_data sbd Balance Data
-          */
-         ///@{
-         asset             sbd_balance = asset( 0, SBD_SYMBOL ); /// total sbd balance
-
-         ///@}
-
-         asset             reward_sbd_balance = asset( 0, SBD_SYMBOL );
          asset             reward_steem_balance = asset( 0, SMOKE_SYMBOL );
          asset             reward_vesting_balance = asset( 0, VESTS_SYMBOL );
          asset             reward_vesting_steem = asset( 0, SMOKE_SYMBOL );
@@ -233,7 +214,6 @@ namespace smoke { namespace chain {
    struct by_next_vesting_withdrawal;
    struct by_steem_balance;
    struct by_smp_balance;
-   struct by_smd_balance;
    struct by_post_count;
    struct by_vote_count;
 
@@ -276,13 +256,6 @@ namespace smoke { namespace chain {
          ordered_unique< tag< by_smp_balance >,
             composite_key< account_object,
                member< account_object, asset, &account_object::vesting_shares >,
-               member< account_object, account_id_type, &account_object::id >
-            >,
-            composite_key_compare< std::greater< asset >, std::less< account_id_type > >
-         >,
-         ordered_unique< tag< by_smd_balance >,
-            composite_key< account_object,
-               member< account_object, asset, &account_object::sbd_balance >,
                member< account_object, account_id_type, &account_object::id >
             >,
             composite_key_compare< std::greater< asset >, std::less< account_id_type > >
@@ -452,8 +425,7 @@ FC_REFLECT( smoke::chain::account_object,
              (owner_challenged)(active_challenged)(last_owner_proved)(last_active_proved)(recovery_account)(last_account_recovery)(reset_account)
              (comment_count)(lifetime_vote_count)(post_count)(can_vote)(voting_power)(last_vote_time)
              (balance)
-             (sbd_balance)
-             (reward_steem_balance)(reward_sbd_balance)(reward_vesting_balance)(reward_vesting_steem)
+             (reward_steem_balance)(reward_vesting_balance)(reward_vesting_steem)
              (vesting_shares)(delegated_vesting_shares)(received_vesting_shares)
              (vesting_withdraw_rate)(next_vesting_withdrawal)(withdrawn)(to_withdraw)(withdraw_routes)
              (curation_rewards)
