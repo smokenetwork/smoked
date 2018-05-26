@@ -4063,7 +4063,6 @@ BOOST_AUTO_TEST_CASE( claim_reward_balance_validate )
       claim_reward_balance_operation op;
       op.account = "alice";
       op.reward_steem = ASSET( "0.000 TESTS" );
-      op.reward_sbd = ASSET( "0.000 TBD" );
       op.reward_vests = ASSET( "0.000000 VESTS" );
 
 
@@ -4076,10 +4075,8 @@ BOOST_AUTO_TEST_CASE( claim_reward_balance_validate )
       op.validate();
 
       op.reward_steem.amount = 0;
-      op.reward_sbd.amount = 1000;
       op.validate();
 
-      op.reward_sbd.amount = 0;
       op.reward_vests.amount = 1000;
       op.validate();
 
@@ -4093,19 +4090,16 @@ BOOST_AUTO_TEST_CASE( claim_reward_balance_validate )
 
       BOOST_TEST_MESSAGE( "Testing wrong SBD symbol" );
       op.reward_steem = ASSET( "1.000 TESTS" );
-      op.reward_sbd = ASSET( "1.000 WRONG" );
       SMOKE_REQUIRE_THROW( op.validate(), fc::assert_exception );
 
 
       BOOST_TEST_MESSAGE( "Testing wrong VESTS symbol" );
-      op.reward_sbd = ASSET( "1.000 TBD" );
       op.reward_vests = ASSET( "1.000000 WRONG" );
       SMOKE_REQUIRE_THROW( op.validate(), fc::assert_exception );
 
 
       BOOST_TEST_MESSAGE( "Testing a single negative amount" );
       op.reward_steem.amount = 1000;
-      op.reward_sbd.amount = -1000;
       SMOKE_REQUIRE_THROW( op.validate(), fc::assert_exception );
    }
    FC_LOG_AND_RETHROW()
@@ -4362,7 +4356,6 @@ BOOST_AUTO_TEST_CASE( claim_reward_balance_apply )
 
       op.account = "alice";
       op.reward_steem = ASSET( "20.000 TESTS" );
-      op.reward_sbd = ASSET( "0.000 TBD" );
       op.reward_vests = ASSET( "0.000000 VESTS" );
 
       tx.operations.push_back( op );
@@ -4393,7 +4386,6 @@ BOOST_AUTO_TEST_CASE( claim_reward_balance_apply )
       BOOST_TEST_MESSAGE( "--- Claiming the full reward balance" );
 
       op.reward_steem = ASSET( "10.000 TESTS" );
-      op.reward_sbd = ASSET( "10.000 TBD" );
       tx.clear();
       tx.operations.push_back( op );
       tx.sign( alice_private_key, db.get_chain_id() );

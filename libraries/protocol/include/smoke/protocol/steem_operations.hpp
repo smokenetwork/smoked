@@ -125,7 +125,7 @@ namespace smoke { namespace protocol {
       account_name_type author;
       string            permlink;
 
-      asset             max_accepted_payout    = asset( 1000000000, SMOKE_SYMBOL );       /// SBD value of the maximum payout this post will receive
+      asset             max_accepted_payout    = asset( 1000000000, SMOKE_SYMBOL );       /// the maximum payout this post will receive
       bool              allow_votes            = true;      /// allows a post to receive votes;
       bool              allow_curation_rewards = true; /// allows voters to recieve curation rewards. Rewards return to reward fund.
       comment_options_extensions_type extensions;
@@ -637,7 +637,6 @@ namespace smoke { namespace protocol {
    {
       account_name_type account;
       asset             reward_steem;
-      asset             reward_sbd;
       asset             reward_vests;
 
       void get_required_posting_authorities( flat_set< account_name_type >& a )const{ a.insert( account ); }
@@ -726,5 +725,5 @@ FC_REFLECT( smoke::protocol::request_account_recovery_operation, (recovery_accou
 FC_REFLECT( smoke::protocol::recover_account_operation, (account_to_recover)(new_owner_authority)(recent_owner_authority)(extensions) );
 FC_REFLECT( smoke::protocol::change_recovery_account_operation, (account_to_recover)(new_recovery_account)(extensions) );
 FC_REFLECT( smoke::protocol::decline_voting_rights_operation, (account)(decline) );
-FC_REFLECT( smoke::protocol::claim_reward_balance_operation, (account)(reward_steem)(reward_sbd)(reward_vests) )
+FC_REFLECT( smoke::protocol::claim_reward_balance_operation, (account)(reward_steem)(reward_vests) )
 FC_REFLECT( smoke::protocol::delegate_vesting_shares_operation, (delegator)(delegatee)(vesting_shares) );

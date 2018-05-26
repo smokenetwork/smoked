@@ -887,7 +887,7 @@ class wallet_api
 
       annotated_signed_transaction decline_voting_rights( string account, bool decline, bool broadcast );
 
-      annotated_signed_transaction claim_reward_balance( string account, asset reward_steem, asset reward_sbd, asset reward_vests, bool broadcast );
+      annotated_signed_transaction claim_reward_balance( string account, asset reward_steem, asset reward_vests, bool broadcast );
 };
 
 struct plain_keys {

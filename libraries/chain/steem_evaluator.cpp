@@ -1486,9 +1486,7 @@ void claim_reward_balance_evaluator::do_apply( const claim_reward_balance_operat
          / uint128_t( acnt.reward_vesting_balance.amount.value ) ).to_uint64(), SMOKE_SYMBOL );
 
    _db.adjust_reward_balance( acnt, -op.reward_steem );
-   _db.adjust_reward_balance( acnt, -op.reward_sbd );
    _db.adjust_balance( acnt, op.reward_steem );
-   _db.adjust_balance( acnt, op.reward_sbd );
 
    _db.modify( acnt, [&]( account_object& a )
    {
