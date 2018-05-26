@@ -1945,6 +1945,7 @@ void database::init_genesis( uint64_t init_supply )
 
       for( int i = 0; i < 0x10000; i++ )
          create< block_summary_object >( [&]( block_summary_object& ) {});
+
       create< hardfork_property_object >( [&](hardfork_property_object& hpo )
       {
          hpo.processed_hardforks.push_back( SMOKE_GENESIS_TIME );
@@ -1962,90 +1963,74 @@ void database::init_genesis( uint64_t init_supply )
 
 
       ////////////////////////////////////////////////////////////////////////////////////////
-      // SMOKE_HARDFORK_0_1
-      // SMOKE_HARDFORK_0_2
-      // SMOKE_HARDFORK_0_3
-      // SMOKE_HARDFORK_0_4
-      // SMOKE_HARDFORK_0_5
-      // SMOKE_HARDFORK_0_6
-      // SMOKE_HARDFORK_0_7
-      // SMOKE_HARDFORK_0_8
-      // SMOKE_HARDFORK_0_9
-      // SMOKE_HARDFORK_0_10
-      {
-         perform_vesting_share_split(1000000);
+      // HF 1 to 10
+      perform_vesting_share_split(1000000);
 #ifdef IS_TEST_NET
-         {
-            custom_operation test_op;
-            string op_msg = "Testnet: Hardfork applied";
-            test_op.data = vector< char >( op_msg.begin(), op_msg.end() );
-            test_op.required_auths.insert( SMOKE_INIT_MINER_NAME );
-            operation op = test_op;   // we need the operation object to live to the end of this scope
-            operation_notification note( op );
-            notify_pre_apply_operation( note );
-            notify_post_apply_operation( note );
-         }
+      {
+         custom_operation test_op;
+         string op_msg = "Testnet: Hardfork applied";
+         test_op.data = vector< char >( op_msg.begin(), op_msg.end() );
+         test_op.required_auths.insert( SMOKE_INIT_MINER_NAME );
+         operation op = test_op;   // we need the operation object to live to the end of this scope
+         operation_notification note( op );
+         notify_pre_apply_operation( note );
+         notify_post_apply_operation( note );
+      }
 #endif
 
-         retally_witness_votes();
-         reset_virtual_schedule_time(*this);
-         retally_witness_vote_counts();
-         retally_comment_children();
-         retally_witness_vote_counts(true);
-         retally_liquidity_weight();
-      }
+      retally_witness_votes();
+      reset_virtual_schedule_time(*this);
+      retally_witness_vote_counts();
+      retally_comment_children();
+      retally_witness_vote_counts(true);
+      retally_liquidity_weight();
 
-      // SMOKE_HARDFORK_0_11
-      // SMOKE_HARDFORK_0_12
+
+      // HF 11, 12
+      modify( get< account_authority_object, by_account >( SMOKE_MINER_ACCOUNT ), [&]( account_authority_object& auth )
       {
-         modify( get< account_authority_object, by_account >( SMOKE_MINER_ACCOUNT ), [&]( account_authority_object& auth )
-         {
-             auth.posting = authority();
-             auth.posting.weight_threshold = 1;
-         });
+          auth.posting = authority();
+          auth.posting.weight_threshold = 1;
+      });
 
-         modify( get< account_authority_object, by_account >( SMOKE_NULL_ACCOUNT ), [&]( account_authority_object& auth )
-         {
-             auth.posting = authority();
-             auth.posting.weight_threshold = 1;
-         });
-
-         modify( get< account_authority_object, by_account >( SMOKE_TEMP_ACCOUNT ), [&]( account_authority_object& auth )
-         {
-             auth.posting = authority();
-             auth.posting.weight_threshold = 1;
-         });
-      }
-
-      // SMOKE_HARDFORK_0_13
-      // SMOKE_HARDFORK_0_14:
-      // SMOKE_HARDFORK_0_15
-      // SMOKE_HARDFORK_0_16
-      // SMOKE_HARDFORK_0_17
+      modify( get< account_authority_object, by_account >( SMOKE_NULL_ACCOUNT ), [&]( account_authority_object& auth )
       {
-         const auto& gpo = get_dynamic_global_properties();
+          auth.posting = authority();
+          auth.posting.weight_threshold = 1;
+      });
 
-         auto post_rf = create< reward_fund_object >( [&]( reward_fund_object& rfo )
-            {
-                rfo.name = SMOKE_POST_REWARD_FUND_NAME;
-                rfo.last_update = head_block_time();
-                rfo.content_constant = SMOKE_CONTENT_CONSTANT;
-                rfo.percent_curation_rewards = SMOKE_CONTENT_CURATE_REWARD_PERCENT;
-                rfo.percent_content_rewards = SMOKE_100_PERCENT;
-                rfo.reward_balance = gpo.total_reward_fund_steem;
+      modify( get< account_authority_object, by_account >( SMOKE_TEMP_ACCOUNT ), [&]( account_authority_object& auth )
+      {
+          auth.posting = authority();
+          auth.posting.weight_threshold = 1;
+      });
+
+
+      // HF 13 to 17
+
+//     const auto& gpo = get_dynamic_global_properties();
+
+      auto post_rf = create< reward_fund_object >( [&]( reward_fund_object& rfo )
+         {
+             rfo.name = SMOKE_POST_REWARD_FUND_NAME;
+             rfo.last_update = head_block_time();
+             rfo.content_constant = SMOKE_CONTENT_CONSTANT;
+             rfo.percent_curation_rewards = SMOKE_CONTENT_CURATE_REWARD_PERCENT;
+             rfo.percent_content_rewards = SMOKE_100_PERCENT;
+             rfo.reward_balance = asset( 0, SMOKE_SYMBOL ); // gpo.total_reward_fund_steem;
 
 #ifndef IS_TEST_NET
-                // (fc::uint128_t(808638359297ull,13744269167557038121ull)); // 14916744862149894120447332012073
-                rfo.recent_claims = (fc::uint128_t(uint64_t(140797515942543623ull)));
+             // (fc::uint128_t(808638359297ull,13744269167557038121ull)); // 14916744862149894120447332012073
+             rfo.recent_claims = (fc::uint128_t(uint64_t(140797515942543623ull)));
 #endif
-                rfo.author_reward_curve = curve_id::linear; // curve_id::quadratic
-                rfo.curation_reward_curve = curve_id::square_root; // curve_id::quadratic_curation
-            });
+             rfo.author_reward_curve = curve_id::linear; // curve_id::quadratic
+             rfo.curation_reward_curve = curve_id::square_root; // curve_id::quadratic_curation
+         });
 
-         // As a shortcut in payout processing, we use the id as an array index.
-         // The IDs must be assigned this way. The assertion is a dummy check to ensure this happens.
-         FC_ASSERT( post_rf.id._id == 0 );
-      }
+      // As a shortcut in payout processing, we use the id as an array index.
+      // The IDs must be assigned this way. The assertion is a dummy check to ensure this happens.
+      FC_ASSERT( post_rf.id._id == 0 );
+
    }
    FC_CAPTURE_AND_RETHROW()
 }
