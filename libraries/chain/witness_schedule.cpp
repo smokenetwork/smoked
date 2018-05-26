@@ -114,10 +114,6 @@ void update_witness_schedule4( database& db )
       {
          wit.pow_worker = 0;
       } );
-      db.modify( gprops, [&]( dynamic_global_property_object& obj )
-      {
-         obj.num_pow_witnesses--;
-      } );
    }
 
    auto num_miners = selected_miners.size();
