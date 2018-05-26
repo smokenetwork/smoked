@@ -57,7 +57,6 @@ struct statistics
    uint32_t             finished_vesting_withdrawals = 0;            ///< Processed vesting withdrawals that are now finished
    share_type           vests_withdrawn = 0;                         ///< Ammount of VESTS withdrawn to SMOKE
    share_type           vests_transferred = 0;                       ///< Ammount of VESTS transferred to another account
-   uint32_t             sbd_conversion_requests_filled = 0;          ///< SBD conversion requests filled
    share_type           steem_converted = 0;                         ///< Amount of SMOKE that was converted
 
    statistics& operator += ( const bucket_object& b );
@@ -138,7 +137,6 @@ FC_REFLECT( smoke::blockchain_statistics::statistics,
    (finished_vesting_withdrawals)
    (vests_withdrawn)
    (vests_transferred)
-   (sbd_conversion_requests_filled)
    (steem_converted)
 )
 

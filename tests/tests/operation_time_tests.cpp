@@ -453,7 +453,6 @@ BOOST_AUTO_TEST_CASE( recent_claims_decay )
       auto bob_comment_payout = asset( ( ( uint128_t( bob_comment_rshares.value ) * bob_comment_rshares.value * reward_steem.amount.value ) / total_rshares2 ).to_uint64(), SMOKE_SYMBOL );
       auto bob_comment_discussion_rewards = asset( bob_comment_payout.amount / 4, SMOKE_SYMBOL );
       bob_comment_payout -= bob_comment_discussion_rewards;
-      auto bob_comment_sbd_reward = db.to_sbd( asset( bob_comment_payout.amount / 2, SMOKE_SYMBOL ) );
       auto bob_comment_vesting_reward = ( bob_comment_payout - asset( bob_comment_payout.amount / 2, SMOKE_SYMBOL) ) * db.get_dynamic_global_properties().get_vesting_share_price();
 
       BOOST_TEST_MESSAGE( "Cause first payout" );
@@ -461,9 +460,8 @@ BOOST_AUTO_TEST_CASE( recent_claims_decay )
       generate_block();
 
       BOOST_REQUIRE( db.get_dynamic_global_properties().total_reward_fund_steem == reward_steem - bob_comment_payout );
-      BOOST_REQUIRE( db.get_comment( "bob", string( "test" ) ).total_payout_value == bob_comment_vesting_reward * db.get_dynamic_global_properties().get_vesting_share_price() + bob_comment_sbd_reward * exchange_rate );
+      BOOST_REQUIRE( db.get_comment( "bob", string( "test" ) ).total_payout_value == bob_comment_vesting_reward * db.get_dynamic_global_properties().get_vesting_share_price() );
       BOOST_REQUIRE( db.get_account( "bob" ).vesting_shares == bob_vest_shares + bob_comment_vesting_reward );
-      BOOST_REQUIRE( db.get_account( "bob" ).sbd_balance == bob_sbd_balance + bob_comment_sbd_reward );
 
       BOOST_TEST_MESSAGE( "Testing no payout when less than $0.02" );
 
@@ -518,7 +516,6 @@ BOOST_AUTO_TEST_CASE( recent_claims_decay )
       generate_block();
 
       BOOST_REQUIRE( bob_vest_shares.amount.value == db.get_account( "bob" ).vesting_shares.amount.value );
-      BOOST_REQUIRE( bob_sbd_balance.amount.value == db.get_account( "bob" ).sbd_balance.amount.value );
       validate_database();
    }
    FC_LOG_AND_RETHROW()
@@ -662,7 +659,6 @@ BOOST_AUTO_TEST_CASE( comment_payout )
       auto bob_comment_payout = asset( ( ( uint128_t( bob_comment_rshares.value ) * bob_comment_rshares.value * reward_steem.amount.value ) / total_rshares2 ).to_uint64(), SMOKE_SYMBOL );
       auto bob_comment_vote_rewards = asset( bob_comment_payout.amount / 2, SMOKE_SYMBOL );
       bob_comment_payout -= bob_comment_vote_rewards;
-      auto bob_comment_sbd_reward = asset( bob_comment_payout.amount / 2, SMOKE_SYMBOL ) * exchange_rate;
       auto bob_comment_vesting_reward = ( bob_comment_payout - asset( bob_comment_payout.amount / 2, SMOKE_SYMBOL ) ) * db.get_dynamic_global_properties().get_vesting_share_price();
       auto unclaimed_payments = bob_comment_vote_rewards;
       auto alice_vote_reward = asset( static_cast< uint64_t >( ( u256( vote_idx.find( std::make_tuple( db.get_comment( "bob", string( "test" ).id, db.get_account( "alice" ) ).id ) )->weight ) * bob_comment_vote_rewards.amount.value ) / bob_comment_vote_total ), SMOKE_SYMBOL );
@@ -680,8 +676,7 @@ BOOST_AUTO_TEST_CASE( comment_payout )
       auto bob_comment_reward = get_last_operations( 1 )[0].get< comment_reward_operation >();
 
       BOOST_REQUIRE( db.get_dynamic_global_properties().total_reward_fund_steem.amount.value == reward_steem.amount.value - ( bob_comment_payout + bob_comment_vote_rewards - unclaimed_payments ).amount.value );
-      BOOST_REQUIRE( db.get_comment( "bob", string( "test" ) ).total_payout_value.amount.value == ( ( bob_comment_vesting_reward * db.get_dynamic_global_properties().get_vesting_share_price() ) + ( bob_comment_sbd_reward * exchange_rate ) ).amount.value );
-      BOOST_REQUIRE( db.get_account( "bob" ).sbd_balance.amount.value == ( bob_sbd_balance + bob_comment_sbd_reward ).amount.value );
+      BOOST_REQUIRE( db.get_comment( "bob", string( "test" ) ).total_payout_value.amount.value == ( ( bob_comment_vesting_reward * db.get_dynamic_global_properties().get_vesting_share_price() ) ).amount.value );
       BOOST_REQUIRE( db.get_comment( "alice", string( "test" ) ).net_rshares.value > 0 );
       BOOST_REQUIRE( db.get_comment( "bob", string( "test" ) ).net_rshares.value == 0 );
       BOOST_REQUIRE( db.get_account( "alice" ).vesting_shares.amount.value == ( alice_vest_shares + alice_vote_vesting ).amount.value );
@@ -690,7 +685,6 @@ BOOST_AUTO_TEST_CASE( comment_payout )
       BOOST_REQUIRE( db.get_account( "dave" ).vesting_shares.amount.value == dave_vest_shares.amount.value );
       BOOST_REQUIRE( bob_comment_reward.author == "bob" );
       BOOST_REQUIRE( bob_comment_reward.permlink == "test" );
-      BOOST_REQUIRE( bob_comment_reward.payout.amount.value == bob_comment_sbd_reward.amount.value );
       BOOST_REQUIRE( bob_comment_reward.vesting_payout.amount.value == bob_comment_vesting_reward.amount.value );
       BOOST_REQUIRE( vote_idx.find( std::make_tuple( db.get_comment( "alice", string( "test" ).id, db.get_account( "alice" ) ).id ) ) != vote_idx.end() );
       BOOST_REQUIRE( vote_idx.find( std::make_tuple( db.get_comment( "alice", string( "test" ).id, db.get_account( "bob" ) ).id   ) ) != vote_idx.end() );
@@ -736,7 +730,6 @@ BOOST_AUTO_TEST_CASE( comment_payout )
       auto alice_comment_payout = asset( static_cast< uint64_t >( ( rf * rs2 ) / trs2 ), SMOKE_SYMBOL );
       auto alice_comment_vote_rewards = asset( alice_comment_payout.amount / 2, SMOKE_SYMBOL );
       alice_comment_payout -= alice_comment_vote_rewards;
-      auto alice_comment_sbd_reward = asset( alice_comment_payout.amount / 2, SMOKE_SYMBOL ) * exchange_rate;
       auto alice_comment_vesting_reward = ( alice_comment_payout - asset( alice_comment_payout.amount / 2, SMOKE_SYMBOL ) ) * db.get_dynamic_global_properties().get_vesting_share_price();
       unclaimed_payments = alice_comment_vote_rewards;
       alice_vote_reward = asset( static_cast< uint64_t >( ( u256( vote_idx.find( std::make_tuple( db.get_comment( "alice", string( "test" ).id, db.get_account( "alice" ) ).id ) )->weight ) * alice_comment_vote_rewards.amount.value ) / alice_comment_vote_total ), SMOKE_SYMBOL );
@@ -753,7 +746,7 @@ BOOST_AUTO_TEST_CASE( comment_payout )
       auto alice_comment_reward = get_last_operations( 1 )[0].get< comment_reward_operation >();
 
       BOOST_REQUIRE( ( db.get_dynamic_global_properties().total_reward_fund_steem + alice_comment_payout + alice_comment_vote_rewards - unclaimed_payments ).amount.value == reward_steem.amount.value );
-      BOOST_REQUIRE( db.get_comment( "alice", string( "test" ) ).total_payout_value.amount.value == ( ( alice_comment_vesting_reward * db.get_dynamic_global_properties().get_vesting_share_price() ) + ( alice_comment_sbd_reward * exchange_rate ) ).amount.value );
+      BOOST_REQUIRE( db.get_comment( "alice", string( "test" ) ).total_payout_value.amount.value == ( ( alice_comment_vesting_reward * db.get_dynamic_global_properties().get_vesting_share_price() ) ).amount.value );
       BOOST_REQUIRE( db.get_comment( "alice", string( "test" ) ).net_rshares.value == 0 );
       BOOST_REQUIRE( db.get_comment( "alice", string( "test" ) ).net_rshares.value == 0 );
       BOOST_REQUIRE( db.get_account( "alice" ).vesting_shares.amount.value == ( alice_vest_shares + alice_vote_vesting + alice_comment_vesting_reward ).amount.value );
@@ -762,7 +755,6 @@ BOOST_AUTO_TEST_CASE( comment_payout )
       BOOST_REQUIRE( db.get_account( "dave" ).vesting_shares.amount.value == ( dave_vest_shares + dave_vote_vesting ).amount.value );
       BOOST_REQUIRE( alice_comment_reward.author == "alice" );
       BOOST_REQUIRE( alice_comment_reward.permlink == "test" );
-      BOOST_REQUIRE( alice_comment_reward.payout.amount.value == alice_comment_sbd_reward.amount.value );
       BOOST_REQUIRE( alice_comment_reward.vesting_payout.amount.value == alice_comment_vesting_reward.amount.value );
       BOOST_REQUIRE( vote_idx.find( std::make_tuple( db.get_comment( "alice", string( "test" ).id, db.get_account( "alice" ) ).id ) ) == vote_idx.end() );
       BOOST_REQUIRE( vote_idx.find( std::make_tuple( db.get_comment( "alice", string( "test" ).id, db.get_account( "bob" ) ).id   ) ) == vote_idx.end() );
@@ -968,39 +960,18 @@ BOOST_AUTO_TEST_CASE( nested_comments )
       reward_steem += dave_comment_vote_rewards - bob_vote_dave_reward.amount.value;
 
       // Calculate rewards paid to parent posts
-      auto alice_pays_alice_sbd = alice_comment_reward / 2;
-      auto alice_pays_alice_vest = alice_comment_reward - alice_pays_alice_sbd;
-      auto bob_pays_bob_sbd = bob_comment_reward / 2;
-      auto bob_pays_bob_vest = bob_comment_reward - bob_pays_bob_sbd;
-      auto dave_pays_dave_sbd = dave_comment_reward / 2;
-      auto dave_pays_dave_vest = dave_comment_reward - dave_pays_dave_sbd;
+      auto bob_pays_bob_vest = bob_comment_reward;
+      auto dave_pays_dave_vest = dave_comment_reward;
 
-      auto bob_pays_alice_sbd = bob_pays_bob_sbd / 2;
       auto bob_pays_alice_vest = bob_pays_bob_vest / 2;
-      bob_pays_bob_sbd -= bob_pays_alice_sbd;
       bob_pays_bob_vest -= bob_pays_alice_vest;
 
-      auto dave_pays_sam_sbd = dave_pays_dave_sbd / 2;
       auto dave_pays_sam_vest = dave_pays_dave_vest / 2;
-      dave_pays_dave_sbd -= dave_pays_sam_sbd;
       dave_pays_dave_vest -= dave_pays_sam_vest;
-      auto dave_pays_bob_sbd = dave_pays_sam_sbd / 2;
       auto dave_pays_bob_vest = dave_pays_sam_vest / 2;
-      dave_pays_sam_sbd -= dave_pays_bob_sbd;
       dave_pays_sam_vest -= dave_pays_bob_vest;
-      auto dave_pays_alice_sbd = dave_pays_bob_sbd / 2;
       auto dave_pays_alice_vest = dave_pays_bob_vest / 2;
-      dave_pays_bob_sbd -= dave_pays_alice_sbd;
       dave_pays_bob_vest -= dave_pays_alice_vest;
-
-      // Calculate total comment payouts
-      auto alice_comment_total_payout = db.to_sbd( asset( alice_pays_alice_sbd + alice_pays_alice_vest, SMOKE_SYMBOL ) );
-      alice_comment_total_payout += db.to_sbd( asset( bob_pays_alice_sbd + bob_pays_alice_vest, SMOKE_SYMBOL ) );
-      alice_comment_total_payout += db.to_sbd( asset( dave_pays_alice_sbd + dave_pays_alice_vest, SMOKE_SYMBOL ) );
-      auto bob_comment_total_payout = db.to_sbd( asset( bob_pays_bob_sbd + bob_pays_bob_vest, SMOKE_SYMBOL ) );
-      bob_comment_total_payout += db.to_sbd( asset( dave_pays_bob_sbd + dave_pays_bob_vest, SMOKE_SYMBOL ) );
-      auto sam_comment_total_payout = db.to_sbd( asset( dave_pays_sam_sbd + dave_pays_sam_vest, SMOKE_SYMBOL ) );
-      auto dave_comment_total_payout = db.to_sbd( asset( dave_pays_dave_sbd + dave_pays_dave_vest, SMOKE_SYMBOL ) );
 
       auto alice_starting_vesting = db.get_account( "alice" ).vesting_shares;
       auto bob_starting_vesting = db.get_account( "bob" ).vesting_shares;
@@ -1036,7 +1007,6 @@ BOOST_AUTO_TEST_CASE( nested_comments )
       BOOST_REQUIRE( com_vop.permlink == "test" );
       BOOST_REQUIRE( com_vop.originating_author == "dave" );
       BOOST_REQUIRE( com_vop.originating_permlink == "test" );
-      BOOST_REQUIRE( com_vop.payout.amount.value == dave_pays_alice_sbd );
       BOOST_REQUIRE( ( com_vop.vesting_payout * gpo.get_vesting_share_price() ).amount.value == dave_pays_alice_vest );
 
       com_vop = ops[1].get< comment_reward_operation >();
@@ -1044,7 +1014,6 @@ BOOST_AUTO_TEST_CASE( nested_comments )
       BOOST_REQUIRE( com_vop.permlink == "test" );
       BOOST_REQUIRE( com_vop.originating_author == "dave" );
       BOOST_REQUIRE( com_vop.originating_permlink == "test" );
-      BOOST_REQUIRE( com_vop.payout.amount.value == dave_pays_bob_sbd );
       BOOST_REQUIRE( ( com_vop.vesting_payout * gpo.get_vesting_share_price() ).amount.value == dave_pays_bob_vest );
 
       com_vop = ops[2].get< comment_reward_operation >();
@@ -1052,7 +1021,6 @@ BOOST_AUTO_TEST_CASE( nested_comments )
       BOOST_REQUIRE( com_vop.permlink == "test" );
       BOOST_REQUIRE( com_vop.originating_author == "dave" );
       BOOST_REQUIRE( com_vop.originating_permlink == "test" );
-      BOOST_REQUIRE( com_vop.payout.amount.value == dave_pays_sam_sbd );
       BOOST_REQUIRE( ( com_vop.vesting_payout * gpo.get_vesting_share_price() ).amount.value == dave_pays_sam_vest );
 
       com_vop = ops[3].get< comment_reward_operation >();
@@ -1060,7 +1028,6 @@ BOOST_AUTO_TEST_CASE( nested_comments )
       BOOST_REQUIRE( com_vop.permlink == "test" );
       BOOST_REQUIRE( com_vop.originating_author == "dave" );
       BOOST_REQUIRE( com_vop.originating_permlink == "test" );
-      BOOST_REQUIRE( com_vop.payout.amount.value == dave_pays_dave_sbd );
       BOOST_REQUIRE( ( com_vop.vesting_payout * gpo.get_vesting_share_price() ).amount.value == dave_pays_dave_vest );
 
       cur_vop = ops[4].get< curate_reward_operation >();

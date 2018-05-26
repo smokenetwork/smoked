@@ -65,7 +65,6 @@ struct account_stats_bucket_object : public object< account_stats_bucket_object_
    uint32_t             author_reward_payouts = 0;                ///< Number of author reward payouts
    share_type           author_rewards_vests = 0;                 ///< VESTS paid for author rewards
    share_type           author_rewards_total_steem_value = 0;     ///< SMOKE Value of author rewards
-   share_type           author_rewards_payout_sbd_value = 0;      ///< SBD Value of author rewards at time of payout
    uint32_t             curation_reward_payouts = 0;              ///< Number of curation reward payouts.
    share_type           curation_rewards_vests = 0;               ///< VESTS paid for curation rewards
    share_type           curation_rewards_steem_value = 0;         ///< SMOKE Value of curation rewards
@@ -164,7 +163,6 @@ FC_REFLECT( smoke::account_statistics::account_stats_bucket_object,
    (author_reward_payouts)
    (author_rewards_vests)
    (author_rewards_total_steem_value)
-   (author_rewards_payout_sbd_value)
    (curation_reward_payouts)
    (curation_rewards_vests)
    (curation_rewards_steem_value)
