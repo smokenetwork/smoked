@@ -981,18 +981,6 @@ asset database::create_vesting( const account_object& to_account, asset steem, b
    FC_CAPTURE_AND_RETHROW( (to_account.name)(steem) )
 }
 
-fc::sha256 database::get_pow_target()const
-{
-   const auto& dgp = get_dynamic_global_properties();
-   fc::sha256 target;
-   target._hash[0] = -1;
-   target._hash[1] = -1;
-   target._hash[2] = -1;
-   target._hash[3] = -1;
-   target = target >> ((dgp.num_pow_witnesses/4)+4);
-   return target;
-}
-
 void database::adjust_proxied_witness_votes( const account_object& a,
                                    const std::array< share_type, SMOKE_MAX_PROXY_RECURSION_DEPTH+1 >& delta,
                                    int depth )
