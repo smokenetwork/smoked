@@ -36,36 +36,6 @@
 
 namespace smoke { namespace chain {
 
-//namespace db2 = graphene::db2;
-
-struct object_schema_repr
-{
-   std::pair< uint16_t, uint16_t > space_type;
-   std::string type;
-};
-
-struct operation_schema_repr
-{
-   std::string id;
-   std::string type;
-};
-
-struct db_schema
-{
-   std::map< std::string, std::string > types;
-   std::vector< object_schema_repr > object_types;
-   std::string operation_type;
-   std::vector< operation_schema_repr > custom_operation_types;
-};
-
-} }
-
-FC_REFLECT( smoke::chain::object_schema_repr, (space_type)(type) )
-FC_REFLECT( smoke::chain::operation_schema_repr, (id)(type) )
-FC_REFLECT( smoke::chain::db_schema, (types)(object_types)(operation_type)(custom_operation_types) )
-
-namespace smoke { namespace chain {
-
 using boost::container::flat_set;
 
 struct reward_fund_context
