@@ -119,7 +119,6 @@
 #define SMOKE_OWNER_CHALLENGE_FEE             asset( 30000, SMOKE_SYMBOL )
 
 #define SMOKE_POST_REWARD_FUND_NAME           ("post")
-#define SMOKE_COMMENT_REWARD_FUND_NAME        ("comment")
 #define SMOKE_RECENT_RSHARES_DECAY_RATE       (fc::days(15))
 #define SMOKE_CONTENT_CONSTANT                (uint128_t(uint64_t(2000000000000ll)))
 
