@@ -683,7 +683,6 @@ class wallet_api
          string who,
          string receiver,
          uint32_t escrow_id,
-         asset sbd_amount,
          asset steem_amount,
          bool broadcast = false
       );
