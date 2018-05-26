@@ -1427,9 +1427,9 @@ share_type database::cashout_comment_helper( util::comment_reward_context& ctx, 
 
            author_tokens -= total_beneficiary;
 
-           auto sbd_steem     = ( author_tokens * comment.percent_steem_dollars ) / ( 2 * SMOKE_100_PERCENT ) ;
+//           auto sbd_steem     = ( author_tokens * comment.percent_steem_dollars ) / ( 2 * SMOKE_100_PERCENT ) ;
 
-           sbd_steem = 0;
+           auto sbd_steem = 0;
 
            auto vesting_steem = author_tokens - sbd_steem;
 
