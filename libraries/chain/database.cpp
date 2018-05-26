@@ -1590,44 +1590,6 @@ void database::process_funds()
   push_virtual_operation( producer_reward_operation( cwit.owner, producer_reward ) );
 }
 
-asset database::get_liquidity_reward()const
-{
-   return asset( 0, SMOKE_SYMBOL );
-}
-
-void database::pay_liquidity_reward()
-{
-#ifdef IS_TEST_NET
-   if( !liquidity_rewards_enabled )
-      return;
-#endif
-
-   if( (head_block_num() % SMOKE_LIQUIDITY_REWARD_BLOCKS) == 0 )
-   {
-      auto reward = get_liquidity_reward();
-
-      if( reward.amount == 0 )
-         return;
-
-      const auto& ridx = get_index< liquidity_reward_balance_index >().indices().get< by_volume_weight >();
-      auto itr = ridx.begin();
-      if( itr != ridx.end() && itr->volume_weight() > 0 )
-      {
-         adjust_supply( reward, true );
-         adjust_balance( get(itr->owner), reward );
-         modify( *itr, [&]( liquidity_reward_balance_object& obj )
-         {
-            obj.steem_volume = 0;
-            obj.sbd_volume   = 0;
-            obj.last_update  = head_block_time();
-            obj.weight = 0;
-         } );
-
-         push_virtual_operation( liquidity_reward_operation( get(itr->owner).name, reward ) );
-      }
-   }
-}
-
 uint16_t database::get_curation_rewards_percent( const comment_object& c ) const
 {
    return get_reward_fund( c ).percent_curation_rewards;
@@ -1829,7 +1791,6 @@ void database::initialize_indexes()
    add_core_index< comment_index                           >(*this);
    add_core_index< comment_vote_index                      >(*this);
    add_core_index< witness_vote_index                      >(*this);
-   add_core_index< liquidity_reward_balance_index          >(*this);
    add_core_index< operation_index                         >(*this);
    add_core_index< account_history_index                   >(*this);
    add_core_index< hardfork_property_index                 >(*this);
@@ -1983,8 +1944,6 @@ void database::init_genesis( uint64_t init_supply )
       retally_witness_vote_counts();
       retally_comment_children();
       retally_witness_vote_counts(true);
-      retally_liquidity_weight();
-
 
       // HF 11, 12
       modify( get< account_authority_object, by_account >( SMOKE_MINER_ACCOUNT ), [&]( account_authority_object& auth )
@@ -2246,7 +2205,6 @@ void database::_apply_block( const signed_block& next_block )
    process_funds();
    process_comment_cashout();
    process_vesting_withdrawals();
-   pay_liquidity_reward();
 
    account_recovery_processing();
    expire_escrow_ratification();
@@ -2752,15 +2710,6 @@ void database::apply_hardfork( uint32_t hardfork )
    } );
 
    push_virtual_operation( hardfork_operation( hardfork ), true );
-}
-
-void database::retally_liquidity_weight() {
-   const auto& ridx = get_index< liquidity_reward_balance_index >().indices().get< by_owner >();
-   for( const auto& i : ridx ) {
-      modify( i, []( liquidity_reward_balance_object& o ){
-         o.update_weight(true/*HAS HARDFORK10 if this method is called*/);
-      });
-   }
 }
 
 /**

@@ -43,16 +43,6 @@ namespace smoke { namespace protocol {
       asset             payout;
    };
 
-
-   struct liquidity_reward_operation : public virtual_operation
-   {
-      liquidity_reward_operation( string o = string(), asset p = asset() )
-      :owner(o), payout(p) {}
-
-      account_name_type owner;
-      asset             payout;
-   };
-
    struct fill_vesting_withdraw_operation : public virtual_operation
    {
       fill_vesting_withdraw_operation(){}
@@ -127,7 +117,6 @@ namespace smoke { namespace protocol {
 FC_REFLECT( smoke::protocol::author_reward_operation, (author)(permlink)(steem_payout)(vesting_payout) )
 FC_REFLECT( smoke::protocol::curation_reward_operation, (curator)(reward)(comment_author)(comment_permlink) )
 FC_REFLECT( smoke::protocol::comment_reward_operation, (author)(permlink)(payout) )
-FC_REFLECT( smoke::protocol::liquidity_reward_operation, (owner)(payout) )
 FC_REFLECT( smoke::protocol::fill_vesting_withdraw_operation, (from_account)(to_account)(withdrawn)(deposited) )
 FC_REFLECT( smoke::protocol::shutdown_witness_operation, (owner) )
 FC_REFLECT( smoke::protocol::hardfork_operation, (hardfork_id) )

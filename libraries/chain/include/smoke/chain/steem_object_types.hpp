@@ -48,7 +48,6 @@ enum object_type
    comment_object_type,
    comment_vote_object_type,
    witness_vote_object_type,
-   liquidity_reward_balance_object_type,
    operation_object_type,
    account_history_object_type,
    hardfork_property_object_type,
@@ -74,7 +73,6 @@ class witness_schedule_object;
 class comment_object;
 class comment_vote_object;
 class witness_vote_object;
-class liquidity_reward_balance_object;
 class operation_object;
 class account_history_object;
 class hardfork_property_object;
@@ -99,7 +97,6 @@ typedef oid< witness_schedule_object                > witness_schedule_id_type;
 typedef oid< comment_object                         > comment_id_type;
 typedef oid< comment_vote_object                    > comment_vote_id_type;
 typedef oid< witness_vote_object                    > witness_vote_id_type;
-typedef oid< liquidity_reward_balance_object        > liquidity_reward_balance_id_type;
 typedef oid< operation_object                       > operation_id_type;
 typedef oid< account_history_object                 > account_history_id_type;
 typedef oid< hardfork_property_object               > hardfork_property_id_type;
@@ -205,7 +202,6 @@ FC_REFLECT_ENUM( smoke::chain::object_type,
                  (comment_object_type)
                  (comment_vote_object_type)
                  (witness_vote_object_type)
-                 (liquidity_reward_balance_object_type)
                  (operation_object_type)
                  (account_history_object_type)
                  (hardfork_property_object_type)

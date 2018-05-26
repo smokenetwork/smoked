@@ -60,9 +60,6 @@ class database_api_impl : public std::enable_shared_from_this<database_api_impl>
       set<account_name_type> lookup_witness_accounts(const string& lower_bound_name, uint32_t limit)const;
       uint64_t get_witness_count()const;
 
-      // Market
-      vector< liquidity_balance > get_liquidity_queue( string start_account, uint32_t limit )const;
-
       // Authority / validation
       std::string get_transaction_hex(const signed_transaction& trx)const;
       set<public_key_type> get_required_signatures( const signed_transaction& trx, const flat_set<public_key_type>& available_keys )const;
@@ -696,58 +693,6 @@ uint64_t database_api::get_witness_count()const
 uint64_t database_api_impl::get_witness_count()const
 {
    return _db.get_index<witness_index>().indices().size();
-}
-
-//////////////////////////////////////////////////////////////////////
-//                                                                  //
-// Market                                                           //
-//                                                                  //
-//////////////////////////////////////////////////////////////////////
-
-vector< liquidity_balance > database_api::get_liquidity_queue( string start_account, uint32_t limit )const
-{
-   return my->_db.with_read_lock( [&]()
-   {
-      return my->get_liquidity_queue( start_account, limit );
-   });
-}
-
-vector< liquidity_balance > database_api_impl::get_liquidity_queue( string start_account, uint32_t limit )const
-{
-   FC_ASSERT( limit <= 1000 );
-
-   const auto& liq_idx = _db.get_index< liquidity_reward_balance_index >().indices().get< by_volume_weight >();
-   auto itr = liq_idx.begin();
-   vector< liquidity_balance > result;
-
-   result.reserve( limit );
-
-   if( start_account.length() )
-   {
-      const auto& liq_by_acc = _db.get_index< liquidity_reward_balance_index >().indices().get< by_owner >();
-      auto acc = liq_by_acc.find( _db.get_account( start_account ).id );
-
-      if( acc != liq_by_acc.end() )
-      {
-         itr = liq_idx.find( boost::make_tuple( acc->weight, acc->owner ) );
-      }
-      else
-      {
-         itr = liq_idx.end();
-      }
-   }
-
-   while( itr != liq_idx.end() && result.size() < limit )
-   {
-      liquidity_balance bal;
-      bal.account = _db.get(itr->owner).name;
-      bal.weight = itr->weight;
-      result.push_back( bal );
-
-      ++itr;
-   }
-
-   return result;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1768,7 +1713,6 @@ state database_api::get_state( string path )const
                   case operation::tag<transfer_to_vesting_operation>::value:
                   case operation::tag<withdraw_vesting_operation>::value:
                   case operation::tag<transfer_operation>::value:
-                  case operation::tag<liquidity_reward_operation>::value:
                   case operation::tag<author_reward_operation>::value:
                   case operation::tag<curation_reward_operation>::value:
                   case operation::tag<comment_benefactor_reward_operation>::value:

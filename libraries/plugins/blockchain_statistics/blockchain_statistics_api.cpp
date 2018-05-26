@@ -131,7 +131,6 @@ statistics& statistics::operator +=( const bucket_object& b )
    this->steem_paid_to_authors                  += b.steem_paid_to_authors;
    this->vests_paid_to_authors                  += b.vests_paid_to_authors;
    this->vests_paid_to_curators                 += b.vests_paid_to_curators;
-   this->liquidity_rewards_paid                 += b.liquidity_rewards_paid;
    this->transfers_to_vesting                   += b.transfers_to_vesting;
    this->steem_vested                           += b.steem_vested;
    this->new_vesting_withdrawal_requests        += b.new_vesting_withdrawal_requests;
