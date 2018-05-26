@@ -336,7 +336,6 @@ namespace smoke { namespace chain {
 
          /// Reset the object graph in-memory
          void initialize_indexes();
-         void init_schema();
          void init_genesis(uint64_t initial_supply = SMOKE_INIT_SUPPLY);
 
          /** when popping a block, the transactions that were removed get cached here so they
