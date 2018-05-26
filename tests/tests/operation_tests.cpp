@@ -2649,7 +2649,6 @@ BOOST_AUTO_TEST_CASE( escrow_transfer_apply )
       op.ratification_deadline = db.head_block_time() + 100;
       op.escrow_expiration = db.head_block_time() + 200;
 
-      BOOST_TEST_MESSAGE( "--- failure when from cannot cover sbd amount" );
       signed_transaction tx;
       tx.operations.push_back( op );
       tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
@@ -3563,7 +3562,6 @@ BOOST_AUTO_TEST_CASE( escrow_release_apply )
       BOOST_REQUIRE( db.get_account( "bob" ).balance == ASSET( "0.100 TESTS" ) );
 
 
-      BOOST_TEST_MESSAGE( "--- failure when releasing more sbd than available" );
       op.steem_amount = ASSET( "1.000 TESTS" );
 
       tx.clear();
