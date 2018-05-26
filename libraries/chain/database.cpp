@@ -2028,6 +2028,10 @@ void database::init_genesis( uint64_t init_supply )
          p.participation_count = 128;
          p.current_supply = asset( init_supply, SMOKE_SYMBOL );
          p.maximum_block_size = SMOKE_MAX_BLOCK_SIZE;
+
+         p.total_reward_fund_steem = asset( 0, SMOKE_SYMBOL );
+         p.total_reward_shares2 = 0;
+         p.vote_power_reserve_rate = 10;
       } );
 
 
@@ -2047,6 +2051,15 @@ void database::init_genesis( uint64_t init_supply )
 
       ////////////////////////////////////////////////////////////////////////////////////////
       // SMOKE_HARDFORK_0_1
+      // SMOKE_HARDFORK_0_2
+      // SMOKE_HARDFORK_0_3
+      // SMOKE_HARDFORK_0_4
+      // SMOKE_HARDFORK_0_5
+      // SMOKE_HARDFORK_0_6
+      // SMOKE_HARDFORK_0_7
+      // SMOKE_HARDFORK_0_8
+      // SMOKE_HARDFORK_0_9
+      // SMOKE_HARDFORK_0_10
       {
          perform_vesting_share_split(1000000);
 #ifdef IS_TEST_NET
@@ -2061,77 +2074,18 @@ void database::init_genesis( uint64_t init_supply )
             notify_post_apply_operation( note );
          }
 #endif
-      }
 
-      // SMOKE_HARDFORK_0_2
-      {
          retally_witness_votes();
-      }
-
-      // SMOKE_HARDFORK_0_3
-      {
-//         retally_witness_votes();
-      }
-
-      // SMOKE_HARDFORK_0_4
-      {
          reset_virtual_schedule_time(*this);
-      }
-
-      // SMOKE_HARDFORK_0_5
-
-      // SMOKE_HARDFORK_0_6
-      {
          retally_witness_vote_counts();
          retally_comment_children();
-      }
-
-      // SMOKE_HARDFORK_0_7
-
-      // SMOKE_HARDFORK_0_8
-      {
          retally_witness_vote_counts(true);
-      }
-
-      // SMOKE_HARDFORK_0_9
-
-      // SMOKE_HARDFORK_0_10
-      {
          retally_liquidity_weight();
       }
 
       // SMOKE_HARDFORK_0_11
-
       // SMOKE_HARDFORK_0_12
       {
-//         const auto& comment_idx = get_index< comment_index >().indices();
-//
-//         for( auto itr = comment_idx.begin(); itr != comment_idx.end(); ++itr )
-//         {
-//            // At the hardfork time, all new posts with no votes get their cashout time set to +12 hrs from head block time.
-//            // All posts with a payout get their cashout time set to +30 days. This hardfork takes place within 30 days
-//            // initial payout so we don't have to handle the case of posts that should be frozen that aren't
-//            if( itr->parent_author == SMOKE_ROOT_POST_PARENT )
-//            {
-//               // Post has not been paid out and has no votes (cashout_time == 0 === net_rshares == 0, under current semmantics)
-//               if( itr->last_payout == fc::time_point_sec::min() && itr->cashout_time == fc::time_point_sec::maximum() )
-//               {
-//                  modify( *itr, [&]( comment_object & c )
-//                  {
-//                      c.cashout_time = head_block_time() + SMOKE_CASHOUT_WINDOW_SECONDS_PRE_HF17;
-//                  });
-//               }
-//                  // Has been paid out, needs to be on second cashout window
-//               else if( itr->last_payout > fc::time_point_sec() )
-//               {
-//                  modify( *itr, [&]( comment_object& c )
-//                  {
-//                      c.cashout_time = c.last_payout + SMOKE_SECOND_CASHOUT_WINDOW;
-//                  });
-//               }
-//            }
-//         }
-
          modify( get< account_authority_object, by_account >( SMOKE_MINER_ACCOUNT ), [&]( account_authority_object& auth )
          {
              auth.posting = authority();
@@ -2152,22 +2106,11 @@ void database::init_genesis( uint64_t init_supply )
       }
 
       // SMOKE_HARDFORK_0_13
-
       // SMOKE_HARDFORK_0_14:
-
       // SMOKE_HARDFORK_0_15
-
       // SMOKE_HARDFORK_0_16
-
       // SMOKE_HARDFORK_0_17
       {
-//         static_assert(
-//                 SMOKE_MAX_VOTED_WITNESSES_HF0 + SMOKE_MAX_MINER_WITNESSES_HF0 + SMOKE_MAX_RUNNER_WITNESSES_HF0 == SMOKE_MAX_WITNESSES,
-//                 "HF0 witness counts must add up to SMOKE_MAX_WITNESSES" );
-//         static_assert(
-//                 SMOKE_MAX_VOTED_WITNESSES_HF17 + SMOKE_MAX_MINER_WITNESSES_HF17 + SMOKE_MAX_RUNNER_WITNESSES_HF17 == SMOKE_MAX_WITNESSES,
-//                 "HF17 witness counts must add up to SMOKE_MAX_WITNESSES" );
-
          modify( get_witness_schedule_object(), [&]( witness_schedule_object& wso )
          {
              wso.max_voted_witnesses = SMOKE_MAX_VOTED_WITNESSES;
@@ -2178,115 +2121,26 @@ void database::init_genesis( uint64_t init_supply )
          const auto& gpo = get_dynamic_global_properties();
 
          auto post_rf = create< reward_fund_object >( [&]( reward_fund_object& rfo )
-                                                      {
-                                                          rfo.name = SMOKE_POST_REWARD_FUND_NAME;
-                                                          rfo.last_update = head_block_time();
-                                                          rfo.content_constant = SMOKE_CONTENT_CONSTANT;
-                                                          rfo.percent_curation_rewards = SMOKE_CONTENT_CURATE_REWARD_PERCENT;
-                                                          rfo.percent_content_rewards = SMOKE_100_PERCENT;
-                                                          rfo.reward_balance = gpo.total_reward_fund_steem;
+            {
+                rfo.name = SMOKE_POST_REWARD_FUND_NAME;
+                rfo.last_update = head_block_time();
+                rfo.content_constant = SMOKE_CONTENT_CONSTANT;
+                rfo.percent_curation_rewards = SMOKE_CONTENT_CURATE_REWARD_PERCENT;
+                rfo.percent_content_rewards = SMOKE_100_PERCENT;
+                rfo.reward_balance = gpo.total_reward_fund_steem;
+
 #ifndef IS_TEST_NET
-                                                          rfo.recent_claims = (fc::uint128_t(808638359297ull,13744269167557038121ull)); // 14916744862149894120447332012073
+                // (fc::uint128_t(808638359297ull,13744269167557038121ull)); // 14916744862149894120447332012073
+                rfo.recent_claims = (fc::uint128_t(uint64_t(140797515942543623ull)));
 #endif
-                                                          rfo.author_reward_curve = curve_id::quadratic;
-                                                          rfo.curation_reward_curve = curve_id::quadratic_curation;
-                                                      });
+                rfo.author_reward_curve = curve_id::linear; // curve_id::quadratic
+                rfo.curation_reward_curve = curve_id::square_root; // curve_id::quadratic_curation
+            });
 
          // As a shortcut in payout processing, we use the id as an array index.
          // The IDs must be assigned this way. The assertion is a dummy check to ensure this happens.
          FC_ASSERT( post_rf.id._id == 0 );
-
-         modify( gpo, [&]( dynamic_global_property_object& g )
-         {
-             g.total_reward_fund_steem = asset( 0, SMOKE_SYMBOL );
-             g.total_reward_shares2 = 0;
-         });
-
-//         /*
-//         * For all current comments we will either keep their current cashout time, or extend it to 1 week
-//         * after creation.
-//         *
-//         * We cannot do a simple iteration by cashout time because we are editting cashout time.
-//         * More specifically, we will be adding an explicit cashout time to all comments with parents.
-//         * To find all discussions that have not been paid out we fir iterate over posts by cashout time.
-//         * Before the hardfork these are all root posts. Iterate over all of their children, adding each
-//         * to a specific list. Next, update payout times for all discussions on the root post. This defines
-//         * the min cashout time for each child in the discussion. Then iterate over the children and set
-//         * their cashout time in a similar way, grabbing the root post as their inherent cashout time.
-//         */
-//         const auto& comment_idx = get_index< comment_index, by_cashout_time >();
-//         const auto& by_root_idx = get_index< comment_index, by_root >();
-//         vector< const comment_object* > root_posts;
-//         root_posts.reserve( SMOKE_HF_17_NUM_POSTS );
-//         vector< const comment_object* > replies;
-//         replies.reserve( SMOKE_HF_17_NUM_REPLIES );
-//
-//         for( auto itr = comment_idx.begin(); itr != comment_idx.end() && itr->cashout_time < fc::time_point_sec::maximum(); ++itr )
-//         {
-//            root_posts.push_back( &(*itr) );
-//
-//            for( auto reply_itr = by_root_idx.lower_bound( itr->id ); reply_itr != by_root_idx.end() && reply_itr->root_comment == itr->id; ++reply_itr )
-//            {
-//               replies.push_back( &(*reply_itr) );
-//            }
-//         }
-//
-//         for( auto itr : root_posts )
-//         {
-//            modify( *itr, [&]( comment_object& c )
-//            {
-//                c.cashout_time = std::max( c.created + SMOKE_CASHOUT_WINDOW_SECONDS, c.cashout_time );
-//            });
-//         }
-//
-//         for( auto itr : replies )
-//         {
-//            modify( *itr, [&]( comment_object& c )
-//            {
-//                c.cashout_time = std::max( calculate_discussion_payout_time( c ), c.created + SMOKE_CASHOUT_WINDOW_SECONDS );
-//            });
-//         }
       }
-
-      // SMOKE_HARDFORK_0_18
-
-      // SMOKE_HARDFORK_0_19
-      {
-         modify( get_dynamic_global_properties(), [&]( dynamic_global_property_object& gpo )
-         {
-             gpo.vote_power_reserve_rate = 10;
-         });
-
-         modify( get< reward_fund_object, by_name >( SMOKE_POST_REWARD_FUND_NAME ), [&]( reward_fund_object &rfo )
-         {
-#ifndef IS_TEST_NET
-             rfo.recent_claims = (fc::uint128_t(uint64_t(140797515942543623ull)));
-#endif
-             rfo.author_reward_curve = curve_id::linear;
-             rfo.curation_reward_curve = curve_id::square_root;
-         });
-
-         /* Remove all 0 delegation objects */
-         vector< const vesting_delegation_object* > to_remove;
-         const auto& delegation_idx = get_index< vesting_delegation_index, by_id >();
-         auto delegation_itr = delegation_idx.begin();
-
-         while( delegation_itr != delegation_idx.end() )
-         {
-            if( delegation_itr->vesting_shares.amount == 0 )
-               to_remove.push_back( &(*delegation_itr) );
-
-            ++delegation_itr;
-         }
-
-         for( const vesting_delegation_object* delegation_ptr: to_remove )
-         {
-            remove( *delegation_ptr );
-         }
-      }
-
-      // SMOKE_HARDFORK_0_20:
-
    }
    FC_CAPTURE_AND_RETHROW()
 }
