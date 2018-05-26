@@ -1052,7 +1052,9 @@ void vote_evaluator::do_apply( const vote_operation& o )
 
    int64_t abs_rshares    = ((uint128_t(voter.effective_vesting_shares().amount.value) * used_power) / (SMOKE_100_PERCENT)).to_uint64();
 
-   FC_ASSERT( abs_rshares > SMOKE_VOTE_DUST_THRESHOLD || o.weight == 0, "Voting weight is too small, please accumulate more voting power." );
+   FC_ASSERT( ((abs_rshares > SMOKE_VOTE_DUST_THRESHOLD) || (o.weight == 0)),
+              "Voting weight is too small, please accumulate more voting power (abs_rshares=${abs_rshares}, weight=${weight}).",
+              ("abs_rshares", abs_rshares)("weight", o.weight) );
 
    // Lazily delete vote
    if( itr != comment_vote_idx.end() && itr->num_changes == -1 )
