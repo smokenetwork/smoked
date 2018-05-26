@@ -91,7 +91,7 @@ void update_witness_schedule4( database& db )
    /// Add miners from the top of the mining queue
    flat_set< witness_id_type > selected_miners;
    selected_miners.reserve( wso.max_miner_witnesses );
-   const auto& gprops = db.get_dynamic_global_properties();
+//   const auto& gprops = db.get_dynamic_global_properties();
    const auto& pow_idx      = db.get_index<witness_index>().indices().get<by_pow>();
    auto mitr = pow_idx.upper_bound(0);
    while( mitr != pow_idx.end() && selected_miners.size() < wso.max_miner_witnesses )
