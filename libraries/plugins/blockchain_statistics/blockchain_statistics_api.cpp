@@ -105,7 +105,6 @@ statistics& statistics::operator +=( const bucket_object& b )
    this->transactions                           += b.transactions;
    this->transfers                              += b.transfers;
    this->steem_transferred                      += b.steem_transferred;
-   this->sbd_paid_as_interest                   += b.sbd_paid_as_interest;
    this->accounts_created                       += b.paid_accounts_created + b.mined_accounts_created;
    this->paid_accounts_created                  += b.paid_accounts_created;
    this->mined_accounts_created                 += b.mined_accounts_created;

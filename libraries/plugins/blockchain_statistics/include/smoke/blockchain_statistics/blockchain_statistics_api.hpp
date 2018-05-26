@@ -23,7 +23,6 @@ struct statistics
    uint32_t             transactions = 0;                            ///< Transactions processed
    uint32_t             transfers = 0;                               ///< Account to account transfers
    share_type           steem_transferred = 0;                       ///< SMOKE transferred from account to account
-   share_type           sbd_paid_as_interest = 0;                    ///< SBD paid as interest
    uint32_t             accounts_created = 0;                        ///< Total accounts created
    uint32_t             paid_accounts_created = 0;                   ///< Accounts created with fee
    uint32_t             mined_accounts_created = 0;                  ///< Accounts mined for free
@@ -107,7 +106,6 @@ FC_REFLECT( smoke::blockchain_statistics::statistics,
    (transactions)
    (transfers)
    (steem_transferred)
-   (sbd_paid_as_interest)
    (accounts_created)
    (paid_accounts_created)
    (mined_accounts_created)
