@@ -2046,6 +2046,10 @@ void database::init_genesis( uint64_t init_supply )
       create< witness_schedule_object >( [&]( witness_schedule_object& wso )
       {
          wso.current_shuffled_witnesses[0] = SMOKE_INIT_MINER_NAME;
+
+         wso.max_voted_witnesses = SMOKE_MAX_VOTED_WITNESSES;
+         wso.max_miner_witnesses = SMOKE_MAX_MINER_WITNESSES;
+         wso.max_runner_witnesses = SMOKE_MAX_RUNNER_WITNESSES;
       } );
 
 
@@ -2111,13 +2115,6 @@ void database::init_genesis( uint64_t init_supply )
       // SMOKE_HARDFORK_0_16
       // SMOKE_HARDFORK_0_17
       {
-         modify( get_witness_schedule_object(), [&]( witness_schedule_object& wso )
-         {
-             wso.max_voted_witnesses = SMOKE_MAX_VOTED_WITNESSES;
-             wso.max_miner_witnesses = SMOKE_MAX_MINER_WITNESSES;
-             wso.max_runner_witnesses = SMOKE_MAX_RUNNER_WITNESSES;
-         });
-
          const auto& gpo = get_dynamic_global_properties();
 
          auto post_rf = create< reward_fund_object >( [&]( reward_fund_object& rfo )
@@ -2143,16 +2140,6 @@ void database::init_genesis( uint64_t init_supply )
       }
    }
    FC_CAPTURE_AND_RETHROW()
-}
-
-void database::validate_transaction( const signed_transaction& trx )
-{
-   database::with_write_lock( [&]()
-   {
-      auto session = start_undo_session( true );
-      _apply_transaction( trx );
-      session.undo();
-   });
 }
 
 void database::notify_changed_objects()

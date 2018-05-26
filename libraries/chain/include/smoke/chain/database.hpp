@@ -339,12 +339,6 @@ namespace smoke { namespace chain {
          void init_schema();
          void init_genesis(uint64_t initial_supply = SMOKE_INIT_SUPPLY);
 
-         /**
-          *  This method validates transactions without adding it to the pending state.
-          *  @throw if an error occurs
-          */
-         void validate_transaction( const signed_transaction& trx );
-
          /** when popping a block, the transactions that were removed get cached here so they
           * can be reapplied at the proper time */
          std::deque< signed_transaction >       _popped_tx;
