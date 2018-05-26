@@ -139,9 +139,6 @@ statistics& statistics::operator +=( const bucket_object& b )
    this->finished_vesting_withdrawals           += b.finished_vesting_withdrawals;
    this->vests_withdrawn                        += b.vests_withdrawn;
    this->vests_transferred                      += b.vests_transferred;
-   this->sbd_conversion_requests_created        += b.sbd_conversion_requests_created;
-   this->sbd_to_be_converted                    += b.sbd_to_be_converted;
-   this->sbd_conversion_requests_filled         += b.sbd_conversion_requests_filled;
    this->steem_converted                        += b.steem_converted;
 
    return ( *this );

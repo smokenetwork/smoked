@@ -75,9 +75,6 @@ struct account_stats_bucket_object : public object< account_stats_bucket_object_
    uint32_t             transfers_from = 0;                       ///< Account to account transfers from this account
    share_type           steem_sent = 0;                           ///< SMOKE sent from this account
    share_type           steem_received = 0;                       ///< SMOKE received by this account
-   share_type           sbd_sent = 0;                             ///< SBD sent from this account
-   share_type           sbd_received = 0;                         ///< SBD received by this account
-   uint32_t             sbd_interest_payments = 0;                ///< Number of times interest was paid to SBD
    uint32_t             transfers_to_vesting = 0;                 ///< Transfers to vesting by this account. Note: Transfer to vesting from A to B counts as a transfer from A to B followed by a vesting deposit by B.
    share_type           steem_vested = 0;                         ///< SMOKE vested by the account
    share_type           new_vests = 0;                            ///< New VESTS by vesting transfers
@@ -89,9 +86,6 @@ struct account_stats_bucket_object : public object< account_stats_bucket_object_
    share_type           steem_received_from_withdrawls = 0;       ///< SMOKE received from this account's vesting withdrawals
    share_type           steem_received_from_routes = 0;           ///< SMOKE received from another account's vesting withdrawals
    share_type           vests_received_from_routes = 0;           ///< VESTS received from another account's vesting withdrawals
-   uint32_t             sbd_conversion_requests_created = 0;      ///< SBD conversion requests created
-   share_type           sbd_to_be_converted = 0;                  ///< Amount of SBD to be converted
-   uint32_t             sbd_conversion_requests_filled = 0;       ///< SBD conversion requests filled
    share_type           steem_converted = 0;                      ///< Amount of SMOKE that was converted
 };
 
@@ -181,9 +175,6 @@ FC_REFLECT( smoke::account_statistics::account_stats_bucket_object,
    (transfers_from)
    (steem_sent)
    (steem_received)
-   (sbd_sent)
-   (sbd_received)
-   (sbd_interest_payments)
    (transfers_to_vesting)
    (steem_vested)
    (new_vests)
@@ -195,9 +186,6 @@ FC_REFLECT( smoke::account_statistics::account_stats_bucket_object,
    (steem_received_from_withdrawls)
    (steem_received_from_routes)
    (vests_received_from_routes)
-   (sbd_conversion_requests_created)
-   (sbd_to_be_converted)
-   (sbd_conversion_requests_filled)
    (steem_converted)
 )
 //SET_INDEX_TYPE( smoke::account_statistics::account_stats_bucket_object,)
