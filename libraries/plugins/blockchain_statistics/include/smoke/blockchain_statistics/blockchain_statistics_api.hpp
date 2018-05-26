@@ -49,7 +49,6 @@ struct statistics
    share_type           steem_paid_to_authors = 0;                   ///< Ammount of SMOKE paid to authors
    share_type           vests_paid_to_authors = 0;                   ///< Ammount of VESS paid to authors
    share_type           vests_paid_to_curators = 0;                  ///< Ammount of VESTS paid to curators
-   share_type           liquidity_rewards_paid = 0;                  ///< Ammount of SMOKE paid to market makers
    uint32_t             transfers_to_vesting = 0;                    ///< Transfers of SMOKE into VESTS
    share_type           steem_vested = 0;                            ///< Ammount of SMOKE vested
    uint32_t             new_vesting_withdrawal_requests = 0;         ///< New vesting withdrawal requests
@@ -134,7 +133,6 @@ FC_REFLECT( smoke::blockchain_statistics::statistics,
    (steem_paid_to_authors)
    (vests_paid_to_authors)
    (vests_paid_to_curators)
-   (liquidity_rewards_paid)
    (transfers_to_vesting)
    (steem_vested)
    (new_vesting_withdrawal_requests)

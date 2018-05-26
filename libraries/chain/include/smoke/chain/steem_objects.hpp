@@ -46,59 +46,6 @@ namespace smoke { namespace chain {
    };
 
    /**
-    *  If last_update is greater than 1 week, then volume gets reset to 0
-    *
-    *  When a user is a maker, their volume increases
-    *  When a user is a taker, their volume decreases
-    *
-    *  Every 1000 blocks, the account that has the highest volume_weight() is paid the maximum of
-    *  1000 SMOKE or 1000 * virtual_supply / (100*blocks_per_year) aka 10 * virtual_supply / blocks_per_year
-    *
-    *  After being paid volume gets reset to 0
-    */
-   class liquidity_reward_balance_object : public object< liquidity_reward_balance_object_type, liquidity_reward_balance_object >
-   {
-      public:
-         template< typename Constructor, typename Allocator >
-         liquidity_reward_balance_object( Constructor&& c, allocator< Allocator > a )
-         {
-            c( *this );
-         }
-
-         liquidity_reward_balance_object(){}
-
-         id_type           id;
-
-         account_id_type   owner;
-         int64_t           steem_volume = 0;
-         int64_t           sbd_volume = 0;
-         uint128_t         weight = 0;
-
-         time_point_sec    last_update = fc::time_point_sec::min(); /// used to decay negative liquidity balances. block num
-
-         /// this is the sort index
-         uint128_t volume_weight()const
-         {
-            return steem_volume * sbd_volume * is_positive();
-         }
-
-         uint128_t min_volume_weight()const
-         {
-            return std::min(steem_volume,sbd_volume) * is_positive();
-         }
-
-         void update_weight( bool hf9 )
-         {
-             weight = hf9 ? min_volume_weight() : volume_weight();
-         }
-
-         inline int is_positive()const
-         {
-            return ( steem_volume > 0 && sbd_volume > 0 ) ? 1 : 0;
-         }
-   };
-
-   /**
     * @breif a route to send withdrawn vesting shares.
     */
    class withdraw_vesting_route_object : public object< withdraw_vesting_route_object_type, withdraw_vesting_route_object >
@@ -168,25 +115,6 @@ namespace smoke { namespace chain {
          curve_id                author_reward_curve = linear;
          curve_id                curation_reward_curve = square_root;
    };
-
-
-   struct by_owner;
-   struct by_volume_weight;
-   typedef multi_index_container<
-      liquidity_reward_balance_object,
-      indexed_by<
-         ordered_unique< tag< by_id >, member< liquidity_reward_balance_object, liquidity_reward_balance_id_type, &liquidity_reward_balance_object::id > >,
-         ordered_unique< tag< by_owner >, member< liquidity_reward_balance_object, account_id_type, &liquidity_reward_balance_object::owner > >,
-         ordered_unique< tag< by_volume_weight >,
-            composite_key< liquidity_reward_balance_object,
-                member< liquidity_reward_balance_object, fc::uint128, &liquidity_reward_balance_object::weight >,
-                member< liquidity_reward_balance_object, account_id_type, &liquidity_reward_balance_object::owner >
-            >,
-            composite_key_compare< std::greater< fc::uint128 >, std::less< account_id_type > >
-         >
-      >,
-      allocator< liquidity_reward_balance_object >
-   > liquidity_reward_balance_index;
 
 
    struct by_withdraw_route;
@@ -289,10 +217,6 @@ namespace smoke { namespace chain {
 FC_REFLECT_ENUM( smoke::chain::curve_id,
                   (quadratic)(quadratic_curation)(linear)(square_root))
 
-
-FC_REFLECT( smoke::chain::liquidity_reward_balance_object,
-             (id)(owner)(steem_volume)(sbd_volume)(weight)(last_update) )
-CHAINBASE_SET_INDEX_TYPE( smoke::chain::liquidity_reward_balance_object, smoke::chain::liquidity_reward_balance_index )
 
 FC_REFLECT( smoke::chain::withdraw_vesting_route_object,
              (id)(from_account)(to_account)(percent)(auto_vest) )

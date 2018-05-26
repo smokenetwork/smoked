@@ -312,13 +312,10 @@ namespace smoke { namespace chain {
          void expire_escrow_ratification();
          void process_decline_voting_rights();
 
-         asset get_liquidity_reward()const;
-
          uint16_t get_curation_rewards_percent( const comment_object& c ) const;
 
          share_type pay_reward_funds( share_type reward );
 
-         void  pay_liquidity_reward();
 
          time_point_sec   head_block_time()const;
          uint32_t         head_block_num()const;
@@ -346,7 +343,6 @@ namespace smoke { namespace chain {
          void retally_comment_children();
          void retally_witness_votes();
          void retally_witness_vote_counts( bool force = false );
-         void retally_liquidity_weight();
 
          bool has_hardfork( uint32_t hardfork )const;
 
@@ -365,7 +361,6 @@ namespace smoke { namespace chain {
          void show_free_memory( bool force );
 
 #ifdef IS_TEST_NET
-         bool liquidity_rewards_enabled = true;
          bool skip_price_feed_limit_check = true;
          bool skip_transaction_delta_check = true;
 #endif

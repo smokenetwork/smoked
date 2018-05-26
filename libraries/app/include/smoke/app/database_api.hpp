@@ -54,12 +54,6 @@ struct scheduled_hardfork
    fc::time_point_sec   live_time;
 };
 
-struct liquidity_balance
-{
-   string               account;
-   fc::uint128_t        weight;
-};
-
 struct withdraw_route
 {
    string               from_account;
@@ -270,17 +264,6 @@ class database_api
        */
       uint64_t get_witness_count()const;
 
-      ////////////
-      // Market //
-      ////////////
-
-      /**
-       * @breif Gets the current liquidity reward queue.
-       * @param start_account The account to start the list from, or "" to get the head of the queue
-       * @param limit Maxmimum number of accounts to return -- Must not exceed 1000
-       */
-      vector< liquidity_balance > get_liquidity_queue( string start_account, uint32_t limit = 1000 )const;
-
       ////////////////////////////
       // Authority / validation //
       ////////////////////////////
@@ -425,7 +408,6 @@ class database_api
 FC_REFLECT( smoke::app::order, (order_price)(real_price)(steem)(sbd)(created) );
 FC_REFLECT( smoke::app::order_book, (asks)(bids) );
 FC_REFLECT( smoke::app::scheduled_hardfork, (hf_version)(live_time) );
-FC_REFLECT( smoke::app::liquidity_balance, (account)(weight) );
 FC_REFLECT( smoke::app::withdraw_route, (from_account)(to_account)(percent)(auto_vest) );
 
 FC_REFLECT( smoke::app::discussion_query, (tag)(filter_tags)(select_tags)(select_authors)(truncate_body)(start_author)(start_permlink)(parent_author)(parent_permlink)(limit) );
@@ -485,9 +467,6 @@ FC_API(smoke::app::database_api,
    (get_account_bandwidth)
    (get_vesting_delegations)
    (get_expiring_vesting_delegations)
-
-   // Market
-   (get_liquidity_queue)
 
    // Authority / validation
    (get_transaction_hex)

@@ -111,10 +111,6 @@
 #define SMOKE_EQUIHASH_N                      140
 #define SMOKE_EQUIHASH_K                      6
 
-#define SMOKE_LIQUIDITY_TIMEOUT_SEC           (fc::seconds(60*60*24*7)) // After one week volume is set to 0
-#define SMOKE_LIQUIDITY_REWARD_PERIOD_SEC     (60*60)
-#define SMOKE_LIQUIDITY_REWARD_BLOCKS         (SMOKE_LIQUIDITY_REWARD_PERIOD_SEC/SMOKE_BLOCK_INTERVAL)
-
 #define SMOKE_ACTIVE_CHALLENGE_FEE            asset( 2000, SMOKE_SYMBOL )
 #define SMOKE_OWNER_CHALLENGE_FEE             asset( 30000, SMOKE_SYMBOL )
 

@@ -133,14 +133,6 @@ struct operation_process
       });
    }
 
-   void operator()( const liquidity_reward_operation& op )const
-   {
-      _db.modify( _bucket, [&]( bucket_object& b )
-      {
-         b.liquidity_rewards_paid += op.payout.amount;
-      });
-   }
-
    void operator()( const transfer_to_vesting_operation& op )const
    {
       _db.modify( _bucket, [&]( bucket_object& b )

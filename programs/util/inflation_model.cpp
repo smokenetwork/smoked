@@ -37,7 +37,6 @@ rvec shows total number of SMOKE satoshis created since genesis for:
 - Vesting rewards balancing content rewards
 - Producer rewards
 - Vesting rewards balancing producer rewards
-- Liquidity rewards
 - Vesting rewards balancing liquidity rewards
 - PoW rewards
 - Vesting rewards balancing PoW rewards
@@ -67,7 +66,6 @@ int main( int argc, char** argv, char** envp )
 #define SMOKE_FIRST_CASHOUT_TIME              (fc::time_point_sec(1467590400))  /// July 4th
 */
 
-//   uint32_t liquidity_begin_block = (1467590400 - 1458835200) / 3;
 //   uint32_t pow_deficit = 100;
 //
 //   for( int i=0; i<REWARD_TYPES; i++ )
@@ -96,33 +94,6 @@ int main( int argc, char** argv, char** envp )
 //      // supply for above is computed by using pre-updated supply for computing all 3 amounts.
 //      // supply for below reward types is basically a self-contained event which updates the supply immediately before the next reward type's computation.
 //
-//      share_type liquidity_reward = 0;
-//      share_type pow_reward = 0;
-//
-//      if( (block_num % SMOKE_MAX_WITNESSES) == 0 )
-//         ++pow_deficit;
-//
-//      if( pow_deficit > 0 )
-//      {
-//         pow_reward = calc_percent_reward_per_round< SMOKE_POW_APR_PERCENT >( current_supply );
-//         pow_reward = std::max( pow_reward, SMOKE_MIN_POW_REWARD.amount );
-//         if( block_num < SMOKE_START_MINER_VOTING_BLOCK )
-//            pow_reward *= SMOKE_MAX_WITNESSES;
-//         --pow_deficit;
-//      }
-//      reward_delta[ POW_OFF ] = pow_reward;
-//      reward_delta[ VPOW_OFF ] = reward_delta[ POW_OFF ] * vesting_factor;
-//
-//      current_supply += reward_delta[ POW_OFF ] + reward_delta[ VPOW_OFF ];
-//
-//      if( (block_num > liquidity_begin_block) && ((block_num % SMOKE_LIQUIDITY_REWARD_BLOCKS) == 0) )
-//      {
-//         liquidity_reward = calc_percent_reward_per_hour< SMOKE_LIQUIDITY_APR_PERCENT >( current_supply );
-//         liquidity_reward = std::max( liquidity_reward, SMOKE_MIN_LIQUIDITY_REWARD.amount );
-//      }
-//      reward_delta[ LIQUIDITY_OFF ] = liquidity_reward;
-//      reward_delta[ VLIQUIDITY_OFF ] = reward_delta[ LIQUIDITY_OFF ] * vesting_factor;
-//      current_supply += reward_delta[ LIQUIDITY_OFF ] + reward_delta[ VLIQUIDITY_OFF ];
 //
 //      for( int i=0; i<REWARD_TYPES; i++ )
 //      {
