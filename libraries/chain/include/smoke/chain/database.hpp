@@ -272,7 +272,7 @@ namespace smoke { namespace chain {
           */
          uint32_t get_slot_at_time(fc::time_point_sec when)const;
 
-         asset create_vesting( const account_object& to_account, asset steem, bool to_reward_balance=false );
+         asset create_vesting( const account_object& to_account, asset smoke, bool to_reward_balance=false );
          void adjust_total_payout( const comment_object& a, const asset& total_payout_value, const asset& curator_steem_value, const asset& beneficiary_value );
 
          void        adjust_liquidity_reward( const account_object& owner, const asset& volume, bool is_bid );

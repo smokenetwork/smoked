@@ -925,9 +925,9 @@ uint32_t database::get_slot_at_time(fc::time_point_sec when)const
 
 /**
  * @param to_account - the account to receive the new vesting shares
- * @param SMOKE - SMOKE to be converted to vesting shares
+ * @param smoke - SMOKE to be converted to vesting shares
  */
-asset database::create_vesting( const account_object& to_account, asset steem, bool to_reward_balance )
+asset database::create_vesting( const account_object& to_account, asset smoke, bool to_reward_balance )
 {
    try
    {
@@ -946,14 +946,14 @@ asset database::create_vesting( const account_object& to_account, asset steem, b
        *
        *  128 bit math is requred due to multiplying of 64 bit numbers. This is done in asset and price.
        */
-      asset new_vesting = steem * ( to_reward_balance ? cprops.get_reward_vesting_share_price() : cprops.get_vesting_share_price() );
+      asset new_vesting = smoke * ( to_reward_balance ? cprops.get_reward_vesting_share_price() : cprops.get_vesting_share_price() );
 
       modify( to_account, [&]( account_object& to )
       {
          if( to_reward_balance )
          {
             to.reward_vesting_balance += new_vesting;
-            to.reward_vesting_steem += steem;
+            to.reward_vesting_steem += smoke;
          }
          else
             to.vesting_shares += new_vesting;
@@ -964,11 +964,11 @@ asset database::create_vesting( const account_object& to_account, asset steem, b
          if( to_reward_balance )
          {
             props.pending_rewarded_vesting_shares += new_vesting;
-            props.pending_rewarded_vesting_steem += steem;
+            props.pending_rewarded_vesting_steem += smoke;
          }
          else
          {
-            props.total_vesting_fund_steem += steem;
+            props.total_vesting_fund_steem += smoke;
             props.total_vesting_shares += new_vesting;
          }
       } );
@@ -978,7 +978,7 @@ asset database::create_vesting( const account_object& to_account, asset steem, b
 
       return new_vesting;
    }
-   FC_CAPTURE_AND_RETHROW( (to_account.name)(steem) )
+   FC_CAPTURE_AND_RETHROW( (to_account.name)(smoke) )
 }
 
 void database::adjust_proxied_witness_votes( const account_object& a,
