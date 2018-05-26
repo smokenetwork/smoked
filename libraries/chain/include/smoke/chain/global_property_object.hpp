@@ -37,12 +37,6 @@ namespace smoke { namespace chain {
          time_point_sec    time;
          account_name_type current_witness;
 
-         /**
-          * The current count of how many pending POW witnesses there are, determines the difficulty
-          * of doing pow
-          */
-         uint32_t num_pow_witnesses = 0;
-
          asset       current_supply             = asset( 0, SMOKE_SYMBOL );
          asset       total_vesting_fund_steem   = asset( 0, SMOKE_SYMBOL );
          asset       total_vesting_shares       = asset( 0, VESTS_SYMBOL );
@@ -115,7 +109,6 @@ FC_REFLECT( smoke::chain::dynamic_global_property_object,
              (head_block_id)
              (time)
              (current_witness)
-             (num_pow_witnesses)
              (current_supply)
              (total_vesting_fund_steem)
              (total_vesting_shares)

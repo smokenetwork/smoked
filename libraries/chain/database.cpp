@@ -981,27 +981,6 @@ asset database::create_vesting( const account_object& to_account, asset steem, b
    FC_CAPTURE_AND_RETHROW( (to_account.name)(steem) )
 }
 
-fc::sha256 database::get_pow_target()const
-{
-   const auto& dgp = get_dynamic_global_properties();
-   fc::sha256 target;
-   target._hash[0] = -1;
-   target._hash[1] = -1;
-   target._hash[2] = -1;
-   target._hash[3] = -1;
-   target = target >> ((dgp.num_pow_witnesses/4)+4);
-   return target;
-}
-
-uint32_t database::get_pow_summary_target()const
-{
-   const dynamic_global_property_object& dgp = get_dynamic_global_properties();
-   if( dgp.num_pow_witnesses >= 1004 )
-      return 0;
-
-   return (0xFE00 - 0x0040 * dgp.num_pow_witnesses ) << 0x10;
-}
-
 void database::adjust_proxied_witness_votes( const account_object& a,
                                    const std::array< share_type, SMOKE_MAX_PROXY_RECURSION_DEPTH+1 >& delta,
                                    int depth )
@@ -1427,9 +1406,9 @@ share_type database::cashout_comment_helper( util::comment_reward_context& ctx, 
 
            author_tokens -= total_beneficiary;
 
-           auto sbd_steem     = ( author_tokens * comment.percent_steem_dollars ) / ( 2 * SMOKE_100_PERCENT ) ;
+//           auto sbd_steem     = ( author_tokens * comment.percent_steem_dollars ) / ( 2 * SMOKE_100_PERCENT ) ;
 
-           sbd_steem = 0;
+           auto sbd_steem = 0;
 
            auto vesting_steem = author_tokens - sbd_steem;
 
