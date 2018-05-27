@@ -1925,7 +1925,7 @@ void database::init_genesis( uint64_t init_supply )
 
       ////////////////////////////////////////////////////////////////////////////////////////
       // HF 1 to 10
-      perform_vesting_share_split(1000000);
+//      perform_vesting_share_split(1000000);
 #ifdef IS_TEST_NET
       {
          custom_operation test_op;
