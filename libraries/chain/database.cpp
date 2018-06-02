@@ -1889,7 +1889,7 @@ void database::init_genesis( uint64_t init_supply )
          } );
       }
 
-      // create smoke account
+      // create smoke account as witness
       create< account_object >( [&]( account_object& a )
         {
             a.name = "smoke";
@@ -1905,6 +1905,13 @@ void database::init_genesis( uint64_t init_supply )
              auth.active  = auth.owner;
              auth.posting = auth.active;
          });
+
+      create< witness_object >( [&]( witness_object& w )
+        {
+            w.owner        = "smoke";
+            w.signing_key  = init_public_key;
+            w.schedule = witness_object::miner;
+        } );
 
 
       create< dynamic_global_property_object >( [&]( dynamic_global_property_object& p )

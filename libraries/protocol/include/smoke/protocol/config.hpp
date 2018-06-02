@@ -60,7 +60,7 @@
 #define SMOKE_MAX_WITNESSES                   21
 
 #define SMOKE_INIT_MINER_NAME                 "initminer"
-#define SMOKE_NUM_INIT_MINERS                 SMOKE_MAX_WITNESSES
+#define SMOKE_NUM_INIT_MINERS                 (SMOKE_MAX_WITNESSES-1)
 
 #define SMOKE_MAX_VOTED_WITNESSES             20
 #define SMOKE_MAX_MINER_WITNESSES             0
