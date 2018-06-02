@@ -1869,7 +1869,7 @@ void database::init_genesis( uint64_t init_supply )
          {
             a.name = SMOKE_INIT_MINER_NAME + ( i ? fc::to_string( i ) : std::string() );
             a.memo_key = init_public_key;
-            a.balance  = asset( i ? 0 : init_supply, SMOKE_SYMBOL );
+            a.balance  = asset( 0, SMOKE_SYMBOL );
          } );
 
          create< account_authority_object >( [&]( account_authority_object& auth )
@@ -1888,6 +1888,24 @@ void database::init_genesis( uint64_t init_supply )
             w.schedule = witness_object::miner;
          } );
       }
+
+      // create smoke account
+      create< account_object >( [&]( account_object& a )
+        {
+            a.name = "smoke";
+            a.memo_key = init_public_key;
+            a.balance  = asset( init_supply, SMOKE_SYMBOL );
+        } );
+
+      create< account_authority_object >( [&]( account_authority_object& auth )
+         {
+             auth.account = "smoke";
+             auth.owner.add_authority( init_public_key, 1 );
+             auth.owner.weight_threshold = 1;
+             auth.active  = auth.owner;
+             auth.posting = auth.active;
+         });
+
 
       create< dynamic_global_property_object >( [&]( dynamic_global_property_object& p )
       {
