@@ -1878,7 +1878,11 @@ void database::init_genesis( uint64_t init_supply )
          {
             a.name = SMOKE_INIT_MINER_NAME + ( i ? fc::to_string( i ) : std::string() );
             a.memo_key = init_public_key;
+#ifdef IS_TEST_NET
+            a.balance  = asset( i ? 0 : init_supply, SMOKE_SYMBOL );
+#else
             a.balance  = asset( 0, SMOKE_SYMBOL );
+#endif
          } );
 
          create< account_authority_object >( [&]( account_authority_object& auth )
@@ -1898,6 +1902,7 @@ void database::init_genesis( uint64_t init_supply )
          } );
       }
 
+#ifndef IS_TEST_NET
       // create smoke account as witness
       create< account_object >( [&]( account_object& a )
         {
@@ -1921,7 +1926,7 @@ void database::init_genesis( uint64_t init_supply )
             w.signing_key  = init_public_key;
             w.schedule = witness_object::miner;
         } );
-
+#endif
 
       create< dynamic_global_property_object >( [&]( dynamic_global_property_object& p )
       {
@@ -1936,7 +1941,6 @@ void database::init_genesis( uint64_t init_supply )
          p.total_reward_shares2 = 0;
          p.vote_power_reserve_rate = 10;
       } );
-
 
       for( int i = 0; i < 0x10000; i++ )
          create< block_summary_object >( [&]( block_summary_object& ) {});

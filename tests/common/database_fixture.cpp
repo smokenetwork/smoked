@@ -28,53 +28,53 @@ using std::cerr;
 
 clean_database_fixture::clean_database_fixture()
 {
-//   try {
-//   int argc = boost::unit_test::framework::master_test_suite().argc;
-//   char** argv = boost::unit_test::framework::master_test_suite().argv;
-//   for( int i=1; i<argc; i++ )
-//   {
-//      const std::string arg = argv[i];
-//      if( arg == "--record-assert-trip" )
-//         fc::enable_record_assert_trip = true;
-//      if( arg == "--show-test-names" )
-//         std::cout << "running test " << boost::unit_test::framework::current_test_case().p_name << std::endl;
-//   }
-//   auto ahplugin = app.register_plugin< smoke::account_history::account_history_plugin >();
-//   db_plugin = app.register_plugin< smoke::plugin::debug_node::debug_node_plugin >();
-//   auto wit_plugin = app.register_plugin< smoke::witness::witness_plugin >();
-//   init_account_pub_key = init_account_priv_key.get_public_key();
-//
-//   boost::program_options::variables_map options;
-//
-//   db_plugin->logging = false;
-//   ahplugin->plugin_initialize( options );
-//   db_plugin->plugin_initialize( options );
-//   wit_plugin->plugin_initialize( options );
-//
-//   open_database();
-//
-//   generate_block();
-//   db.set_hardfork( SMOKE_NUM_HARDFORKS );
-//   generate_block();
-//
-//   //ahplugin->plugin_startup();
-//   db_plugin->plugin_startup();
-//   vest( "initminer", 10000 );
-//
-//   // Fill up the rest of the required miners
-//   for( int i = SMOKE_NUM_INIT_MINERS; i < SMOKE_MAX_WITNESSES; i++ )
-//   {
-//      account_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_pub_key );
-//      fund( SMOKE_INIT_MINER_NAME + fc::to_string( i ), SMOKE_MIN_PRODUCER_REWARD.amount.value );
-//      witness_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_priv_key, "foo.bar", init_account_pub_key, SMOKE_MIN_PRODUCER_REWARD.amount );
-//   }
-//
-//   validate_database();
-//   } catch ( const fc::exception& e )
-//   {
-//      edump( (e.to_detail_string()) );
-//      throw;
-//   }
+   try {
+      int argc = boost::unit_test::framework::master_test_suite().argc;
+      char** argv = boost::unit_test::framework::master_test_suite().argv;
+      for( int i=1; i<argc; i++ )
+      {
+         const std::string arg = argv[i];
+         if( arg == "--record-assert-trip" )
+            fc::enable_record_assert_trip = true;
+         if( arg == "--show-test-names" )
+            std::cout << "running test " << boost::unit_test::framework::current_test_case().p_name << std::endl;
+      }
+      auto ahplugin = app.register_plugin< smoke::account_history::account_history_plugin >();
+      db_plugin = app.register_plugin< smoke::plugin::debug_node::debug_node_plugin >();
+      auto wit_plugin = app.register_plugin< smoke::witness::witness_plugin >();
+      init_account_pub_key = init_account_priv_key.get_public_key();
+
+      boost::program_options::variables_map options;
+
+      db_plugin->logging = false;
+      ahplugin->plugin_initialize( options );
+      db_plugin->plugin_initialize( options );
+      wit_plugin->plugin_initialize( options );
+
+      open_database();
+
+      generate_block();
+      db.set_hardfork( SMOKE_NUM_HARDFORKS );
+      generate_block();
+
+      //ahplugin->plugin_startup();
+      db_plugin->plugin_startup();
+      vest( "initminer", 10000 );
+
+   //   // Fill up the rest of the required miners
+   //   for( int i = SMOKE_NUM_INIT_MINERS; i < SMOKE_MAX_WITNESSES; i++ )
+   //   {
+   //      account_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_pub_key );
+   //      fund( SMOKE_INIT_MINER_NAME + fc::to_string( i ), SMOKE_MIN_PRODUCER_REWARD.amount.value );
+   //      witness_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_priv_key, "foo.bar", init_account_pub_key, SMOKE_MIN_PRODUCER_REWARD.amount );
+   //   }
+
+      validate_database();
+   } catch ( const fc::exception& e )
+   {
+      edump( (e.to_detail_string()) );
+      throw;
+   }
 
    return;
 }
@@ -95,30 +95,30 @@ clean_database_fixture::~clean_database_fixture()
 
 void clean_database_fixture::resize_shared_mem( uint64_t size )
 {
-//   db.wipe( data_dir->path(), data_dir->path(), true );
-//   int argc = boost::unit_test::framework::master_test_suite().argc;
-//   char** argv = boost::unit_test::framework::master_test_suite().argv;
-//   for( int i=1; i<argc; i++ )
-//   {
-//      const std::string arg = argv[i];
-//      if( arg == "--record-assert-trip" )
-//         fc::enable_record_assert_trip = true;
-//      if( arg == "--show-test-names" )
-//         std::cout << "running test " << boost::unit_test::framework::current_test_case().p_name << std::endl;
-//   }
-//   init_account_pub_key = init_account_priv_key.get_public_key();
-//
-//   db.open( data_dir->path(), data_dir->path(), INITIAL_TEST_SUPPLY, size, chainbase::database::read_write );
-//
-//   boost::program_options::variables_map options;
-//
-//
-//   generate_block();
-//   db.set_hardfork( SMOKE_NUM_HARDFORKS );
-//   generate_block();
-//
-//   vest( "initminer", 10000 );
-//
+   db.wipe( data_dir->path(), data_dir->path(), true );
+   int argc = boost::unit_test::framework::master_test_suite().argc;
+   char** argv = boost::unit_test::framework::master_test_suite().argv;
+   for( int i=1; i<argc; i++ )
+   {
+      const std::string arg = argv[i];
+      if( arg == "--record-assert-trip" )
+         fc::enable_record_assert_trip = true;
+      if( arg == "--show-test-names" )
+         std::cout << "running test " << boost::unit_test::framework::current_test_case().p_name << std::endl;
+   }
+   init_account_pub_key = init_account_priv_key.get_public_key();
+
+   db.open( data_dir->path(), data_dir->path(), INITIAL_TEST_SUPPLY, size, chainbase::database::read_write );
+
+   boost::program_options::variables_map options;
+
+
+   generate_block();
+   db.set_hardfork( SMOKE_NUM_HARDFORKS );
+   generate_block();
+
+   vest( "initminer", 10000 );
+
 //   // Fill up the rest of the required miners
 //   for( int i = SMOKE_NUM_INIT_MINERS; i < SMOKE_MAX_WITNESSES; i++ )
 //   {
@@ -126,8 +126,8 @@ void clean_database_fixture::resize_shared_mem( uint64_t size )
 //      fund( SMOKE_INIT_MINER_NAME + fc::to_string( i ), SMOKE_MIN_PRODUCER_REWARD.amount.value );
 //      witness_create( SMOKE_INIT_MINER_NAME + fc::to_string( i ), init_account_priv_key, "foo.bar", init_account_pub_key, SMOKE_MIN_PRODUCER_REWARD.amount );
 //   }
-//
-//   validate_database();
+
+   validate_database();
 }
 
 live_database_fixture::live_database_fixture()

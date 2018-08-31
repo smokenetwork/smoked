@@ -529,8 +529,8 @@ BOOST_AUTO_TEST_CASE( comment_apply )
 
       BOOST_TEST_MESSAGE( "--- Test modifying a comment" );
       const auto& mod_sam_comment = db.get_comment( "sam", string( "dolor" ) );
-      const auto& mod_bob_comment = db.get_comment( "bob", string( "ipsum" ) );
-      const auto& mod_alice_comment = db.get_comment( "alice", string( "lorem" ) );
+//      const auto& mod_bob_comment = db.get_comment( "bob", string( "ipsum" ) );
+//      const auto& mod_alice_comment = db.get_comment( "alice", string( "lorem" ) );
       fc::time_point_sec created = mod_sam_comment.created;
 
       db.modify( mod_sam_comment, [&]( comment_object& com )
@@ -1454,16 +1454,15 @@ BOOST_AUTO_TEST_CASE( withdraw_vesting_apply )
       tx.operations.push_back( op );
       tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
       tx.sign( alice_private_key, db.get_chain_id() );
-      STEEMIT_REQUIRE_THROW( db.push_transaction( tx, 0 ), fc::assert_exception );
+      SMOKE_REQUIRE_THROW( db.push_transaction( tx, 0 ), fc::assert_exception );
 
 
       BOOST_TEST_MESSAGE( "--- Test withdraw of existing VESTS" );
-
       op.vesting_shares = asset( alice.vesting_shares.amount / 2, VESTS_SYMBOL );
-
       auto old_vesting_shares = alice.vesting_shares;
 
-      signed_transaction tx;
+      tx.operations.clear();
+      tx.signatures.clear();
       tx.operations.push_back( op );
       tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
       tx.sign( alice_private_key, db.get_chain_id() );
