@@ -1458,12 +1458,21 @@ void database::process_comment_cashout()
       // Add all reward funds to the local cache and decay their recent rshares
       modify( *itr, [&]( reward_fund_object& rfo )
       {
-         fc::microseconds decay_rate;
+          fc::microseconds decay_rate = SMOKE_RECENT_RSHARES_DECAY_RATE;
 
-         decay_rate = SMOKE_RECENT_RSHARES_DECAY_RATE;
+          /**
+           * Fix bug in situation:
+           * diff time to genesis time is longer than decay_rate, which make the result of recent_claims < 0
+           * because recent_claims is unsigned so it will be a huge number ( MAX - value)
+           * Result as post payouts in first weeks are so small.
+           **/
 
-         rfo.recent_claims -= ( rfo.recent_claims * ( head_block_time() - rfo.last_update ).to_seconds() ) / decay_rate.to_seconds();
-         rfo.last_update = head_block_time();
+          int64_t delta_seconds = ( head_block_time() - rfo.last_update ).to_seconds();
+          if (delta_seconds < decay_rate.to_seconds()) {
+             rfo.recent_claims -=  ( rfo.recent_claims * delta_seconds ) / decay_rate.to_seconds();
+          }
+
+          rfo.last_update = head_block_time();
       });
 
       reward_fund_context rf_ctx;
