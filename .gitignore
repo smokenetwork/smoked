@@ -39,6 +39,7 @@ doxygen
 
 build
 cmake-build-debug
+cmake-build-release
 
 wallet.json
 witness_node_data_dir
