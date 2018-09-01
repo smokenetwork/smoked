@@ -36,7 +36,7 @@
 #define SMOKE_SYMBOL_STR                      "SMOKE"
 #define SMOKE_ADDRESS_PREFIX                  "SMK"
 
-#define SMOKE_GENESIS_TIME_EPOCH              1518000000  // Wed Feb 07 2018 17:40:00 GMT+0700 (+07)
+#define SMOKE_GENESIS_TIME_EPOCH              1533055724  // Tue Jul 31 2018 23:48:44 GMT+0700 (Indochina Time)
 #define SMOKE_GENESIS_TIME                    (fc::time_point_sec(SMOKE_GENESIS_TIME_EPOCH))
 #define SMOKE_CASHOUT_WINDOW_SECONDS          (60*60*24*7)  /// 7 days
 #define SMOKE_UPVOTE_LOCKOUT                  (fc::hours(12))
