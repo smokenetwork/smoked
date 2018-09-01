@@ -1374,20 +1374,11 @@ share_type database::cashout_comment_helper( util::comment_reward_context& ctx, 
            }
 
            author_tokens -= total_beneficiary;
-
-//           auto sbd_steem     = ( author_tokens * comment.percent_steem_dollars ) / ( 2 * SMOKE_100_PERCENT ) ;
-
-           auto sbd_steem = 0;
-
-           auto vesting_steem = author_tokens - sbd_steem;
-
+           auto vesting_steem = author_tokens;
            const auto& author = get_account( comment.author );
            auto vest_created = create_vesting( author, vesting_steem, true );
-//           auto sbd_payout = create_sbd( author, sbd_steem, true );
-
-           adjust_total_payout( comment, asset( sbd_steem, SMOKE_SYMBOL ) + asset( vesting_steem, SMOKE_SYMBOL ), asset( curation_tokens, SMOKE_SYMBOL ), asset( total_beneficiary, SMOKE_SYMBOL ) );
-
-           push_virtual_operation( author_reward_operation( comment.author, to_string( comment.permlink ), asset( sbd_steem, SMOKE_SYMBOL ), vest_created ) );
+           adjust_total_payout( comment, asset( vesting_steem, SMOKE_SYMBOL ), asset( curation_tokens, SMOKE_SYMBOL ), asset( total_beneficiary, SMOKE_SYMBOL ) );
+           push_virtual_operation( author_reward_operation( comment.author, to_string( comment.permlink ), asset( 0, SMOKE_SYMBOL ), vest_created ) );
            push_virtual_operation( comment_reward_operation( comment.author, to_string( comment.permlink ), asset( claimed_reward, SMOKE_SYMBOL ) ) );
 
 #ifndef IS_LOW_MEM
@@ -1428,13 +1419,21 @@ share_type database::cashout_comment_helper( util::comment_reward_context& ctx, 
      auto vote_itr = vote_idx.lower_bound( comment.id );
      while( vote_itr != vote_idx.end() && vote_itr->comment == comment.id )
      {
-        const auto& cur_vote = *vote_itr;
-        ++vote_itr;
-
+         const auto& cur_vote = *vote_itr;
+         ++vote_itr;
+         if( calculate_discussion_payout_time( comment ) != fc::time_point_sec::maximum() )
+         {
+            modify( cur_vote, [&]( comment_vote_object& cvo )
+            {
+               cvo.num_changes = -1;
+            });
+         }
+         else
+         {
 #ifdef CLEAR_VOTES
-           remove( cur_vote );
+            remove( cur_vote );
 #endif
-
+         }
      }
 
      return claimed_reward;
@@ -1542,11 +1541,10 @@ void database::process_comment_cashout()
 }
 
 /**
- *  Overall the network has an inflation rate of 102% of virtual steem per year
- *  90% of inflation is directed to vesting shares
- *  10% of inflation is directed to subjective proof of work voting
- *  1% of inflation is directed to liquidity providers
- *  1% of inflation is directed to block producers
+ *  Reward allocation:
+ *  75% of inflation to social consensus algorithm.
+ *  15% of inflation to stake holders.
+ *  10% of inflation to block producers.
  *
  *  This method pays out vesting and reward shares every block, and liquidity shares once per day.
  *  This method does not pay out witnesses.
@@ -1557,8 +1555,8 @@ void database::process_funds()
   const auto& wso = get_witness_schedule_object();
 
   /**
-   * At block 7,000,000 have a 9.5% instantaneous inflation rate, decreasing to 0.95% at a rate of 0.01%
-   * every 250k blocks. This narrowing will take approximately 20.5 years and will complete on block 220,750,000
+   * inflation rate of 9.5% per year, reducing by 0.5% per annum until drop to 5%
+   * narowing every 250k blocks
    */
   int64_t start_inflation_rate = int64_t( SMOKE_INFLATION_RATE_START_PERCENT );
   int64_t inflation_rate_adjustment = int64_t( head_block_num() / SMOKE_INFLATION_NARROWING_PERIOD );
