@@ -1848,6 +1848,8 @@ void database::init_genesis( uint64_t init_supply )
          auth.account = SMOKE_MINER_ACCOUNT;
          auth.owner.weight_threshold = 1;
          auth.active.weight_threshold = 1;
+         auth.posting = authority();
+         auth.posting.weight_threshold = 1;
       });
 
       create< account_object >( [&]( account_object& a )
@@ -1859,6 +1861,8 @@ void database::init_genesis( uint64_t init_supply )
          auth.account = SMOKE_NULL_ACCOUNT;
          auth.owner.weight_threshold = 1;
          auth.active.weight_threshold = 1;
+         auth.posting = authority();
+         auth.posting.weight_threshold = 1;
       });
 
       create< account_object >( [&]( account_object& a )
@@ -1870,6 +1874,8 @@ void database::init_genesis( uint64_t init_supply )
          auth.account = SMOKE_TEMP_ACCOUNT;
          auth.owner.weight_threshold = 0;
          auth.active.weight_threshold = 0;
+         auth.posting = authority();
+         auth.posting.weight_threshold = 1;
       });
 
       for( int i = 0; i < SMOKE_NUM_INIT_MINERS; ++i )
@@ -1964,18 +1970,18 @@ void database::init_genesis( uint64_t init_supply )
       ////////////////////////////////////////////////////////////////////////////////////////
       // HF 1 to 10
 //      perform_vesting_share_split(1000000);
-#ifdef IS_TEST_NET
-      {
-         custom_operation test_op;
-         string op_msg = "Testnet: Hardfork applied";
-         test_op.data = vector< char >( op_msg.begin(), op_msg.end() );
-         test_op.required_auths.insert( SMOKE_INIT_MINER_NAME );
-         operation op = test_op;   // we need the operation object to live to the end of this scope
-         operation_notification note( op );
-         notify_pre_apply_operation( note );
-         notify_post_apply_operation( note );
-      }
-#endif
+//#ifdef IS_TEST_NET
+//      {
+//         custom_operation test_op;
+//         string op_msg = "Testnet: Hardfork applied";
+//         test_op.data = vector< char >( op_msg.begin(), op_msg.end() );
+//         test_op.required_auths.insert( SMOKE_INIT_MINER_NAME );
+//         operation op = test_op;   // we need the operation object to live to the end of this scope
+//         operation_notification note( op );
+//         notify_pre_apply_operation( note );
+//         notify_post_apply_operation( note );
+//      }
+//#endif
 
       retally_witness_votes();
       reset_virtual_schedule_time(*this);
@@ -1984,29 +1990,7 @@ void database::init_genesis( uint64_t init_supply )
       retally_witness_vote_counts(true);
 
       // HF 11, 12
-      modify( get< account_authority_object, by_account >( SMOKE_MINER_ACCOUNT ), [&]( account_authority_object& auth )
-      {
-          auth.posting = authority();
-          auth.posting.weight_threshold = 1;
-      });
-
-      modify( get< account_authority_object, by_account >( SMOKE_NULL_ACCOUNT ), [&]( account_authority_object& auth )
-      {
-          auth.posting = authority();
-          auth.posting.weight_threshold = 1;
-      });
-
-      modify( get< account_authority_object, by_account >( SMOKE_TEMP_ACCOUNT ), [&]( account_authority_object& auth )
-      {
-          auth.posting = authority();
-          auth.posting.weight_threshold = 1;
-      });
-
-
       // HF 13 to 17
-
-//     const auto& gpo = get_dynamic_global_properties();
-
       auto post_rf = create< reward_fund_object >( [&]( reward_fund_object& rfo )
          {
              rfo.name = SMOKE_POST_REWARD_FUND_NAME;
