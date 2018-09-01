@@ -105,8 +105,6 @@ statistics& statistics::operator +=( const bucket_object& b )
    this->transactions                           += b.transactions;
    this->transfers                              += b.transfers;
    this->steem_transferred                      += b.steem_transferred;
-   this->sbd_transferred                        += b.sbd_transferred;
-   this->sbd_paid_as_interest                   += b.sbd_paid_as_interest;
    this->accounts_created                       += b.paid_accounts_created + b.mined_accounts_created;
    this->paid_accounts_created                  += b.paid_accounts_created;
    this->mined_accounts_created                 += b.mined_accounts_created;
@@ -129,10 +127,9 @@ statistics& statistics::operator +=( const bucket_object& b )
    this->new_reply_votes                        += b.new_reply_votes;
    this->changed_reply_votes                    += b.changed_reply_votes;
    this->payouts                                += b.payouts;
-   this->sbd_paid_to_authors                    += b.sbd_paid_to_authors;
+   this->steem_paid_to_authors                  += b.steem_paid_to_authors;
    this->vests_paid_to_authors                  += b.vests_paid_to_authors;
    this->vests_paid_to_curators                 += b.vests_paid_to_curators;
-   this->liquidity_rewards_paid                 += b.liquidity_rewards_paid;
    this->transfers_to_vesting                   += b.transfers_to_vesting;
    this->steem_vested                           += b.steem_vested;
    this->new_vesting_withdrawal_requests        += b.new_vesting_withdrawal_requests;
@@ -142,15 +139,7 @@ statistics& statistics::operator +=( const bucket_object& b )
    this->finished_vesting_withdrawals           += b.finished_vesting_withdrawals;
    this->vests_withdrawn                        += b.vests_withdrawn;
    this->vests_transferred                      += b.vests_transferred;
-   this->sbd_conversion_requests_created        += b.sbd_conversion_requests_created;
-   this->sbd_to_be_converted                    += b.sbd_to_be_converted;
-   this->sbd_conversion_requests_filled         += b.sbd_conversion_requests_filled;
    this->steem_converted                        += b.steem_converted;
-   this->limit_orders_created                   += b.limit_orders_created;
-   this->limit_orders_filled                    += b.limit_orders_filled;
-   this->limit_orders_cancelled                 += b.limit_orders_cancelled;
-   this->total_pow                              += b.total_pow;
-   this->estimated_hashpower                    += b.estimated_hashpower;
 
    return ( *this );
 }

@@ -125,12 +125,6 @@ class wallet_api
        */
       vector<applied_operation>           get_ops_in_block( uint32_t block_num, bool only_virtual = true );
 
-      /** Return the current price feed history
-       *
-       * @returns Price feed history data on the blockchain
-       */
-      feed_history_api_obj                 get_feed_history()const;
-
       /**
        * Returns the list of witnesses producing blocks in the current round (21 Blocks)
        */
@@ -383,10 +377,10 @@ class wallet_api
        *  that is paid by the creator. The current account creation fee can be found with the
        *  'info' wallet command.
        *
-       *  These accounts are created with combination of STEEM and delegated SP
+       *  These accounts are created with combination of SMOKE and delegated SP
        *
        *  @param creator The account creating the new account
-       *  @param steem_fee The amount of the fee to be paid with STEEM
+       *  @param steem_fee The amount of the fee to be paid with SMOKE
        *  @param delegated_vests The amount of the fee to be paid with delegation
        *  @param new_account_name The name of the new account
        *  @param json_meta JSON Metadata associated with the new account
@@ -400,10 +394,10 @@ class wallet_api
        * wallet. There is a fee associated with account creation that is paid by the creator.
        * The current account creation fee can be found with the 'info' wallet command.
        *
-       * These accounts are created with combination of STEEM and delegated SP
+       * These accounts are created with combination of SMOKE and delegated SP
        *
        * @param creator The account creating the new account
-       * @param steem_fee The amount of the fee to be paid with STEEM
+       * @param steem_fee The amount of the fee to be paid with SMOKE
        * @param delegated_vests The amount of the fee to be paid with delegation
        * @param newname The name of the new account
        * @param json_meta JSON Metadata associated with the new account
@@ -541,15 +535,6 @@ class wallet_api
        */
       optional< witness_api_obj > get_witness(string owner_account);
 
-      /** Returns conversion requests by an account
-       *
-       * @param owner Account name of the account owning the requests
-       *
-       * @returns All pending conversion requests by account
-       */
-      vector<convert_request_api_obj> get_conversion_requests( string owner );
-
-
       /**
        * Update a witness object owned by the given account.
        *
@@ -601,25 +586,24 @@ class wallet_api
                                           bool broadcast = false);
 
       /**
-       * Transfer funds from one account to another. STEEM and SBD can be transferred.
+       * Transfer funds from one account to another. SMOKE and SBD can be transferred.
        *
        * @param from The account the funds are coming from
        * @param to The account the funds are going to
-       * @param amount The funds being transferred. i.e. "100.000 STEEM"
+       * @param amount The funds being transferred. i.e. "100.000 SMOKE"
        * @param memo A memo for the transactionm, encrypted with the to account's public memo key
        * @param broadcast true if you wish to broadcast the transaction
        */
       annotated_signed_transaction transfer(string from, string to, asset amount, string memo, bool broadcast = false);
 
       /**
-       * Transfer funds from one account to another using escrow. STEEM and SBD can be transferred.
+       * Transfer funds from one account to another using escrow. SMOKE and SBD can be transferred.
        *
        * @param from The account the funds are coming from
        * @param to The account the funds are going to
        * @param agent The account acting as the agent in case of dispute
        * @param escrow_id A unique id for the escrow transfer. (from, escrow_id) must be a unique pair
-       * @param sbd_amount The amount of SBD to transfer
-       * @param steem_amount The amount of STEEM to transfer
+       * @param steem_amount The amount of SMOKE to transfer
        * @param fee The fee paid to the agent
        * @param ratification_deadline The deadline for 'to' and 'agent' to approve the escrow transfer
        * @param escrow_expiration The expiration of the escrow transfer, after which either party can claim the funds
@@ -631,7 +615,6 @@ class wallet_api
          string to,
          string agent,
          uint32_t escrow_id,
-         asset sbd_amount,
          asset steem_amount,
          asset fee,
          time_point_sec ratification_deadline,
@@ -690,8 +673,7 @@ class wallet_api
        * @param who The account authorizing the release
        * @param receiver The account that will receive funds being released
        * @param escrow_id A unique id for the escrow transfer
-       * @param sbd_amount The amount of SBD that will be released
-       * @param steem_amount The amount of STEEM that will be released
+       * @param steem_amount The amount of SMOKE that will be released
        * @param broadcast true if you wish to broadcast the transaction
        */
       annotated_signed_transaction escrow_release(
@@ -701,46 +683,28 @@ class wallet_api
          string who,
          string receiver,
          uint32_t escrow_id,
-         asset sbd_amount,
          asset steem_amount,
          bool broadcast = false
       );
 
       /**
-       * Transfer STEEM into a vesting fund represented by vesting shares (VESTS). VESTS are required to vesting
+       * Transfer SMOKE into a vesting fund represented by vesting shares (VESTS). VESTS are required to vesting
        * for a minimum of one coin year and can be withdrawn once a week over a two year withdraw period.
-       * VESTS are protected against dilution up until 90% of STEEM is vesting.
+       * VESTS are protected against dilution up until 90% of SMOKE is vesting.
        *
-       * @param from The account the STEEM is coming from
+       * @param from The account the SMOKE is coming from
        * @param to The account getting the VESTS
-       * @param amount The amount of STEEM to vest i.e. "100.00 STEEM"
+       * @param amount The amount of SMOKE to vest i.e. "100.00 SMOKE"
        * @param broadcast true if you wish to broadcast the transaction
        */
       annotated_signed_transaction transfer_to_vesting(string from, string to, asset amount, bool broadcast = false);
-
-      /**
-       *  Transfers into savings happen immediately, transfers from savings take 72 hours
-       */
-      annotated_signed_transaction transfer_to_savings( string from, string to, asset amount, string memo, bool broadcast = false );
-
-      /**
-       * @param request_id - an unique ID assigned by from account, the id is used to cancel the operation and can be reused after the transfer completes
-       */
-      annotated_signed_transaction transfer_from_savings( string from, uint32_t request_id, string to, asset amount, string memo, bool broadcast = false );
-
-      /**
-       *  @param request_id the id used in transfer_from_savings
-       *  @param from the account that initiated the transfer
-       */
-      annotated_signed_transaction cancel_transfer_from_savings( string from, uint32_t request_id, bool broadcast = false );
-
 
       /**
        * Set up a vesting withdraw request. The request is fulfilled once a week over the next two year (104 weeks).
        *
        * @param from The account the VESTS are withdrawn from
        * @param vesting_shares The amount of VESTS to withdraw over the next two years. Each week (amount/104) shares are
-       *    withdrawn and deposited back as STEEM. i.e. "10.000000 VESTS"
+       *    withdrawn and deposited back as SMOKE. i.e. "10.000000 VESTS"
        * @param broadcast true if you wish to broadcast the transaction
        */
       annotated_signed_transaction withdraw_vesting( string from, asset vesting_shares, bool broadcast = false );
@@ -750,34 +714,14 @@ class wallet_api
        * based on the specified weights.
        *
        * @param from The account the VESTS are withdrawn from.
-       * @param to   The account receiving either VESTS or STEEM.
+       * @param to   The account receiving either VESTS or SMOKE.
        * @param percent The percent of the withdraw to go to the 'to' account. This is denoted in hundreths of a percent.
        *    i.e. 100 is 1% and 10000 is 100%. This value must be between 1 and 100000
        * @param auto_vest Set to true if the from account should receive the VESTS as VESTS, or false if it should receive
-       *    them as STEEM.
+       *    them as SMOKE.
        * @param broadcast true if you wish to broadcast the transaction.
        */
       annotated_signed_transaction set_withdraw_vesting_route( string from, string to, uint16_t percent, bool auto_vest, bool broadcast = false );
-
-      /**
-       *  This method will convert SBD to STEEM at the current_median_history price one
-       *  week from the time it is executed. This method depends upon there being a valid price feed.
-       *
-       *  @param from The account requesting conversion of its SBD i.e. "1.000 SBD"
-       *  @param amount The amount of SBD to convert
-       *  @param broadcast true if you wish to broadcast the transaction
-       */
-      annotated_signed_transaction convert_sbd( string from, asset amount, bool broadcast = false );
-
-      /**
-       * A witness can public a price feed for the STEEM:SBD market. The median price feed is used
-       * to process conversion requests from SBD to STEEM.
-       *
-       * @param witness The witness publishing the price feed
-       * @param exchange_rate The desired exchange rate
-       * @param broadcast true if you wish to broadcast the transaction
-       */
-      annotated_signed_transaction publish_feed(string witness, price exchange_rate, bool broadcast );
 
       /** Signs a transaction.
        *
@@ -811,36 +755,6 @@ class wallet_api
       vector< variant > network_get_connected_peers();
 
       /**
-       * Gets the current order book for STEEM:SBD
-       *
-       * @param limit Maximum number of orders to return for bids and asks. Max is 1000.
-       */
-      order_book  get_order_book( uint32_t limit = 1000 );
-      vector<extended_limit_order>  get_open_orders( string accountname );
-
-      /**
-       *  Creates a limit order at the price amount_to_sell / min_to_receive and will deduct amount_to_sell from account
-       *
-       *  @param owner The name of the account creating the order
-       *  @param order_id is a unique identifier assigned by the creator of the order, it can be reused after the order has been filled
-       *  @param amount_to_sell The amount of either SBD or STEEM you wish to sell
-       *  @param min_to_receive The amount of the other asset you will receive at a minimum
-       *  @param fill_or_kill true if you want the order to be killed if it cannot immediately be filled
-       *  @param expiration the time the order should expire if it has not been filled
-       *  @param broadcast true if you wish to broadcast the transaction
-       */
-      annotated_signed_transaction create_order( string owner, uint32_t order_id, asset amount_to_sell, asset min_to_receive, bool fill_or_kill, uint32_t expiration, bool broadcast );
-
-      /**
-       * Cancel an order created with create_order
-       *
-       * @param owner The name of the account owning the order to cancel_order
-       * @param orderid The unique identifier assigned to the order by its creator
-       * @param broadcast true if you wish to broadcast the transaction
-       */
-      annotated_signed_transaction cancel_order( string owner, uint32_t orderid, bool broadcast );
-
-      /**
        *  Post or update a comment.
        *
        *  @param author the name of the account authoring the comment
@@ -860,7 +774,7 @@ class wallet_api
       message_body try_decrypt_message( const message_api_obj& mo );
 
       /**
-       * Vote on a comment to be paid STEEM
+       * Vote on a comment to be paid SMOKE
        *
        * @param voter The account voting
        * @param author The author of the comment to be voted on
@@ -877,7 +791,7 @@ class wallet_api
 
       /**
        * Challenge a user's authority. The challenger pays a fee to the challenged which is depositted as
-       * Steem Power. Until the challenged proves their active key, all posting rights are revoked.
+       * Power. Until the challenged proves their active key, all posting rights are revoked.
        *
        * @param challenger The account issuing the challenge
        * @param challenged The account being challenged
@@ -973,7 +887,7 @@ class wallet_api
 
       annotated_signed_transaction decline_voting_rights( string account, bool decline, bool broadcast );
 
-      annotated_signed_transaction claim_reward_balance( string account, asset reward_steem, asset reward_sbd, asset reward_vests, bool broadcast );
+      annotated_signed_transaction claim_reward_balance( string account, asset reward_steem, asset reward_vests, bool broadcast );
 };
 
 struct plain_keys {
@@ -1019,8 +933,6 @@ FC_API( smoke::wallet::wallet_api,
         (get_account)
         (get_block)
         (get_ops_in_block)
-        (get_feed_history)
-        (get_conversion_requests)
         (get_account_history)
         (get_state)
         (get_withdraw_routes)
@@ -1049,12 +961,6 @@ FC_API( smoke::wallet::wallet_api,
         (transfer_to_vesting)
         (withdraw_vesting)
         (set_withdraw_vesting_route)
-        (convert_sbd)
-        (publish_feed)
-        (get_order_book)
-        (get_open_orders)
-        (create_order)
-        (cancel_order)
         (post_comment)
         (vote)
         (set_transaction_expiration)
@@ -1064,9 +970,6 @@ FC_API( smoke::wallet::wallet_api,
         (recover_account)
         (change_recovery_account)
         (get_owner_history)
-        (transfer_to_savings)
-        (transfer_from_savings)
-        (cancel_transfer_from_savings)
         (get_encrypted_memo)
         (decrypt_memo)
         (decline_voting_rights)

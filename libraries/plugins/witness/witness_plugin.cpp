@@ -227,21 +227,6 @@ namespace detail
                         _db.get< account_authority_object, chain::by_account >( o.from ) );
       }
 
-      void operator()( const transfer_to_savings_operation& o )const
-      {
-         if( o.memo.length() > 0 )
-            check_memo( o.memo,
-                        _db.get< account_object, chain::by_name >( o.from ),
-                        _db.get< account_authority_object, chain::by_account >( o.from ) );
-      }
-
-      void operator()( const transfer_from_savings_operation& o )const
-      {
-         if( o.memo.length() > 0 )
-            check_memo( o.memo,
-                        _db.get< account_object, chain::by_name >( o.from ),
-                        _db.get< account_authority_object, chain::by_account >( o.from ) );
-      }
    };
 
    void witness_plugin_impl::pre_transaction( const signed_transaction& trx )
@@ -401,7 +386,7 @@ namespace detail
 
          if( _db.is_producing() )
             SMOKE_ASSERT( has_bandwidth, chain::plugin_exception,
-               "Account: ${account} bandwidth limit exceeded. Please wait to transact or power up STEEM.",
+               "Account: ${account} bandwidth limit exceeded. Please wait to transact or power up SMOKE.",
                ("account", a.name)
                ("account_vshares", account_vshares)
                ("account_average_bandwidth", account_average_bandwidth)

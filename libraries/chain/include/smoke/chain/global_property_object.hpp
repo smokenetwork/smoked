@@ -37,50 +37,30 @@ namespace smoke { namespace chain {
          time_point_sec    time;
          account_name_type current_witness;
 
-
-         /**
-          *  The total POW accumulated, aka the sum of num_pow_witness at the time new POW is added
-          */
-         uint64_t total_pow = -1;
-
-         /**
-          * The current count of how many pending POW witnesses there are, determines the difficulty
-          * of doing pow
-          */
-         uint32_t num_pow_witnesses = 0;
-
-         asset       virtual_supply             = asset( 0, STEEM_SYMBOL );
-         asset       current_supply             = asset( 0, STEEM_SYMBOL );
-         asset       confidential_supply        = asset( 0, STEEM_SYMBOL ); ///< total asset held in confidential balances
-         asset       current_sbd_supply         = asset( 0, SBD_SYMBOL );
-         asset       confidential_sbd_supply    = asset( 0, SBD_SYMBOL ); ///< total asset held in confidential balances
-         asset       total_vesting_fund_steem   = asset( 0, STEEM_SYMBOL );
+         asset       current_supply             = asset( 0, SMOKE_SYMBOL );
+         asset       total_vesting_fund_steem   = asset( 0, SMOKE_SYMBOL );
          asset       total_vesting_shares       = asset( 0, VESTS_SYMBOL );
-         asset       total_reward_fund_steem    = asset( 0, STEEM_SYMBOL );
+         asset       total_reward_fund_steem    = asset( 0, SMOKE_SYMBOL );
          fc::uint128 total_reward_shares2; ///< the running total of REWARD^2
          asset       pending_rewarded_vesting_shares = asset( 0, VESTS_SYMBOL );
-         asset       pending_rewarded_vesting_steem = asset( 0, STEEM_SYMBOL );
+         asset       pending_rewarded_vesting_steem = asset( 0, SMOKE_SYMBOL );
 
          price       get_vesting_share_price() const
          {
             if ( total_vesting_fund_steem.amount == 0 || total_vesting_shares.amount == 0 )
-               return price ( asset( 1000, STEEM_SYMBOL ), asset( 1000000, VESTS_SYMBOL ) );
+               return price ( asset( 1, SMOKE_SYMBOL ), asset( 1000000, VESTS_SYMBOL ) );
 
             return price( total_vesting_shares, total_vesting_fund_steem );
          }
 
          price get_reward_vesting_share_price() const
          {
+            if ( pending_rewarded_vesting_shares.amount == 0 || pending_rewarded_vesting_steem.amount == 0 )
+               return get_vesting_share_price();
+
             return price( total_vesting_shares + pending_rewarded_vesting_shares,
                total_vesting_fund_steem + pending_rewarded_vesting_steem );
          }
-
-         /**
-          *  This property defines the interest rate that SBD deposits receive.
-          */
-         uint16_t sbd_interest_rate = 0;
-
-         uint16_t sbd_print_rate = SMOKE_100_PERCENT;
 
          /**
           *  Maximum block size is decided by the set of active witnesses which change every round.
@@ -132,21 +112,13 @@ FC_REFLECT( smoke::chain::dynamic_global_property_object,
              (head_block_id)
              (time)
              (current_witness)
-             (total_pow)
-             (num_pow_witnesses)
-             (virtual_supply)
              (current_supply)
-             (confidential_supply)
-             (current_sbd_supply)
-             (confidential_sbd_supply)
              (total_vesting_fund_steem)
              (total_vesting_shares)
              (total_reward_fund_steem)
              (total_reward_shares2)
              (pending_rewarded_vesting_shares)
              (pending_rewarded_vesting_steem)
-             (sbd_interest_rate)
-             (sbd_print_rate)
              (maximum_block_size)
              (current_aslot)
              (recent_slots_filled)

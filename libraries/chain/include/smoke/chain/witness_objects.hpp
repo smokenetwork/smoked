@@ -67,8 +67,6 @@ namespace smoke { namespace chain {
          public_key_type   signing_key;
 
          chain_properties  props;
-         price             sbd_exchange_rate;
-         time_point_sec    last_sbd_exchange_update;
 
 
          /**
@@ -160,9 +158,9 @@ namespace smoke { namespace chain {
          chain_properties                                                  median_props;
          version                                                           majority_version;
 
-         uint8_t max_voted_witnesses            = SMOKE_MAX_VOTED_WITNESSES_HF0;
-         uint8_t max_miner_witnesses            = SMOKE_MAX_MINER_WITNESSES_HF0;
-         uint8_t max_runner_witnesses           = SMOKE_MAX_RUNNER_WITNESSES_HF0;
+         uint8_t max_voted_witnesses            = SMOKE_MAX_VOTED_WITNESSES;
+         uint8_t max_miner_witnesses            = SMOKE_MAX_MINER_WITNESSES;
+         uint8_t max_runner_witnesses           = SMOKE_MAX_RUNNER_WITNESSES;
          uint8_t hardfork_required_witnesses    = SMOKE_HARDFORK_REQUIRED_WITNESSES;
    };
 
@@ -243,7 +241,6 @@ FC_REFLECT( smoke::chain::witness_object,
              (url)(votes)(schedule)(virtual_last_update)(virtual_position)(virtual_scheduled_time)(total_missed)
              (last_aslot)(last_confirmed_block_num)(pow_worker)(signing_key)
              (props)
-             (sbd_exchange_rate)(last_sbd_exchange_update)
              (last_work)
              (running_version)
              (hardfork_version_vote)(hardfork_time_vote)
