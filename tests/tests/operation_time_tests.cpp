@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE( comment_payout_equalize )
       std::vector< voter_actor > voters;
 
       authors.emplace_back( "alice", alice_private_key );
-      authors.emplace_back( "bob"  , bob_private_key, ASSET( "0.000 TBD" ) );
+      authors.emplace_back( "bob"  , bob_private_key, ASSET( "0.000 TESTS" ) );
       authors.emplace_back( "dave" , dave_private_key );
       voters.emplace_back( "ulysses", ulysses_private_key, "alice");
       voters.emplace_back( "vivian" , vivian_private_key , "bob"  );
@@ -66,9 +66,6 @@ BOOST_AUTO_TEST_CASE( comment_payout_equalize )
 
       // A,B,D : posters
       // U,V,W : voters
-
-      // set a ridiculously high SMOKE price ($1 / satoshi) to disable dust threshold
-//      set_price_feed( price( ASSET( "0.001 TESTS" ), ASSET( "1.000 TBD" ) ) );
 
       for( const auto& voter : voters )
       {
@@ -144,6 +141,10 @@ BOOST_AUTO_TEST_CASE( comment_payout_equalize )
       const account_object& alice_account = db.get_account("alice");
       const account_object& bob_account   = db.get_account("bob");
       const account_object& dave_account  = db.get_account("dave");
+
+//      BOOST_CHECK( alice_account.reward_sbd_balance == ASSET( "14288.000 TBD" ) );
+//      BOOST_CHECK( bob_account.reward_sbd_balance == ASSET( "0.000 TBD" ) );
+//      BOOST_CHECK( dave_account.reward_sbd_balance == alice_account.reward_sbd_balance );
    }
    FC_LOG_AND_RETHROW()
 }
@@ -1618,6 +1619,7 @@ BOOST_AUTO_TEST_CASE( comment_freeze )
    try
    {
       ACTORS( (alice)(bob)(sam)(dave) )
+      generate_block();
       fund( "alice", 10000 );
       fund( "bob", 10000 );
       fund( "sam", 10000 );
@@ -1627,9 +1629,6 @@ BOOST_AUTO_TEST_CASE( comment_freeze )
       vest( "bob", 10000 );
       vest( "sam", 10000 );
       vest( "dave", 10000 );
-
-//      auto exchange_rate = price( ASSET( "1.250 TESTS" ), ASSET( "1.000 TBD" ) );
-//      set_price_feed( exchange_rate );
 
       signed_transaction tx;
 
@@ -1741,20 +1740,13 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
       ACTORS( (alice) );
       generate_block();
 
-//      set_price_feed( price( ASSET( "1.000 TESTS" ), ASSET( "1.000 TBD" ) ) );
-
       fund( "alice", ASSET( "10.000 TESTS" ) );
-      fund( "alice", ASSET( "10.000 TBD" ) );
+      generate_block();
 
       transfer_operation transfer1;
       transfer1.from = "alice";
       transfer1.to = SMOKE_NULL_ACCOUNT;
       transfer1.amount = ASSET( "1.000 TESTS" );
-
-      transfer_operation transfer2;
-      transfer2.from = "alice";
-      transfer2.to = SMOKE_NULL_ACCOUNT;
-      transfer2.amount = ASSET( "2.000 TBD" );
 
       transfer_to_vesting_operation vest;
       vest.from = "alice";
@@ -1765,7 +1757,6 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
 
       signed_transaction tx;
       tx.operations.push_back( transfer1 );
-      tx.operations.push_back( transfer2 );
       tx.operations.push_back( vest );
       tx.set_expiration( db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION );
       tx.sign( alice_private_key, db.get_chain_id() );
@@ -1796,7 +1787,7 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_steem_balance == ASSET( "1.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_balance == ASSET( "1.000000 VESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_steem == ASSET( "1.000 TESTS" ) );
-      BOOST_REQUIRE( db.get_account( "alice" ).balance == ASSET( "2.000 TESTS" ) );
+      BOOST_REQUIRE( db.get_account( "alice" ).balance == ASSET( "6.000 TESTS" ) );
 
       BOOST_TEST_MESSAGE( "--- Generating block to clear balances" );
       generate_block();
@@ -1807,7 +1798,7 @@ BOOST_AUTO_TEST_CASE( clear_null_account )
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_steem_balance == ASSET( "0.000 TESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_balance == ASSET( "0.000000 VESTS" ) );
       BOOST_REQUIRE( db.get_account( SMOKE_NULL_ACCOUNT ).reward_vesting_steem == ASSET( "0.000 TESTS" ) );
-      BOOST_REQUIRE( db.get_account( "alice" ).balance == ASSET( "2.000 TESTS" ) );
+      BOOST_REQUIRE( db.get_account( "alice" ).balance == ASSET( "6.000 TESTS" ) );
    }
    FC_LOG_AND_RETHROW()
 }
