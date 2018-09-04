@@ -159,3 +159,5 @@
 /// Represents the canonical root post parent account
 #define SMOKE_ROOT_POST_PARENT                (account_name_type())
 ///@}
+
+#define SMOKE_SMOKE_ACCOUNT                   "smoke"

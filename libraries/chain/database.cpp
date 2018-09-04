@@ -1910,14 +1910,14 @@ void database::init_genesis( uint64_t init_supply )
       // create smoke account as witness
       create< account_object >( [&]( account_object& a )
         {
-            a.name = "smoke";
+            a.name = SMOKE_SMOKE_ACCOUNT;
             a.memo_key = init_public_key;
             a.balance  = asset( init_supply, SMOKE_SYMBOL );
         } );
 
       create< account_authority_object >( [&]( account_authority_object& auth )
          {
-             auth.account = "smoke";
+             auth.account = SMOKE_SMOKE_ACCOUNT;
              auth.owner.add_authority( init_public_key, 1 );
              auth.owner.weight_threshold = 1;
              auth.active  = auth.owner;
@@ -1926,7 +1926,7 @@ void database::init_genesis( uint64_t init_supply )
 
       create< witness_object >( [&]( witness_object& w )
         {
-            w.owner        = "smoke";
+            w.owner        = SMOKE_SMOKE_ACCOUNT;
             w.signing_key  = init_public_key;
             w.schedule = witness_object::miner;
         } );

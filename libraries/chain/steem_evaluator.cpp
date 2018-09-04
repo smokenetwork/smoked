@@ -98,6 +98,10 @@ void witness_update_evaluator::do_apply( const witness_update_operation& o )
 
 void account_create_evaluator::do_apply( const account_create_operation& o )
 {
+#ifndef IS_TEST_NET
+   // only wls account can create new account at prelauch period to have sometime preparing infrastructure
+   FC_ASSERT( o.creator == SMOKE_SMOKE_ACCOUNT, "only smoke account can create new account this period." );
+#endif
    const auto& creator = _db.get_account( o.creator );
    const auto& props = _db.get_dynamic_global_properties();
 
