@@ -1885,7 +1885,7 @@ void database::init_genesis( uint64_t init_supply )
 #ifdef IS_TEST_NET
             a.balance  = asset( i ? 0 : init_supply, SMOKE_SYMBOL );
 #else
-            a.balance  = asset( 0, SMOKE_SYMBOL );
+            a.balance  = asset( i ? 0 : 1000, SMOKE_SYMBOL ); // 1 SMOKE to powerup smoke account
 #endif
          } );
 
@@ -1907,12 +1907,12 @@ void database::init_genesis( uint64_t init_supply )
       }
 
 #ifndef IS_TEST_NET
-      // create smoke account as witness
+      // create smoke account
       create< account_object >( [&]( account_object& a )
         {
             a.name = SMOKE_SMOKE_ACCOUNT;
             a.memo_key = init_public_key;
-            a.balance  = asset( init_supply, SMOKE_SYMBOL );
+            a.balance  = asset( init_supply - 1000, SMOKE_SYMBOL );
         } );
 
       create< account_authority_object >( [&]( account_authority_object& auth )
@@ -1923,13 +1923,6 @@ void database::init_genesis( uint64_t init_supply )
              auth.active  = auth.owner;
              auth.posting = auth.active;
          });
-
-      create< witness_object >( [&]( witness_object& w )
-        {
-            w.owner        = SMOKE_SMOKE_ACCOUNT;
-            w.signing_key  = init_public_key;
-            w.schedule = witness_object::miner;
-        } );
 #endif
 
       create< dynamic_global_property_object >( [&]( dynamic_global_property_object& p )

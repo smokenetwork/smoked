@@ -41,7 +41,7 @@
 #define SMOKE_CASHOUT_WINDOW_SECONDS          (60*60*24*7)  /// 7 days
 #define SMOKE_UPVOTE_LOCKOUT                  (fc::hours(12))
 
-#define SMOKE_MIN_ACCOUNT_CREATION_FEE         0 // 1
+#define SMOKE_MIN_ACCOUNT_CREATION_FEE         4200 // 4.2 SMOKE
 
 #define SMOKE_OWNER_AUTH_RECOVERY_PERIOD                  fc::days(30)
 #define SMOKE_ACCOUNT_RECOVERY_REQUEST_EXPIRATION_PERIOD  fc::days(1)
@@ -76,7 +76,7 @@
 #define SMOKE_MAX_VOTE_CHANGES                5
 #define SMOKE_REVERSE_AUCTION_WINDOW_SECONDS  (60*30) /// 30 minutes
 #define SMOKE_MIN_VOTE_INTERVAL_SEC           3
-#define SMOKE_VOTE_DUST_THRESHOLD             (32768) // just enough for new user with 4.2 SMOKE in VESTS be able to vote
+#define SMOKE_VOTE_DUST_THRESHOLD             (50000) // make sure new user with 4.2 SMOKE in VESTS be able to vote
 
 #define SMOKE_MIN_ROOT_COMMENT_INTERVAL       (fc::seconds(60*5)) // 5 minutes
 #define SMOKE_MIN_REPLY_INTERVAL              (fc::seconds(20)) // 20 seconds
