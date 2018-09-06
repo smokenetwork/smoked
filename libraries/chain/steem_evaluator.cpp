@@ -107,7 +107,7 @@ void account_create_evaluator::do_apply( const account_create_operation& o )
 
    FC_ASSERT( creator.balance >= o.fee, "Insufficient balance to create account.", ( "creator.balance", creator.balance )( "required", o.fee ) );
 
-   const witness_schedule_object& wso = _db.get_witness_schedule_object();
+//   const witness_schedule_object& wso = _db.get_witness_schedule_object();
    FC_ASSERT( o.fee >= asset( SMOKE_MIN_ACCOUNT_CREATION_FEE, SMOKE_SYMBOL ), "Insufficient Fee: ${f} required, ${p} provided.",
               ("f", asset( SMOKE_MIN_ACCOUNT_CREATION_FEE, SMOKE_SYMBOL ) )
               ("p", o.fee) );
