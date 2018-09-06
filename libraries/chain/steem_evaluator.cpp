@@ -99,7 +99,6 @@ void witness_update_evaluator::do_apply( const witness_update_operation& o )
 void account_create_evaluator::do_apply( const account_create_operation& o )
 {
 #ifndef IS_TEST_NET
-   // only wls account can create new account at prelauch period to have sometime preparing infrastructure
    FC_ASSERT( o.creator == SMOKE_SMOKE_ACCOUNT, "only smoke account can create new account this period." );
 #endif
    const auto& creator = _db.get_account( o.creator );
@@ -107,11 +106,12 @@ void account_create_evaluator::do_apply( const account_create_operation& o )
 
    FC_ASSERT( creator.balance >= o.fee, "Insufficient balance to create account.", ( "creator.balance", creator.balance )( "required", o.fee ) );
 
+#ifndef IS_TEST_NET
 //   const witness_schedule_object& wso = _db.get_witness_schedule_object();
    FC_ASSERT( o.fee >= asset( SMOKE_MIN_ACCOUNT_CREATION_FEE, SMOKE_SYMBOL ), "Insufficient Fee: ${f} required, ${p} provided.",
               ("f", asset( SMOKE_MIN_ACCOUNT_CREATION_FEE, SMOKE_SYMBOL ) )
               ("p", o.fee) );
-
+#endif
 
    for( auto& a : o.owner.account_auths )
    {
