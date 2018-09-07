@@ -53,7 +53,7 @@
 #define SMOKE_BLOCK_INTERVAL                  3
 #define SMOKE_BLOCKS_PER_YEAR                 (365*24*60*60/SMOKE_BLOCK_INTERVAL)
 #define SMOKE_BLOCKS_PER_DAY                  (24*60*60/SMOKE_BLOCK_INTERVAL)
-#define SMOKE_START_MINER_VOTING_BLOCK        (SMOKE_BLOCKS_PER_DAY * 30)
+#define SMOKE_START_MINER_VOTING_BLOCK        (1 * 30) // (SMOKE_BLOCKS_PER_DAY * 30)
 
 #define SMOKE_MAX_WITNESSES                   21
 
@@ -76,7 +76,7 @@
 #define SMOKE_MAX_VOTE_CHANGES                5
 #define SMOKE_REVERSE_AUCTION_WINDOW_SECONDS  (60*30) /// 30 minutes
 #define SMOKE_MIN_VOTE_INTERVAL_SEC           3
-#define SMOKE_VOTE_DUST_THRESHOLD             (50000) // make sure new user with 4.2 SMOKE in VESTS be able to vote
+#define SMOKE_VOTE_DUST_THRESHOLD             (32000) // make sure new user with 4.2 SMOKE in VESTS be able to vote
 
 #define SMOKE_MIN_ROOT_COMMENT_INTERVAL       (fc::seconds(60*5)) // 5 minutes
 #define SMOKE_MIN_REPLY_INTERVAL              (fc::seconds(20)) // 20 seconds

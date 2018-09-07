@@ -1558,8 +1558,9 @@ void database::process_funds()
    * inflation rate of 9.5% per year, reducing by 0.5% per annum until drop to 5%
    * narowing every 250k blocks
    */
+  uint32_t block_num = head_block_num();
   int64_t start_inflation_rate = int64_t( SMOKE_INFLATION_RATE_START_PERCENT );
-  int64_t inflation_rate_adjustment = int64_t( head_block_num() / SMOKE_INFLATION_NARROWING_PERIOD );
+  int64_t inflation_rate_adjustment = int64_t( block_num / SMOKE_INFLATION_NARROWING_PERIOD );
   int64_t inflation_rate_floor = int64_t( SMOKE_INFLATION_RATE_STOP_PERCENT );
 
   // below subtraction cannot underflow int64_t because inflation_rate_adjustment is <2^32
@@ -1569,6 +1570,9 @@ void database::process_funds()
   auto content_reward = ( new_steem * SMOKE_CONTENT_REWARD_PERCENT ) / SMOKE_100_PERCENT;
   content_reward = pay_reward_funds( content_reward ); /// 75% to content creator
   auto vesting_reward = ( new_steem * SMOKE_VESTING_FUND_PERCENT ) / SMOKE_100_PERCENT; /// 15% to vesting fund
+  if (block_num < SMOKE_BLOCKS_PER_DAY) { // no vesting reward in early blocks
+     vesting_reward = 0;
+  }
   auto witness_reward = new_steem - content_reward - vesting_reward; /// Remaining 10% to witness pay
 
   const auto& cwit = get_witness( props.current_witness );

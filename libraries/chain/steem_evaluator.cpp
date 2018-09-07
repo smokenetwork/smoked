@@ -163,7 +163,9 @@ void account_create_evaluator::do_apply( const account_create_operation& o )
 
 void account_create_with_delegation_evaluator::do_apply( const account_create_with_delegation_operation& o )
 {
+#ifndef IS_TEST_NET
    FC_ASSERT( false, "This operation disabled temporary." );
+#endif
 
    const auto& creator = _db.get_account( o.creator );
    const auto& props = _db.get_dynamic_global_properties();
@@ -1525,7 +1527,9 @@ void claim_reward_balance_evaluator::do_apply( const claim_reward_balance_operat
 
 void delegate_vesting_shares_evaluator::do_apply( const delegate_vesting_shares_operation& op )
 {
+#ifndef IS_TEST_NET
    FC_ASSERT( false, "This operation disabled temporary." );
+#endif
 
    const auto& delegator = _db.get_account( op.delegator );
    const auto& delegatee = _db.get_account( op.delegatee );
@@ -1541,7 +1545,8 @@ void delegate_vesting_shares_evaluator::do_apply( const delegate_vesting_shares_
    // If delegation doesn't exist, create it
    if( delegation == nullptr )
    {
-      FC_ASSERT( available_shares >= op.vesting_shares, "Account does not have enough vesting shares to delegate." );
+      FC_ASSERT( available_shares >= op.vesting_shares, "Account does not have enough vesting shares to delegate. available=${a} delegate=${d}",
+              ("a", available_shares)("d", op.vesting_shares));
       FC_ASSERT( op.vesting_shares >= min_delegation, "Account must delegate a minimum of ${v}", ("v", min_delegation) );
 
       _db.create< vesting_delegation_object >( [&]( vesting_delegation_object& obj )
