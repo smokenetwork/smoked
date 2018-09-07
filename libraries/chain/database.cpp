@@ -1880,7 +1880,7 @@ void database::init_genesis( uint64_t init_supply )
          auth.posting.weight_threshold = 1;
       });
 
-      for( int i = 0; i < SMOKE_NUM_INIT_MINERS; ++i )
+      for( int i = 0; i < SMOKE_MAX_WITNESSES; ++i )
       {
          create< account_object >( [&]( account_object& a )
          {
