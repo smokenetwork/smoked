@@ -98,16 +98,20 @@ void witness_update_evaluator::do_apply( const witness_update_operation& o )
 
 void account_create_evaluator::do_apply( const account_create_operation& o )
 {
+#ifndef IS_TEST_NET
+   FC_ASSERT( o.creator == SMOKE_SMOKE_ACCOUNT, "only smoke account can create new account this period." );
+#endif
    const auto& creator = _db.get_account( o.creator );
    const auto& props = _db.get_dynamic_global_properties();
 
    FC_ASSERT( creator.balance >= o.fee, "Insufficient balance to create account.", ( "creator.balance", creator.balance )( "required", o.fee ) );
 
-   const witness_schedule_object& wso = _db.get_witness_schedule_object();
-   FC_ASSERT( o.fee >= asset( wso.median_props.account_creation_fee.amount * SMOKE_CREATE_ACCOUNT_WITH_STEEM_MODIFIER, SMOKE_SYMBOL ), "Insufficient Fee: ${f} required, ${p} provided.",
-              ("f", wso.median_props.account_creation_fee * asset( SMOKE_CREATE_ACCOUNT_WITH_STEEM_MODIFIER, SMOKE_SYMBOL ) )
+#ifndef IS_TEST_NET
+//   const witness_schedule_object& wso = _db.get_witness_schedule_object();
+   FC_ASSERT( o.fee >= asset( SMOKE_MIN_ACCOUNT_CREATION_FEE, SMOKE_SYMBOL ), "Insufficient Fee: ${f} required, ${p} provided.",
+              ("f", asset( SMOKE_MIN_ACCOUNT_CREATION_FEE, SMOKE_SYMBOL ) )
               ("p", o.fee) );
-
+#endif
 
    for( auto& a : o.owner.account_auths )
    {
@@ -159,6 +163,10 @@ void account_create_evaluator::do_apply( const account_create_operation& o )
 
 void account_create_with_delegation_evaluator::do_apply( const account_create_with_delegation_operation& o )
 {
+#ifndef IS_TEST_NET
+   FC_ASSERT( false, "This operation disabled temporary." );
+#endif
+
    const auto& creator = _db.get_account( o.creator );
    const auto& props = _db.get_dynamic_global_properties();
    const witness_schedule_object& wso = _db.get_witness_schedule_object();
@@ -1519,6 +1527,10 @@ void claim_reward_balance_evaluator::do_apply( const claim_reward_balance_operat
 
 void delegate_vesting_shares_evaluator::do_apply( const delegate_vesting_shares_operation& op )
 {
+#ifndef IS_TEST_NET
+   FC_ASSERT( false, "This operation disabled temporary." );
+#endif
+
    const auto& delegator = _db.get_account( op.delegator );
    const auto& delegatee = _db.get_account( op.delegatee );
    auto delegation = _db.find< vesting_delegation_object, by_delegation >( boost::make_tuple( op.delegator, op.delegatee ) );
@@ -1533,7 +1545,8 @@ void delegate_vesting_shares_evaluator::do_apply( const delegate_vesting_shares_
    // If delegation doesn't exist, create it
    if( delegation == nullptr )
    {
-      FC_ASSERT( available_shares >= op.vesting_shares, "Account does not have enough vesting shares to delegate." );
+      FC_ASSERT( available_shares >= op.vesting_shares, "Account does not have enough vesting shares to delegate. available=${a} delegate=${d}",
+              ("a", available_shares)("d", op.vesting_shares));
       FC_ASSERT( op.vesting_shares >= min_delegation, "Account must delegate a minimum of ${v}", ("v", min_delegation) );
 
       _db.create< vesting_delegation_object >( [&]( vesting_delegation_object& obj )

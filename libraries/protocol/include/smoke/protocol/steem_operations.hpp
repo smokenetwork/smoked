@@ -376,8 +376,7 @@ namespace smoke { namespace protocol {
        *  fee requires all accounts to have some kind of commitment to the network that includes the
        *  ability to vote and make transactions.
        */
-      asset             account_creation_fee =
-         asset( SMOKE_MIN_ACCOUNT_CREATION_FEE, SMOKE_SYMBOL );
+      asset             account_creation_fee = asset( SMOKE_MIN_ACCOUNT_CREATION_FEE, SMOKE_SYMBOL );
 
       /**
        *  This witnesses vote for the maximum_block_size which is used by the network

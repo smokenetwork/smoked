@@ -1558,8 +1558,9 @@ void database::process_funds()
    * inflation rate of 9.5% per year, reducing by 0.5% per annum until drop to 5%
    * narowing every 250k blocks
    */
+  uint32_t block_num = head_block_num();
   int64_t start_inflation_rate = int64_t( SMOKE_INFLATION_RATE_START_PERCENT );
-  int64_t inflation_rate_adjustment = int64_t( head_block_num() / SMOKE_INFLATION_NARROWING_PERIOD );
+  int64_t inflation_rate_adjustment = int64_t( block_num / SMOKE_INFLATION_NARROWING_PERIOD );
   int64_t inflation_rate_floor = int64_t( SMOKE_INFLATION_RATE_STOP_PERCENT );
 
   // below subtraction cannot underflow int64_t because inflation_rate_adjustment is <2^32
@@ -1569,6 +1570,9 @@ void database::process_funds()
   auto content_reward = ( new_steem * SMOKE_CONTENT_REWARD_PERCENT ) / SMOKE_100_PERCENT;
   content_reward = pay_reward_funds( content_reward ); /// 75% to content creator
   auto vesting_reward = ( new_steem * SMOKE_VESTING_FUND_PERCENT ) / SMOKE_100_PERCENT; /// 15% to vesting fund
+  if (block_num < SMOKE_BLOCKS_PER_DAY) { // no vesting reward in early blocks
+     vesting_reward = 0;
+  }
   auto witness_reward = new_steem - content_reward - vesting_reward; /// Remaining 10% to witness pay
 
   const auto& cwit = get_witness( props.current_witness );
@@ -1876,7 +1880,7 @@ void database::init_genesis( uint64_t init_supply )
          auth.posting.weight_threshold = 1;
       });
 
-      for( int i = 0; i < SMOKE_NUM_INIT_MINERS; ++i )
+      for( int i = 0; i < SMOKE_MAX_WITNESSES; ++i )
       {
          create< account_object >( [&]( account_object& a )
          {
@@ -1885,7 +1889,7 @@ void database::init_genesis( uint64_t init_supply )
 #ifdef IS_TEST_NET
             a.balance  = asset( i ? 0 : init_supply, SMOKE_SYMBOL );
 #else
-            a.balance  = asset( 0, SMOKE_SYMBOL );
+            a.balance  = asset( i ? 0 : 1000, SMOKE_SYMBOL ); // 1 SMOKE to powerup smoke account
 #endif
          } );
 
@@ -1907,29 +1911,22 @@ void database::init_genesis( uint64_t init_supply )
       }
 
 #ifndef IS_TEST_NET
-      // create smoke account as witness
+      // create smoke account
       create< account_object >( [&]( account_object& a )
         {
-            a.name = "smoke";
+            a.name = SMOKE_SMOKE_ACCOUNT;
             a.memo_key = init_public_key;
-            a.balance  = asset( init_supply, SMOKE_SYMBOL );
+            a.balance  = asset( init_supply - 1000, SMOKE_SYMBOL );
         } );
 
       create< account_authority_object >( [&]( account_authority_object& auth )
          {
-             auth.account = "smoke";
+             auth.account = SMOKE_SMOKE_ACCOUNT;
              auth.owner.add_authority( init_public_key, 1 );
              auth.owner.weight_threshold = 1;
              auth.active  = auth.owner;
              auth.posting = auth.active;
          });
-
-      create< witness_object >( [&]( witness_object& w )
-        {
-            w.owner        = "smoke";
-            w.signing_key  = init_public_key;
-            w.schedule = witness_object::miner;
-        } );
 #endif
 
       create< dynamic_global_property_object >( [&]( dynamic_global_property_object& p )

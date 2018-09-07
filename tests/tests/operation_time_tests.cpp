@@ -138,9 +138,9 @@ BOOST_AUTO_TEST_CASE( comment_payout_equalize )
       }
       */
 
-      const account_object& alice_account = db.get_account("alice");
-      const account_object& bob_account   = db.get_account("bob");
-      const account_object& dave_account  = db.get_account("dave");
+//      const account_object& alice_account = db.get_account("alice");
+//      const account_object& bob_account   = db.get_account("bob");
+//      const account_object& dave_account  = db.get_account("dave");
 
 //      BOOST_CHECK( alice_account.reward_sbd_balance == ASSET( "14288.000 TBD" ) );
 //      BOOST_CHECK( bob_account.reward_sbd_balance == ASSET( "0.000 TBD" ) );

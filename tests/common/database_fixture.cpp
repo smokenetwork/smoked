@@ -223,16 +223,26 @@ const account_object& database_fixture::account_create(
 {
    try
    {
-      account_create_with_delegation_operation op;
-      op.new_account_name = name;
+//      account_create_with_delegation_operation op;
+//      op.new_account_name = name;
+//      op.creator = creator;
+//      op.fee = asset( fee, SMOKE_SYMBOL );
+//      op.delegation = asset( 0, VESTS_SYMBOL );
+//      op.owner = authority( 1, key, 1 );
+//      op.active = authority( 1, key, 1 );
+//      op.posting = authority( 1, post_key, 1 );
+//      op.memo_key = key;
+//      op.json_metadata = json_metadata;
+
+      account_create_operation op;
       op.creator = creator;
-      op.fee = asset( fee, SMOKE_SYMBOL );
-      op.delegation = asset( 0, VESTS_SYMBOL );
+      op.new_account_name = name;
       op.owner = authority( 1, key, 1 );
       op.active = authority( 1, key, 1 );
       op.posting = authority( 1, post_key, 1 );
       op.memo_key = key;
       op.json_metadata = json_metadata;
+      op.fee = asset( fee, SMOKE_SYMBOL );
 
       trx.operations.push_back( op );
 
@@ -263,7 +273,7 @@ const account_object& database_fixture::account_create(
          name,
          SMOKE_INIT_MINER_NAME,
          init_account_priv_key,
-         std::max( db.get_witness_schedule_object().median_props.account_creation_fee.amount * SMOKE_CREATE_ACCOUNT_WITH_STEEM_MODIFIER, share_type( 100 ) ),
+         std::max( db.get_witness_schedule_object().median_props.account_creation_fee.amount * SMOKE_CREATE_ACCOUNT_WITH_STEEM_MODIFIER, share_type( 4200 ) ),
          key,
          post_key,
          "" );
