@@ -4448,7 +4448,10 @@ namespace graphene { namespace net {
           ilog( "Loaded configuration from file ${filename}", ("filename", configuration_file_name ) );
 
           if( _node_configuration.private_key == fc::ecc::private_key() )
+          {
+            ilog( "generating new private key for this node" );
             _node_configuration.private_key = fc::ecc::private_key::generate();
+          }
 
           node_configuration_loaded = true;
         }
@@ -4997,8 +5000,18 @@ namespace graphene { namespace net {
     void node_impl::set_advanced_node_parameters(const fc::variant_object& params)
     {
       VERIFY_CORRECT_THREAD();
+      ilog( "set_advanced_node_parameters ${params}", ("params", params) );
 
       fc::from_variant( params, _node_configuration );
+
+      if( _node_configuration.private_key == fc::ecc::private_key() )
+      {
+         ilog( "generating new private key for this node" );
+         _node_configuration.private_key = fc::ecc::private_key::generate();
+      }
+
+      // Private key could have been overridden at this point. Update public key just in case
+      _node_public_key = _node_configuration.private_key.get_public_key().serialize();
 
       if( _node_configuration.desired_number_of_connections > _node_configuration.maximum_number_of_connections )
       {
