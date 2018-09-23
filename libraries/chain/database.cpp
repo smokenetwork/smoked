@@ -1681,7 +1681,6 @@ void database::expire_escrow_ratification()
 
       const auto& from_account = get_account( old_escrow.from );
       adjust_balance( from_account, old_escrow.steem_balance );
-//      adjust_balance( from_account, old_escrow.sbd_balance );
       adjust_balance( from_account, old_escrow.pending_fee );
 
       remove( old_escrow );
@@ -1996,8 +1995,7 @@ void database::init_genesis( uint64_t init_supply )
              rfo.reward_balance = asset( 0, SMOKE_SYMBOL ); // gpo.total_reward_fund_steem;
 
 #ifndef IS_TEST_NET
-             // (fc::uint128_t(808638359297ull,13744269167557038121ull)); // 14916744862149894120447332012073
-             rfo.recent_claims = (fc::uint128_t(uint64_t(140797515942543623ull)));
+             rfo.recent_claims = (fc::uint128_t(uint64_t(42000000000000ull)));
 #endif
              rfo.author_reward_curve = curve_id::linear; // curve_id::quadratic
              rfo.curation_reward_curve = curve_id::square_root; // curve_id::quadratic_curation
