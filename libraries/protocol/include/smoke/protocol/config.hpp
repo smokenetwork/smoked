@@ -30,7 +30,7 @@
 #else // IS LIVE SMOKE NETWORK
 
 #define SMOKE_INIT_PUBLIC_KEY_STR             "SMK619jJm3VKrHRLbKaAkFXSCUBFwwv9d4yuTYM9KT6cjJV6zno1G"
-#define SMOKE_CHAIN_ID                        (fc::sha256::hash("smokepubnet")) // 83c90d313a3ac06bdbfd5997f13a8f1908df80f6eba91f5bb591e0472ab7b212
+#define SMOKE_CHAIN_ID                        (fc::sha256::hash("smokepubnet")) // 1ce08345e61cd3bf91673a47fc507e7ed01550dab841fd9cdb0ab66ef576aaf0
 #define VESTS_SYMBOL  (uint64_t(6) | (uint64_t('V') << 8) | (uint64_t('E') << 16) | (uint64_t('S') << 24) | (uint64_t('T') << 32) | (uint64_t('S') << 40)) ///< VESTS with 6 digits of precision
 #define SMOKE_SYMBOL  (uint64_t(3) | (uint64_t('S') << 8) | (uint64_t('M') << 16) | (uint64_t('O') << 24) | (uint64_t('K') << 32) | (uint64_t('E') << 40)) ///< SMOKE with 3 digits of precision
 #define SMOKE_SYMBOL_STR                      "SMOKE"
