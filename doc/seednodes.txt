@@ -1,3 +1,7 @@
-# testnet2
-seed-node = 163.172.128.38:2001
-seed-node = 51.15.95.123:2001
+# mainnet
+
+# smoke seed01
+seed-node = 51.15.223.10:2001
+
+# smoke seed02
+seed-node = 51.15.120.228:2001
