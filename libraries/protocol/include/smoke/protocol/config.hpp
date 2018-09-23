@@ -29,14 +29,14 @@
 #define SMOKE_OWNER_AUTH_HISTORY_TRACKING_START_BLOCK_NUM 1
 #else // IS LIVE SMOKE NETWORK
 
-#define SMOKE_INIT_PUBLIC_KEY_STR             "SMK6EC5NtQBvLRJ1m3Fs4GQpH4fnZZq4M1sDSnDfTKdLfqB2aoSV9"
-#define SMOKE_CHAIN_ID                        (fc::sha256::hash("smoke")) // a66e00caa50e6817bbe24e927bf48c5d4ba1b33f36bdbb5fa262a04012c4e3ee
+#define SMOKE_INIT_PUBLIC_KEY_STR             "SMK619jJm3VKrHRLbKaAkFXSCUBFwwv9d4yuTYM9KT6cjJV6zno1G"
+#define SMOKE_CHAIN_ID                        (fc::sha256::hash("smokepubnet")) // 1ce08345e61cd3bf91673a47fc507e7ed01550dab841fd9cdb0ab66ef576aaf0
 #define VESTS_SYMBOL  (uint64_t(6) | (uint64_t('V') << 8) | (uint64_t('E') << 16) | (uint64_t('S') << 24) | (uint64_t('T') << 32) | (uint64_t('S') << 40)) ///< VESTS with 6 digits of precision
 #define SMOKE_SYMBOL  (uint64_t(3) | (uint64_t('S') << 8) | (uint64_t('M') << 16) | (uint64_t('O') << 24) | (uint64_t('K') << 32) | (uint64_t('E') << 40)) ///< SMOKE with 3 digits of precision
 #define SMOKE_SYMBOL_STR                      "SMOKE"
 #define SMOKE_ADDRESS_PREFIX                  "SMK"
 
-#define SMOKE_GENESIS_TIME_EPOCH              1533055724  // Tue Jul 31 2018 23:48:44 GMT+0700 (Indochina Time)
+#define SMOKE_GENESIS_TIME_EPOCH              1537690632  // 2018-09-23T08:17:12Z ( at testnet2 snapshot )
 #define SMOKE_GENESIS_TIME                    (fc::time_point_sec(SMOKE_GENESIS_TIME_EPOCH))
 #define SMOKE_CASHOUT_WINDOW_SECONDS          (60*60*24*7)  /// 7 days
 #define SMOKE_UPVOTE_LOCKOUT                  (fc::hours(12))
@@ -75,7 +75,7 @@
 #define SMOKE_MAX_VOTE_CHANGES                5
 #define SMOKE_REVERSE_AUCTION_WINDOW_SECONDS  (60*30) /// 30 minutes
 #define SMOKE_MIN_VOTE_INTERVAL_SEC           3
-#define SMOKE_VOTE_DUST_THRESHOLD             (32000) // make sure new user with 4.2 SMOKE in VESTS be able to vote
+#define SMOKE_VOTE_DUST_THRESHOLD             (10000) // new user has 4.2 SMOKE POWER when creating account
 
 #define SMOKE_MIN_ROOT_COMMENT_INTERVAL       (fc::seconds(60*5)) // 5 minutes
 #define SMOKE_MIN_REPLY_INTERVAL              (fc::seconds(20)) // 20 seconds
