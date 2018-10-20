@@ -46,6 +46,27 @@ int main(int argc, char** argv) {
    fc::oexception unhandled_exception;
    try {
 
+      std::cerr << "\n\n\n";
+      std::cerr << "                 ,s#@@R#%R#8@Mm,               \n";
+      std::cerr << "              a@#%`          `7%@8m            \n";
+      std::cerr << "           ,@#C                   7@@          \n";
+      std::cerr << "          @#b          ,@m          7@k        \n";
+      std::cerr << "        ,@#            @@@Q            @       \n";
+      std::cerr << "        @#     g,     @@@@@      ,o    @@      \n";
+      std::cerr << "       @#      @@@@m  @@@@@b ,@@@@~     @@     \n";
+      std::cerr << "       @b        @@@@@@@@@@M@@@@#^      j@     \n";
+      std::cerr << "       @b        \"@@@@@@@@@@@@@#         @b   \n";
+      std::cerr << "       @Q    ,,s#@@@@@@@@@@@@@@@@Mm,,   ]@     \n";
+      std::cerr << "       1@Q   `5@@@@@@@@@@@@@@@@@@#R\"    @     \n";
+      std::cerr << "        %@Q       `.@@@#`7@@@Q         @#      \n";
+      std::cerr << "         7@m       %5\\     `55~      ;@B      \n";
+      std::cerr << "           %@m                     ,@#`        \n";
+      std::cerr << "             1@@m                ,@#\\         \n";
+      std::cerr << "                7W@@@mw,,     ,#@M`           \n";
+      std::cerr << "                     '7^@Q,e@#W`               \n";
+      std::cerr << "                        ##5`                   \n";
+      std::cerr << "\n\n";
+
 #ifdef IS_TEST_NET
       std::cerr << "------------------------------------------------------\n\n";
       std::cerr << "            STARTING TEST NETWORK\n\n";
