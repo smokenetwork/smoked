@@ -16,8 +16,8 @@
 
 #define SMOKE_SYMBOL_STR                      "TESTS"
 #define SMOKE_ADDRESS_PREFIX                  "TST"
-
-#define SMOKE_GENESIS_TIME                    (fc::time_point_sec(1515765200))
+#define SMOKE_GENESIS_TIME_EPOCH              1515765200
+#define SMOKE_GENESIS_TIME                    (fc::time_point_sec(SMOKE_GENESIS_TIME_EPOCH))
 #define SMOKE_CASHOUT_WINDOW_SECONDS          (60*60) /// 1 hr
 #define SMOKE_UPVOTE_LOCKOUT                  (fc::minutes(5))
 
