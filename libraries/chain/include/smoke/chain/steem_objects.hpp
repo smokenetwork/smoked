@@ -15,7 +15,7 @@ namespace smoke { namespace chain {
    using smoke::protocol::price;
    using smoke::protocol::asset_symbol_type;
 
-   typedef protocol::fixed_string_16 reward_fund_name_type;
+   typedef fc::fixed_string_16 reward_fund_name_type;
 
    class escrow_object : public object< escrow_object_type, escrow_object >
    {
