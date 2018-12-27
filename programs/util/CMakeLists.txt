@@ -81,7 +81,7 @@ install( TARGETS
 
 add_executable( test_fixed_string test_fixed_string.cpp )
 target_link_libraries( test_fixed_string
-                       PRIVATE smoke_chain smoke_protocol fc ${CMAKE_DL_LIB} ${PLATFORM_SPECIFIC_LIBS} )
+                       PRIVATE fc ${CMAKE_DL_LIB} ${PLATFORM_SPECIFIC_LIBS} )
 
 install( TARGETS
    test_fixed_string
