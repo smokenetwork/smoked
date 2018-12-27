@@ -152,7 +152,7 @@ namespace fc
          s.write( (const char*)&id._id, sizeof(id._id) );
       }
       template<typename Stream, typename T>
-      inline void unpack( Stream& s, chainbase::oid<T>& id )
+      inline void unpack( Stream& s, chainbase::oid<T>& id, uint32_t = 0 )
       {
          s.read( (char*)&id._id, sizeof(id._id));
       }
@@ -171,24 +171,20 @@ namespace fc
          pack( ds, v );
       }
 
-      template< typename T > inline void unpack( const smoke::chain::buffer_type& raw, T& v )
+      template< typename T > inline void unpack( const smoke::chain::buffer_type& raw, T& v, uint32_t depth = 0 )
       {
          datastream< const char* > ds( raw.data(), raw.size() );
-         unpack( ds, v );
+         unpack( ds, v, depth );
       }
 
-      template< typename T > inline T unpack( const smoke::chain::buffer_type& raw )
+      template< typename T > inline T unpack( const smoke::chain::buffer_type& raw, uint32_t depth = 0 )
       {
          T v;
          datastream< const char* > ds( raw.data(), raw.size() );
-         unpack( ds, v );
+         unpack( ds, v, depth );
          return v;
       }
    }
-}
-
-namespace fc {
-
 }
 
 FC_REFLECT_ENUM( smoke::chain::object_type,
