@@ -1,6 +1,6 @@
 #pragma once
 #include <smoke/protocol/config.hpp>
-#include <smoke/protocol/fixed_string.hpp>
+#include <fc/fixed_string.hpp>
 
 #include <fc/container/flat_fwd.hpp>
 #include <fc/io/varint.hpp>
@@ -28,7 +28,9 @@
 
 namespace smoke {
 
-   using                                    fc::uint128_t;
+   using                               fc::uint128_t;
+   using                               fc::fixed_string_16;
+
    typedef boost::multiprecision::uint256_t u256;
    typedef boost::multiprecision::uint512_t u512;
 
