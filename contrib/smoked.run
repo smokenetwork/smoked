@@ -32,6 +32,14 @@ if [[ ! -z "$SMOKED_SEED_NODES" ]]; then
     done
 fi
 
+# if user pass in desired rpc nodes, use
+# the ones the user specified:
+if [[ ! -z "$SMOKED_RPC_NODES" ]]; then
+    for NODE in $SMOKED_RPC_NODES ; do
+        ARGS+="--rpc-endpoint=$NODE"
+    done
+fi
+
 if [[ ! -z "$SMOKED_WITNESS_NAME" ]]; then
     ARGS+=" --witness=\"$SMOKED_WITNESS_NAME\""
 fi
@@ -60,6 +68,8 @@ ARGS+=" --follow-start-feeds=$SMOKED_FEED_START_TIME"
 # overwrite local config with image one
 if [[ "$USE_FULL_WEB_NODE" ]]; then
   cp /etc/smoked/fullnode.config.ini $HOME/config.ini
+else if [[ "$USE_WITNESS_NODE" ]]; then
+  cp /etc/smoked/witness.config.ini $HOME/config.ini
 else
   cp /etc/smoked/config.ini $HOME/config.ini
 fi
