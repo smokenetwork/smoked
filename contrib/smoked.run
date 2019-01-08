@@ -84,13 +84,12 @@ if [[ -d $HOME/blockchain ]]; then
         ARGS+=" --replay-blockchain"
     fi
 elif [[ -e /var/cache/smoked/blocks.tbz2 ]]; then
-        # init with blockchain cached in image
-        ARGS+=" --replay-blockchain"
-        mkdir -p $HOME/blockchain/database
-        cd $HOME/blockchain/database
-        tar xvjpf /var/cache/smoked/blocks.tbz2
-        chown -R smoked:smoked $HOME/blockchain
-    fi
+    # init with blockchain cached in image
+    ARGS+=" --replay-blockchain"
+    mkdir -p $HOME/blockchain/database
+    cd $HOME/blockchain/database
+    tar xvjpf /var/cache/smoked/blocks.tbz2
+    chown -R smoked:smoked $HOME/blockchain
 fi
 
 # without --data-dir it uses cwd as datadir(!)
