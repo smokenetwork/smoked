@@ -199,6 +199,7 @@ ADD doc/seednodes.txt /etc/smoked/seednodes.txt
 # the following adds lots of logging info to stdout
 ADD contrib/config-for-docker.ini /etc/smoked/config.ini
 ADD contrib/fullnode.config.ini /etc/smoked/fullnode.config.ini
+ADD contrib/witness.config.ini /etc/smoked/witness.config.ini
 
 # add normal startup script that starts via sv
 ADD contrib/smoked.run /usr/local/bin/smoked-sv-run.sh
