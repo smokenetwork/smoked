@@ -68,7 +68,7 @@ ARGS+=" --follow-start-feeds=$SMOKED_FEED_START_TIME"
 # overwrite local config with image one
 if [[ "$USE_FULL_WEB_NODE" ]]; then
   cp /etc/smoked/fullnode.config.ini $HOME/config.ini
-else if [[ "$USE_WITNESS_NODE" ]]; then
+elif [[ "$USE_WITNESS_NODE" ]]; then
   cp /etc/smoked/witness.config.ini $HOME/config.ini
 else
   cp /etc/smoked/config.ini $HOME/config.ini
