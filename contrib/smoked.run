@@ -76,8 +76,14 @@ fi
 
 chown smoked:smoked $HOME/config.ini
 
-if [[ ! -d $HOME/blockchain ]]; then
-    if [[ -e /var/cache/smoked/blocks.tbz2 ]]; then
+SHARED_FILE_DIR=$(awk -F= '/shared-file-dir/ { print $2 }' $HOME/config.ini | tr -d ' ' )
+SHARED_FILE_DIR="${SHARED_FILEDIR}shared_memory.meta" 
+
+if [[ -d $HOME/blockchain ]]; then
+    if [ ! -f SHARED_FILE_DIR ]; then
+        ARGS+=" --replay-blockchain"
+    fi
+elif [[ -e /var/cache/smoked/blocks.tbz2 ]]; then
         # init with blockchain cached in image
         ARGS+=" --replay-blockchain"
         mkdir -p $HOME/blockchain/database
