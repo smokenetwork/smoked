@@ -168,8 +168,10 @@ void update_witness_schedule4( database& db )
    }
 
    size_t expected_active_witnesses = std::min( size_t(SMOKE_MAX_WITNESSES), widx.size() );
-   FC_ASSERT( active_witnesses.size() == expected_active_witnesses, "number of active witnesses does not equal expected_active_witnesses=${expected_active_witnesses}",
+   if (db.head_block_num() > 12000000) {
+      FC_ASSERT( active_witnesses.size() == expected_active_witnesses, "number of active witnesses does not equal expected_active_witnesses=${expected_active_witnesses}",
                                        ("active_witnesses.size()",active_witnesses.size()) ("SMOKE_MAX_WITNESSES",SMOKE_MAX_WITNESSES) ("expected_active_witnesses", expected_active_witnesses) );
+   }
 
    auto majority_version = wso.majority_version;
 
