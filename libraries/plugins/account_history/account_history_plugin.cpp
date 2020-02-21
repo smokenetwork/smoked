@@ -114,7 +114,7 @@ struct operation_visitor
                && sequence - seq_itr->sequence > 30
                && now - _db.get< operation_object >( seq_itr->op ).timestamp > fc::days(30) )
          {
-            ilog( "Removing ${a}:${i}", ("a", item)("i", seq_itr->sequence) );
+//            ilog( "Removing ${a}:${i}", ("a", item)("i", seq_itr->sequence) );
             to_remove.push_back( &(*seq_itr) );
             --seq_itr;
          }
@@ -155,6 +155,18 @@ void account_history_plugin_impl::on_operation( const operation_notification& no
 {
    flat_set<account_name_type> impacted;
    smoke::chain::database& db = database();
+
+   /////////////////////////
+   // filter here
+   if (note.op.which() == operation::tag<comment_operation>::value) {
+      auto com = note.op.get<comment_operation>();
+      const set<account_name_type>& spam_accounts = db.get_spam_accounts();
+      if ((db.head_block_num() > 10000000) && (spam_accounts.find(com.author) != spam_accounts.end())) {
+//        ilog("spam history filter: ${a}", ("a", com.author));
+        return;
+      }
+   }
+   // end filter
 
    const operation_object* new_obj = nullptr;
    app::operation_get_impacted_accounts( note.op, impacted );

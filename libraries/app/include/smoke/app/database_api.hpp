@@ -205,6 +205,7 @@ class database_api
       vector< withdraw_route > get_withdraw_routes( string account, withdraw_route_type type = outgoing )const;
 
       optional< account_bandwidth_api_obj > get_account_bandwidth( string account, witness::bandwidth_type type )const;
+      optional< account_daily_bandwidth_api_obj > get_account_daily_bandwidth( string account )const;
 
       vector< vesting_delegation_api_obj > get_vesting_delegations( string account, string from, uint32_t limit = 100 )const;
       vector< vesting_delegation_expiration_api_obj > get_expiring_vesting_delegations( string account, time_point_sec from, uint32_t limit = 100 )const;
@@ -448,6 +449,7 @@ FC_API(smoke::app::database_api,
    (get_escrow)
    (get_withdraw_routes)
    (get_account_bandwidth)
+   (get_account_daily_bandwidth)
    (get_vesting_delegations)
    (get_expiring_vesting_delegations)
 

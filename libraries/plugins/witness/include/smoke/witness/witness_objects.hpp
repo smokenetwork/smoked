@@ -17,7 +17,8 @@ enum witness_plugin_object_type
 {
    account_bandwidth_object_type = ( WITNESS_SPACE_ID << 8 ),
    content_edit_lock_object_type = ( WITNESS_SPACE_ID << 8 ) + 1,
-   reserve_ratio_object_type      = ( WITNESS_SPACE_ID << 8 ) + 2
+   reserve_ratio_object_type      = ( WITNESS_SPACE_ID << 8 ) + 2,
+   account_daily_bandwidth_object_type = (WITNESS_SPACE_ID << 8) + 3,
 };
 
 enum bandwidth_type
@@ -115,6 +116,25 @@ class reserve_ratio_object : public object< reserve_ratio_object_type, reserve_r
 typedef oid< reserve_ratio_object > reserve_ratio_id_type;
 
 
+class account_daily_bandwidth_object : public object<account_daily_bandwidth_object_type, account_daily_bandwidth_object> {
+ public:
+  template <typename Constructor, typename Allocator>
+  account_daily_bandwidth_object(Constructor &&c, allocator<Allocator> a) {
+    c(*this);
+  }
+
+  account_daily_bandwidth_object() {}
+
+  id_type id;
+
+  account_name_type account;
+  uint32_t bandwidth;  /// note that unit is byte
+  time_point_sec last_update;
+};
+
+typedef oid<account_daily_bandwidth_object> account_daily_bandwidth_id_type;
+
+
 struct by_account_bandwidth_type;
 
 typedef multi_index_container <
@@ -154,6 +174,20 @@ typedef multi_index_container <
    allocator< reserve_ratio_object >
 > reserve_ratio_index;
 
+
+struct by_account;
+// clang-format off
+typedef multi_index_container<
+  account_daily_bandwidth_object,
+  indexed_by<
+    ordered_unique<tag<by_id>,
+      member<account_daily_bandwidth_object, account_daily_bandwidth_id_type, &account_daily_bandwidth_object::id> >,
+    ordered_unique<tag<by_account>,
+      member<account_daily_bandwidth_object, account_name_type, &account_daily_bandwidth_object::account> >
+  >,
+  allocator<account_daily_bandwidth_object>
+> account_daily_bandwidth_index;
+
 } } // smoke::witness
 
 FC_REFLECT_ENUM( smoke::witness::bandwidth_type, (post)(forum)(market) )
@@ -169,3 +203,6 @@ CHAINBASE_SET_INDEX_TYPE( smoke::witness::content_edit_lock_object, smoke::witne
 FC_REFLECT( smoke::witness::reserve_ratio_object,
             (id)(average_block_size)(current_reserve_ratio)(max_virtual_bandwidth) )
 CHAINBASE_SET_INDEX_TYPE( smoke::witness::reserve_ratio_object, smoke::witness::reserve_ratio_index )
+
+FC_REFLECT(smoke::witness::account_daily_bandwidth_object, (id)(account)(bandwidth)(last_update))
+CHAINBASE_SET_INDEX_TYPE(smoke::witness::account_daily_bandwidth_object, smoke::witness::account_daily_bandwidth_index)

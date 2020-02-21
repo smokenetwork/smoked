@@ -1,0 +1,7 @@
+#ifndef SMOKE_HARDFORK_0_1
+#define SMOKE_HARDFORK_0_1 1
+
+#define SMOKE_HARDFORK_0_1_TIME (1582502400)  /// 2020-02-24T00:00:00Z
+#define SMOKE_HARDFORK_0_1_VERSION hardfork_version(0, 1)
+
+#endif

@@ -28,6 +28,7 @@ typedef chain::vesting_delegation_object               vesting_delegation_api_ob
 typedef chain::vesting_delegation_expiration_object    vesting_delegation_expiration_api_obj;
 typedef chain::reward_fund_object                      reward_fund_api_obj;
 typedef witness::account_bandwidth_object              account_bandwidth_api_obj;
+typedef witness::account_daily_bandwidth_object        account_daily_bandwidth_api_obj;
 
 struct comment_api_obj
 {

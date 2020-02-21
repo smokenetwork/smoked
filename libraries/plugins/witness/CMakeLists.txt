@@ -4,6 +4,7 @@ add_library( smoke_witness
              witness_plugin.cpp
              witness_evaluators.cpp
              witness_operations.cpp
+             simple_daily_bandwidth_limit.cpp
            )
 
 target_link_libraries( smoke_witness smoke_chain smoke_protocol smoke_app )

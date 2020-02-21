@@ -59,7 +59,7 @@ clean_database_fixture::clean_database_fixture()
 
       //ahplugin->plugin_startup();
       db_plugin->plugin_startup();
-      vest( "initminer", 10000 );
+      vest( "initminer", 1000000 );
 
    //   // Fill up the rest of the required miners
    //   for( int i = SMOKE_NUM_INIT_MINERS; i < SMOKE_MAX_WITNESSES; i++ )
@@ -117,7 +117,7 @@ void clean_database_fixture::resize_shared_mem( uint64_t size )
    db.set_hardfork( SMOKE_NUM_HARDFORKS );
    generate_block();
 
-   vest( "initminer", 10000 );
+   vest( "initminer", 1000000 );
 
 //   // Fill up the rest of the required miners
 //   for( int i = SMOKE_NUM_INIT_MINERS; i < SMOKE_MAX_WITNESSES; i++ )
@@ -189,7 +189,7 @@ void database_fixture::open_database()
    if( !data_dir ) {
       data_dir = fc::temp_directory( graphene::utilities::temp_directory_path() );
       db._log_hardforks = false;
-      db.open( data_dir->path(), data_dir->path(), INITIAL_TEST_SUPPLY, 1024 * 1024 * 8, chainbase::database::read_write ); // 8 MB file for testing
+      db.open( data_dir->path(), data_dir->path(), INITIAL_TEST_SUPPLY, 1024 * 1024 * 100, chainbase::database::read_write );
    }
 }
 

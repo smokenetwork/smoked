@@ -3,7 +3,7 @@
  */
 #pragma once
 
-#define SMOKE_BLOCKCHAIN_VERSION              ( version(0, 0, 7) )
+#define SMOKE_BLOCKCHAIN_VERSION              ( version(0, 1, 0) )
 #define SMOKE_BLOCKCHAIN_HARDFORK_VERSION     ( hardfork_version( SMOKE_BLOCKCHAIN_VERSION ) )
 
 #ifdef IS_TEST_NET

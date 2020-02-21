@@ -307,6 +307,21 @@ namespace detail {
          if( _options->count( "disable_get_block" ) )
             _self->_disable_get_block = true;
 
+         if( _options->count( "spam-accounts" ) ) {
+            set<account_name_type> spam_accounts;
+            for( auto& arg : _options->at( "spam-accounts" ).as< vector< string > >() ) {
+               vector< string > accs;
+               boost::split( accs, arg, boost::is_any_of( " \t," ) );
+               for( const string& acc : accs ) {
+                  if( acc.size() ) {
+                    spam_accounts.insert( account_name_type(acc) );
+                  }
+               }
+            }
+           _chain_db->add_spam_accounts(spam_accounts);
+           ilog( "spam-accounts: ${spam_accounts}", ("spam_accounts", spam_accounts) );
+         }
+
          if( !read_only )
          {
             _self->_read_only = false;
@@ -1032,6 +1047,7 @@ void application::set_program_options(boost::program_options::options_descriptio
          ("max-block-age", bpo::value< int32_t >()->default_value(200), "Maximum age of head block when broadcasting tx via API")
          ("flush", bpo::value< uint32_t >()->default_value(100000), "Flush shared memory file to disk this many blocks")
          ("backtrace", bpo::value<string>()->default_value("yes"), "Whether to print backtrace on SIGSEGV")
+         ("spam-accounts", bpo::value<vector<string>>()->composing(), "Defines a list of accounts which will be explicitly ignored in account history storage and post content.")
          ;
    command_line_options.add(configuration_file_options);
    command_line_options.add_options()

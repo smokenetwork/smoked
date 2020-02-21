@@ -580,6 +580,18 @@ optional< account_bandwidth_api_obj > database_api::get_account_bandwidth( strin
    return result;
 }
 
+optional< account_daily_bandwidth_api_obj > database_api::get_account_daily_bandwidth( string account )const {
+   optional< account_daily_bandwidth_api_obj > result;
+
+   if( my->_db.has_index< witness::account_daily_bandwidth_index >() ) {
+      auto bw = my->_db.find<witness::account_daily_bandwidth_object, witness::by_account>(account);
+      if (bw != nullptr) result = *bw;
+   }
+
+   return result;
+}
+
+
 //////////////////////////////////////////////////////////////////////
 //                                                                  //
 // Witnesses                                                        //
