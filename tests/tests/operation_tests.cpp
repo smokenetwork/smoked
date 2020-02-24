@@ -11,6 +11,7 @@
 #include <smoke/chain/util/reward.hpp>
 
 #include <smoke/witness/witness_objects.hpp>
+#include <smoke/witness/simple_daily_bandwidth_limit.hpp>
 
 #include <fc/crypto/digest.hpp>
 
@@ -4069,6 +4070,198 @@ BOOST_AUTO_TEST_CASE( account_bandwidth )
       BOOST_REQUIRE( average_bandwidth == total_bandwidth + fc::raw::pack_size( tx ) * 10 * SMOKE_BANDWIDTH_PRECISION );
    }
    FC_LOG_AND_RETHROW()
+}
+
+
+BOOST_AUTO_TEST_CASE(account_daily_bandwidth) {
+  try {
+    BOOST_TEST_MESSAGE("Testing: account_bandwidth");
+    generate_blocks(SMOKE_BLOCKS_PER_DAY); // generate blocks for 1 day to fill up daily bandwidth for initminer
+    generate_block();
+    ACTORS((whale)(test0)(test1)(test2)(test3)(test4)(test5)(test6))
+    generate_block();
+    vest("whale", ASSET("9000000.000 TESTS"));
+//    vest("test0", ASSET("1.000 TESTS"));
+    vest("test1", ASSET("10.000 TESTS"));
+    vest("test2", ASSET("100.000 TESTS"));
+    vest("test3", ASSET("1000.000 TESTS"));
+    vest("test4", ASSET("10000.000 TESTS"));
+    vest("test5", ASSET("100000.000 TESTS"));
+    vest("test6", ASSET("1000000.000 TESTS"));
+    generate_blocks(SMOKE_BLOCKS_PER_DAY); // generate blocks for 1 day to fill up daily bandwidth for initminer
+    generate_block();
+
+    const auto &props = db.get_dynamic_global_properties();
+
+    auto get_bandwidth_limit = [&] (const string& acc_name) {
+      const auto &acc_obj = db.get_account(acc_name);
+      auto stake = acc_obj.vesting_shares * props.get_vesting_share_price();
+      auto daily_bw_limit = smoke::witness::simple_daily_bandwidth_limit(stake.amount.value);
+      return daily_bw_limit;
+    };
+
+    BOOST_TEST_MESSAGE("--- Test whale");
+    {
+      signed_transaction tx;
+      custom_json_operation op;
+
+      op.required_posting_auths.insert("whale");
+      op.json = "{\"test\":\"value\"}";
+
+      tx.operations.push_back(op);
+      tx.set_expiration(db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION);
+      tx.sign(whale_private_key, db.get_chain_id());
+      db.push_transaction(tx, 0);
+
+      const auto &daba = db.get<smoke::witness::account_daily_bandwidth_object, smoke::witness::by_account>("whale");
+      const auto max = get_bandwidth_limit("whale");
+      ilog("bw=${b}, max=${max}", ("b", daba)("max", max));
+
+      BOOST_REQUIRE((max >= 128*1024 + BASE_BANDWIDTH) && (max <= 256*1024 + BASE_BANDWIDTH)); // no account could have more than 1MB daily bandwidth no matter how many staked.
+      generate_block();
+    }
+
+    BOOST_TEST_MESSAGE("--- Test test0 for 4.2 SP");
+    {
+      signed_transaction tx;
+      custom_json_operation op;
+
+      op.required_posting_auths.insert("test0");
+      op.json = "{\"test\":\"value\"}";
+
+      tx.operations.push_back(op);
+      tx.set_expiration(db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION);
+      tx.sign(test0_private_key, db.get_chain_id());
+      db.push_transaction(tx, 0);
+
+      const auto &daba = db.get<smoke::witness::account_daily_bandwidth_object, smoke::witness::by_account>("test0");
+      const auto max = get_bandwidth_limit("test0");
+      ilog("bw=${b}, max=${max}", ("b", daba)("max", max));
+      BOOST_REQUIRE((max >= 2*1024 + BASE_BANDWIDTH) && (max <= 4*1024 + BASE_BANDWIDTH));
+      generate_block();
+    }
+
+    BOOST_TEST_MESSAGE("--- Test test1 for 10 SP");
+    {
+      signed_transaction tx;
+      custom_json_operation op;
+
+      op.required_posting_auths.insert("test1");
+      op.json = "{\"test\":\"value\"}";
+
+      tx.operations.push_back(op);
+      tx.set_expiration(db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION);
+      tx.sign(test1_private_key, db.get_chain_id());
+      db.push_transaction(tx, 0);
+
+      const auto &daba = db.get<smoke::witness::account_daily_bandwidth_object, smoke::witness::by_account>("test1");
+      const auto max = get_bandwidth_limit("test1");
+      ilog("bw=${b}, max=${max}", ("b", daba)("max", max));
+      BOOST_REQUIRE((max >= 4*1024 + BASE_BANDWIDTH) && (max <= 8*1024 + BASE_BANDWIDTH));
+      generate_block();
+    }
+
+    BOOST_TEST_MESSAGE("--- Test test2 for 100 SP");
+    {
+      signed_transaction tx;
+      custom_json_operation op;
+
+      op.required_posting_auths.insert("test2");
+      op.json = "{\"test\":\"value\"}";
+
+      tx.operations.push_back(op);
+      tx.set_expiration(db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION);
+      tx.sign(test2_private_key, db.get_chain_id());
+      db.push_transaction(tx, 0);
+
+      const auto &daba = db.get<smoke::witness::account_daily_bandwidth_object, smoke::witness::by_account>("test2");
+      const auto max = get_bandwidth_limit("test2");
+      ilog("bw=${b}, max=${max}", ("b", daba)("max", max));
+      BOOST_REQUIRE((max >= 8*1024 + BASE_BANDWIDTH) && (max <= 16*1024 + BASE_BANDWIDTH));
+      generate_block();
+    }
+
+    BOOST_TEST_MESSAGE("--- Test test3 for 1000 SP");
+    {
+      signed_transaction tx;
+      custom_json_operation op;
+
+      op.required_posting_auths.insert("test3");
+      op.json = "{\"test\":\"value\"}";
+
+      tx.operations.push_back(op);
+      tx.set_expiration(db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION);
+      tx.sign(test3_private_key, db.get_chain_id());
+      db.push_transaction(tx, 0);
+
+      const auto &daba = db.get<smoke::witness::account_daily_bandwidth_object, smoke::witness::by_account>("test3");
+      const auto max = get_bandwidth_limit("test3");
+      ilog("bw=${b}, max=${max}", ("b", daba)("max", max));
+      BOOST_REQUIRE((max >= 16*1024 + BASE_BANDWIDTH) && (max <= 32*1024 + BASE_BANDWIDTH));
+      generate_block();
+    }
+
+    BOOST_TEST_MESSAGE("--- Test test4 for 10000 SP");
+    {
+      signed_transaction tx;
+      custom_json_operation op;
+
+      op.required_posting_auths.insert("test4");
+      op.json = "{\"test\":\"value\"}";
+
+      tx.operations.push_back(op);
+      tx.set_expiration(db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION);
+      tx.sign(test4_private_key, db.get_chain_id());
+      db.push_transaction(tx, 0);
+
+      const auto &daba = db.get<smoke::witness::account_daily_bandwidth_object, smoke::witness::by_account>("test4");
+      const auto max = get_bandwidth_limit("test4");
+      ilog("bw=${b}, max=${max}", ("b", daba)("max", max));
+      BOOST_REQUIRE((max >= 32*1024 + BASE_BANDWIDTH) && (max <= 64*1024 + BASE_BANDWIDTH));
+      generate_block();
+    }
+
+    BOOST_TEST_MESSAGE("--- Test test5 for 100000 SP");
+    {
+      signed_transaction tx;
+      custom_json_operation op;
+
+      op.required_posting_auths.insert("test5");
+      op.json = "{\"test\":\"value\"}";
+
+      tx.operations.push_back(op);
+      tx.set_expiration(db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION);
+      tx.sign(test5_private_key, db.get_chain_id());
+      db.push_transaction(tx, 0);
+
+      const auto &daba = db.get<smoke::witness::account_daily_bandwidth_object, smoke::witness::by_account>("test5");
+      const auto max = get_bandwidth_limit("test5");
+      ilog("bw=${b}, max=${max}", ("b", daba)("max", max));
+      BOOST_REQUIRE((max >= 64*1024 + BASE_BANDWIDTH) && (max <= 128*1024 + BASE_BANDWIDTH));
+      generate_block();
+    }
+
+    BOOST_TEST_MESSAGE("--- Test test6 for 1000000 SP");
+    {
+      signed_transaction tx;
+      custom_json_operation op;
+
+      op.required_posting_auths.insert("test6");
+      op.json = "{\"test\":\"value\"}";
+
+      tx.operations.push_back(op);
+      tx.set_expiration(db.head_block_time() + SMOKE_MAX_TIME_UNTIL_EXPIRATION);
+      tx.sign(test6_private_key, db.get_chain_id());
+      db.push_transaction(tx, 0);
+
+      const auto &daba = db.get<smoke::witness::account_daily_bandwidth_object, smoke::witness::by_account>("test6");
+      const auto max = get_bandwidth_limit("test6");
+      ilog("bw=${b}, max=${max}", ("b", daba)("max", max));
+      BOOST_REQUIRE((max >= 128*1024 + BASE_BANDWIDTH) && (max <= 256*1024 + BASE_BANDWIDTH));
+      generate_block();
+    }
+  }
+  FC_LOG_AND_RETHROW()
 }
 
 BOOST_AUTO_TEST_CASE( claim_reward_balance_validate )

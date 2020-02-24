@@ -23,6 +23,7 @@
  */
 #include <smoke/witness/witness_plugin.hpp>
 #include <smoke/witness/witness_objects.hpp>
+#include <smoke/witness/simple_daily_bandwidth_limit.hpp>
 #include <smoke/witness/witness_operations.hpp>
 
 #include <smoke/chain/account_object.hpp>
@@ -88,6 +89,7 @@ namespace detail
          void on_block( const signed_block& b );
 
          void update_account_bandwidth( const account_object& a, uint32_t trx_size, const bandwidth_type type );
+         void update_account_daily_bandwidth(const account_object &a, uint32_t trx_size);
 
          witness_plugin& _self;
          std::shared_ptr< generic_custom_operation_interpreter< witness_plugin_operation > > _custom_operation_interpreter;
@@ -235,14 +237,21 @@ namespace detail
       flat_set< account_name_type > required; vector<authority> other;
       trx.get_required_authorities( required, required, required, other );
 
+      bool enable_daily_bandwidth = false;
+#ifdef IS_TEST_NET
+      enable_daily_bandwidth = true;
+#else
+      if (_db.has_hardfork(SMOKE_HARDFORK_0_1)) enable_daily_bandwidth = true;
+#endif
+
       auto trx_size = fc::raw::pack_size(trx);
 
       for( const auto& auth : required )
       {
          const auto& acnt = _db.get_account( auth );
 
+         // for the old bandwidth
          update_account_bandwidth( acnt, trx_size, bandwidth_type::forum );
-
          for( const auto& op : trx.operations )
          {
             if( is_market_operation( op ) )
@@ -251,6 +260,9 @@ namespace detail
                break;
             }
          }
+
+         // for the new daily bandwidth
+         if (enable_daily_bandwidth) update_account_daily_bandwidth(acnt, trx_size);
       }
    }
 
@@ -394,6 +406,40 @@ namespace detail
                ("total_vesting_shares", total_vshares) );
       }
    }
+
+   void witness_plugin_impl::update_account_daily_bandwidth(const account_object &a, uint32_t trx_size) {
+      database& _db = _self.database();
+      const auto &props = _db.get_dynamic_global_properties();
+      auto stake = a.vesting_shares * props.get_vesting_share_price();
+      auto daily_bw_limit = simple_daily_bandwidth_limit(stake.amount.value);
+      SMOKE_ASSERT(daily_bw_limit >= 0, chain::plugin_exception, "daily_bw_limit must >= 0");
+      auto acc_daily_bw = _db.find<account_daily_bandwidth_object, by_account>(a.name);
+      if (acc_daily_bw == nullptr) {
+        SMOKE_ASSERT(trx_size < daily_bw_limit, chain::plugin_exception,
+            "Daily bandwidth limit exceeded. Please wait or power up. (account=${a}, stake=${stake}, trx_size=${trx_size}, limit=${limit}, max=${max})",
+            ("a", a.name)("stake", stake)("trx_size", trx_size)("limit", daily_bw_limit)("max", daily_bw_limit));
+        acc_daily_bw = &_db.create<account_daily_bandwidth_object>([&](account_daily_bandwidth_object &b) {
+          b.account = a.name;
+          b.bandwidth = daily_bw_limit - trx_size;
+          b.last_update = _db.head_block_time();
+        });
+      } else {
+        int64_t elapsed_seconds = (_db.head_block_time() - acc_daily_bw->last_update).to_seconds();
+        int64_t regenerated_bw = daily_bw_limit * elapsed_seconds / 86400;
+        int64_t new_bw = std::min(acc_daily_bw->bandwidth + regenerated_bw, int64_t(daily_bw_limit));
+
+        SMOKE_ASSERT(trx_size < new_bw, chain::plugin_exception,
+            "Daily bandwidth limit exceeded. Please wait or power up. (account=${a}, stake=${stake}, trx_size=${trx_size}, limit=${limit}, max=${max})",
+            ("a", a.name)("stake", stake)("trx_size", trx_size)("limit", new_bw)("max", daily_bw_limit));
+        _db.modify(*acc_daily_bw, [&](account_daily_bandwidth_object &b) {
+          b.bandwidth = new_bw - trx_size;
+          b.last_update = _db.head_block_time();
+        });
+      }
+
+//      dlog("update_account_daily_bandwidth: account=${a}, stake=${stake}, daily_bw=${daily_bw}, limit=${limit}",
+//          ("a", a.name)("stake", stake)("daily_bw", acc_daily_bw->bandwidth)("limit", daily_bw_limit));
+  }
 }
 
 witness_plugin::witness_plugin( application* app )
@@ -463,6 +509,7 @@ void witness_plugin::plugin_initialize(const boost::program_options::variables_m
    db.applied_block.connect( [&]( const signed_block& b ){ _my->on_block( b ); } );
 
    add_plugin_index< account_bandwidth_index >( db );
+   add_plugin_index< account_daily_bandwidth_index >( db );
    add_plugin_index< content_edit_lock_index >( db );
    add_plugin_index< reserve_ratio_index     >( db );
 } FC_LOG_AND_RETHROW() }

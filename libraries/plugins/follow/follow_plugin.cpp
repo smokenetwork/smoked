@@ -184,6 +184,18 @@ struct post_operation_visitor
       {
          if( op.parent_author.size() > 0 ) return;
          auto& db = _plugin.database();
+
+         //////////////////////////
+         // spam filter
+         if (db.head_block_num() > 10000000) {
+            const auto& filtered_list = db.get_spam_accounts();
+            if (filtered_list.find(op.author) != filtered_list.end()) {
+//               ilog("spam follow filter: ${a}", ("a", op.author));
+               return;
+            }
+         }
+         // end spam filter
+
          const auto& c = db.get_comment( op.author, op.permlink );
 
          if( c.created != db.head_block_time() ) return;

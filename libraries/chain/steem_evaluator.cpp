@@ -27,6 +27,7 @@ std::string wstring_to_utf8(const std::wstring& str)
 
 #include <fc/uint128.hpp>
 #include <fc/utf8.hpp>
+#include <fc/io/json.hpp>
 
 #include <limits>
 
@@ -433,6 +434,18 @@ void comment_evaluator::do_apply( const comment_operation& o )
 { try {
    FC_ASSERT( o.title.size() + o.body.size() + o.json_metadata.size(), "Cannot update comment because nothing appears to be changing." );
 
+   //////////////////////////
+   // spam filter
+   bool filtered = false;
+   if (_db.head_block_num() > 10000000) {
+      const auto& filtered_list = _db.get_spam_accounts();
+      if (filtered_list.find(o.author) != filtered_list.end()) {
+         filtered = true;
+//         ilog("spam comment filter: ${a}", ("a", o.author));
+      }
+   }
+   // end spam filter
+
    const auto& by_permlink_idx = _db.get_index< comment_index >().indices().get< by_permlink >();
    auto itr = by_permlink_idx.find( boost::make_tuple( o.author, o.permlink ) );
 
@@ -512,7 +525,8 @@ void comment_evaluator::do_apply( const comment_operation& o )
 
          com.cashout_time = com.created + SMOKE_CASHOUT_WINDOW_SECONDS;
 
-         #ifndef IS_LOW_MEM
+         if (!filtered) {
+#ifndef IS_LOW_MEM
             from_string( com.title, o.title );
             if( o.body.size() < 1024*1024*128 )
             {
@@ -522,7 +536,8 @@ void comment_evaluator::do_apply( const comment_operation& o )
                from_string( com.json_metadata, o.json_metadata );
             else
                wlog( "Comment ${a}/${p} contains invalid UTF-8 metadata", ("a", o.author)("p", o.permlink) );
-         #endif
+#endif
+         }
       });
 
       id = new_comment.id;
@@ -564,37 +579,41 @@ void comment_evaluator::do_apply( const comment_operation& o )
             FC_ASSERT( equal( com.parent_permlink, o.parent_permlink ), "The permlink of a comment cannot change." );
          }
 
-         #ifndef IS_LOW_MEM
-           if( o.title.size() )         from_string( com.title, o.title );
-           if( o.json_metadata.size() )
-           {
-              if( fc::is_utf8( o.json_metadata ) )
-                 from_string( com.json_metadata, o.json_metadata );
-              else
-                 wlog( "Comment ${a}/${p} contains invalid UTF-8 metadata", ("a", o.author)("p", o.permlink) );
+        if (!filtered) {
+#ifndef IS_LOW_MEM
+           if (o.title.size())
+             from_string(com.title, o.title);
+           if (o.json_metadata.size()) {
+             if (fc::is_utf8(o.json_metadata))
+               from_string(com.json_metadata, o.json_metadata);
+             else
+               wlog("Comment ${a}/${p} contains invalid UTF-8 metadata",
+                    ("a", o.author)("p", o.permlink));
            }
 
-           if( o.body.size() ) {
-              try {
+           if (o.body.size()) {
+             try {
                diff_match_patch<std::wstring> dmp;
-               auto patch = dmp.patch_fromText( utf8_to_wstring(o.body) );
-               if( patch.size() ) {
-                  auto result = dmp.patch_apply( patch, utf8_to_wstring( to_string( com.body ) ) );
-                  auto patched_body = wstring_to_utf8(result.first);
-                  if( !fc::is_utf8( patched_body ) ) {
-                     idump(("invalid utf8")(patched_body));
-                     from_string( com.body, fc::prune_invalid_utf8(patched_body) );
-                  } else { from_string( com.body, patched_body ); }
+               auto patch = dmp.patch_fromText(utf8_to_wstring(o.body));
+               if (patch.size()) {
+                 auto result = dmp.patch_apply(
+                     patch, utf8_to_wstring(to_string(com.body)));
+                 auto patched_body = wstring_to_utf8(result.first);
+                 if (!fc::is_utf8(patched_body)) {
+                   idump(("invalid utf8")(patched_body));
+                   from_string(com.body, fc::prune_invalid_utf8(patched_body));
+                 } else {
+                   from_string(com.body, patched_body);
+                 }
+               } else { // replace
+                 from_string(com.body, o.body);
                }
-               else { // replace
-                  from_string( com.body, o.body );
-               }
-              } catch ( ... ) {
-                  from_string( com.body, o.body );
-              }
+             } catch (...) {
+               from_string(com.body, o.body);
+             }
            }
-         #endif
-
+#endif
+         }
       });
 
    } // end EDIT case
