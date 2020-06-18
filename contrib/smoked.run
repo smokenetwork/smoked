@@ -32,6 +32,14 @@ if [[ ! -z "$SMOKED_SEED_NODES" ]]; then
     done
 fi
 
+# if user pass in desired rpc nodes, use
+# the ones the user specified:
+if [[ ! -z "$SMOKED_RPC_NODES" ]]; then
+    for NODE in $SMOKED_RPC_NODES ; do
+        ARGS+="--rpc-endpoint=$NODE"
+    done
+fi
+
 if [[ ! -z "$SMOKED_WITNESS_NAME" ]]; then
     ARGS+=" --witness=\"$SMOKED_WITNESS_NAME\""
 fi
@@ -60,21 +68,28 @@ ARGS+=" --follow-start-feeds=$SMOKED_FEED_START_TIME"
 # overwrite local config with image one
 if [[ "$USE_FULL_WEB_NODE" ]]; then
   cp /etc/smoked/fullnode.config.ini $HOME/config.ini
+elif [[ "$USE_WITNESS_NODE" ]]; then
+  cp /etc/smoked/witness.config.ini $HOME/config.ini
 else
   cp /etc/smoked/config.ini $HOME/config.ini
 fi
 
 chown smoked:smoked $HOME/config.ini
 
-if [[ ! -d $HOME/blockchain ]]; then
-    if [[ -e /var/cache/smoked/blocks.tbz2 ]]; then
-        # init with blockchain cached in image
+SHARED_FILE_DIR=$(awk -F= '/shared-file-dir/ { print $2 }' $HOME/config.ini | tr -d ' ' )
+SHARED_FILE_DIR="${SHARED_FILEDIR}shared_memory.meta" 
+
+if [[ -s $HOME/blockchain/block_log ]]; then
+    if [ ! -f SHARED_FILE_DIR ]; then
         ARGS+=" --replay-blockchain"
-        mkdir -p $HOME/blockchain/database
-        cd $HOME/blockchain/database
-        tar xvjpf /var/cache/smoked/blocks.tbz2
-        chown -R smoked:smoked $HOME/blockchain
     fi
+elif [[ -e /var/cache/smoked/blocks.tbz2 ]]; then
+    # init with blockchain cached in image
+    ARGS+=" --replay-blockchain"
+    mkdir -p $HOME/blockchain/database
+    cd $HOME/blockchain/database
+    tar xvjpf /var/cache/smoked/blocks.tbz2
+    chown -R smoked:smoked $HOME/blockchain
 fi
 
 # without --data-dir it uses cwd as datadir(!)
