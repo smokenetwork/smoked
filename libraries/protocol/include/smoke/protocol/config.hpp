@@ -141,6 +141,8 @@
 #define SMOKE_MIN_TRANSACTION_EXPIRATION_LIMIT (SMOKE_BLOCK_INTERVAL * 5) // 5 transactions per block
 
 #define SMOKE_IRREVERSIBLE_THRESHOLD          (75 * SMOKE_1_PERCENT)
+
+#define SMOKE_IRREVERSIBLE_THRESHOLD_0_1          (40 * SMOKE_1_PERCENT)
 #define VIRTUAL_SCHEDULE_LAP_LENGTH           ( fc::uint128::max_value() )
 
 /**
